@@ -1,46 +1,48 @@
 #include <Servo.h>
 
-// 超声波引脚
-#define TRIG_PIN 3  // 发射脚 T
-#define ECHO_PIN 4  // 接收脚 E
+// ===================== 超声波引脚 =====================
+#define TRIG_F  3   // 前方超声波 发射
+#define ECHO_F  4   // 前方超声波 接收
+#define TRIG_R  8   // 右侧超声波 发射
+#define ECHO_R  9   // 右侧超声波 接收
 
 // ===================== 引脚与参数设置 =====================
-#define STEER_PIN 2         // 转向舵机端口
-const int MIN_ANGLE = 35;   // 最左角度（对应 -100）
-const int MAX_ANGLE = 145;  // 最右角度（对应 100）
+#define STEER_PIN 2
+const int MIN_ANGLE = 35;   // 最左角度（对应 steer -100）
+const int MAX_ANGLE = 145;  // 最右角度（对应 steer +100）
 
-// 电机驱动引脚
 #define PWM_PIN 6
 #define DIR_PIN 7
-// ==========================================================
 
-// 全局定义舵机对象
+// ===================== 巡墙 P 控制参数 =====================
+const float TARGET_DIST = 30.0;  // 目标右侧距离（cm）
+const float KP          = 2.5;   // 比例系数，可调
+const int   DRIVE_SPEED = 70;    // 前进速度
+const int   MAX_STEER   = 90;    // 最大转向幅度（限幅，防打死）
+
+// ===================== 全局对象 =====================
 Servo steeringServo;
 
-// 全局变量（用于串口显示）
-int currentSteer = 0;          // 当前舵机转向值
-int currentSpeed = 0;          // 当前电机速度
-String currentState = "待机";  // 当前状态
+int   currentSteer = 0;
+int   currentSpeed = 0;
+const char* currentState = "巡墙前进";
 
-// ===================== 超声波测距函数（带异常过滤） =====================
-float getDistance(void) {
-  digitalWrite(TRIG_PIN, LOW);
+// ===================== 超声波测距 =====================
+float getDistance(int trigPin, int echoPin) {
+  digitalWrite(trigPin, LOW);
   delayMicroseconds(2);
-  digitalWrite(TRIG_PIN, HIGH);
+  digitalWrite(trigPin, HIGH);
   delayMicroseconds(10);
-  digitalWrite(TRIG_PIN, LOW);
+  digitalWrite(trigPin, LOW);
 
-  long t = pulseIn(ECHO_PIN, HIGH, 30000);  // 超时30ms（约5米）
-  if (t == 0) return 999;                   // 检测不到返回999cm（视为无限远）
-
-  float dis = t * 0.034 / 2.0;
-  return dis;
+  long t = pulseIn(echoPin, HIGH, 30000);
+  if (t == 0) return 999;
+  return t * 0.034 / 2.0;
 }
 
-// ===================== 电机控制函数 =====================
+// ===================== 电机控制 =====================
 void move(int speed) {
-  currentSpeed = speed;  // 记录当前速度
-
+  currentSpeed = speed;
   if (speed > 0) {
     digitalWrite(DIR_PIN, HIGH);
     analogWrite(PWM_PIN, speed * 2.55);
@@ -52,84 +54,69 @@ void move(int speed) {
   }
 }
 
-// ===================== 转向控制函数 =====================
+// ===================== 转向控制 =====================
 void steer(int steerValue) {
-  currentSteer = steerValue;  // 记录当前转向值
-
-  int targetAngle = map(steerValue, -100, 100, MIN_ANGLE, MAX_ANGLE);
-  targetAngle = constrain(targetAngle, MIN_ANGLE, MAX_ANGLE);
-  steeringServo.write(targetAngle);
+  currentSteer = steerValue;
+  int angle = map(steerValue, -100, 100, MIN_ANGLE, MAX_ANGLE);
+  angle = constrain(angle, MIN_ANGLE, MAX_ANGLE);
+  steeringServo.write(angle);
 }
 
 // ===================== 初始化 =====================
 void setup() {
   steeringServo.attach(STEER_PIN);
+  steeringServo.write(map(0, -100, 100, MIN_ANGLE, MAX_ANGLE));
+
   pinMode(PWM_PIN, OUTPUT);
   pinMode(DIR_PIN, OUTPUT);
-  pinMode(TRIG_PIN, OUTPUT);
-  pinMode(ECHO_PIN, INPUT);
+  pinMode(TRIG_F, OUTPUT);
+  pinMode(ECHO_F, INPUT);
+  pinMode(TRIG_R, OUTPUT);
+  pinMode(ECHO_R, INPUT);
 
-  Serial.begin(9600);  // 开启串口通讯
-  Serial.println("阿克曼小车启动成功！");
-  Serial.println("------------------------");
+  move(0);
+
+  Serial.begin(9600);
+  Serial.println("=======================================");
+  Serial.println("  阿克曼小车 - 右侧巡墙模式 (P控制)");
+  Serial.println("  目标距离: 30cm  速度: 80  KP: 2.0");
+  Serial.println("=======================================");
+  Serial.println("前方(cm) | 右侧(cm) | 误差(cm) | 转向 | 速度");
+  Serial.println("-------------------------------------------------");
 }
 
-// ===================== 主循环（完全符合你的需求） =====================
+// ===================== 主循环 =====================
 void loop() {
-  float distance = getDistance();
+  float distFront = getDistance(TRIG_F, ECHO_F);
+  float distRight = getDistance(TRIG_R, ECHO_R);
 
-  // 核心控制逻辑
-  if (distance >= 70) {
-    // 前方通畅：直行前进
-    currentState = "直行前进";
-    steer(0);
-    move(50);
-  } else {
-    // 检测到障碍物：开始避障流程
-    currentState = "避障转弯中";
-    move(0);          // 先紧急停车
-    delay(100);       // 刹车缓冲
+  // ---------- P 控制计算转向 ----------
+  // 误差 = 实际距离 - 目标距离
+  // 误差 > 0（偏远）→ 右转（正值）
+  // 误差 < 0（偏近）→ 左转（负值）
+  float error = 0;
+  int   steerOut = 0;
 
-    // 第一步：一直转弯，直到前方距离≥70cm
-    while (distance < 80) {
-      steer(90);    // 
-      move(90);       // 低速转弯（建议30-50，太快容易打滑）
-      distance = getDistance();  // 实时更新距离
-      
-      // 转弯过程中也实时打印数据
-      Serial.print("距离: ");
-      Serial.print(distance);
-      Serial.print(" cm | 状态: ");
-      Serial.print(currentState);
-      Serial.print(" | 转向: ");
-      Serial.print(currentSteer);
-      Serial.print(" | 速度: ");
-      Serial.println(currentSpeed);
-      
-      delay(50);
-    }
-
-    // 第二步：前方已经通畅，再额外多转0.5秒（你的核心需求）
-    currentState = "额外转弯0.5秒";
-    delay(500);
-
-    // 第三步：避障完成，回正舵机准备继续直行
-    steer(0);
-    move(0);
-    delay(200);       // 回正缓冲
+  if (distRight < 500) {  // 右侧有效读数才做控制
+    error    = distRight - TARGET_DIST;
+    steerOut = (int)(KP * error);
+    steerOut = constrain(steerOut, -MAX_STEER, MAX_STEER);
   }
+  // 右侧无读数时保持直行
+  steer(steerOut);
+  move(DRIVE_SPEED);
 
-  // 正常行驶时的实时串口数据显示
-  if (currentState == "直行前进") {
-    Serial.print("距离: ");
-    Serial.print(distance);
-    Serial.print(" cm | 状态: ");
-    Serial.print(currentState);
-    Serial.print(" | 转向: ");
-    Serial.print(currentSteer);
-    Serial.print(" | 速度: ");
-    Serial.println(currentSpeed);
-  }
+  // ---------- 串口实时输出 ----------
+  Serial.print("前方: ");
+  Serial.print(distFront >= 999 ? 999 : distFront, 1);
+  Serial.print(" cm | 右侧: ");
+  Serial.print(distRight >= 999 ? 999 : distRight, 1);
+  Serial.print(" cm | 误差: ");
+  Serial.print(error, 1);
+  Serial.print(" cm | 转向: ");
+  Serial.print(currentSteer);
+  Serial.print(" | 速度: ");
+  Serial.println(currentSpeed);
 
-  delay(50);
+  delay(50);  // 50ms 控制周期
 }
