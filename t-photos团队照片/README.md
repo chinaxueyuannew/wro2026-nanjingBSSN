@@ -29,7 +29,7 @@ This folder contains the official team photograph, the 2026 WRO China Qualificat
 
 ## 成员照片 / Member Portraits
 
-| 陆昭颖 🏳️‍🌈 / Lu Zhaoying | 张隽泽 / Zhang Junze | 黄鸣博 / Huang Mingbo |
+| 陆昭颖 / Lu Zhaoying | 张隽泽 / Zhang Junze | 黄鸣博 / Huang Mingbo |
 |---|---|---|
 | [![陆昭颖正式成员照 / Formal portrait of Lu Zhaoying](陆昭颖.jpg)](陆昭颖.jpg) | [![张隽泽正式成员照 / Formal portrait of Zhang Junze](张隽泽.jpg)](张隽泽.jpg) | [![黄鸣博正式成员照 / Formal portrait of Huang Mingbo](黄鸣博.jpg)](黄鸣博.jpg) |
 

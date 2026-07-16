@@ -32,7 +32,7 @@ We collaborate on programming, mechanical structure and electronics for a vision
 
 | 姓名 / Name | 分工 / Role |
 |---|---|
-| 陆昭颖 🏳️‍🌈 / Lu Zhaoying | 程序 / Programming |
+| 陆昭颖 / Lu Zhaoying | 程序 / Programming |
 | 张隽泽 / Zhang Junze | 结构 / Mechanical Structure |
 | 黄鸣博 / Huang Mingbo | 电子 / Electronics |
 | 薛源 / Xue Yuan | 教练 / Coach |
@@ -41,7 +41,7 @@ We collaborate on programming, mechanical structure and electronics for a vision
 
 ### 成员照片 / Member Portraits
 
-| 陆昭颖 🏳️‍🌈 / Lu Zhaoying | 张隽泽 / Zhang Junze | 黄鸣博 / Huang Mingbo |
+| 陆昭颖 / Lu Zhaoying | 张隽泽 / Zhang Junze | 黄鸣博 / Huang Mingbo |
 |---|---|---|
 | <a href="t-photos团队照片/陆昭颖.jpg"><img src="t-photos团队照片/陆昭颖.jpg" alt="陆昭颖，程序 / Lu Zhaoying, Programming" width="280"></a> | <a href="t-photos团队照片/张隽泽.jpg"><img src="t-photos团队照片/张隽泽.jpg" alt="张隽泽，结构 / Zhang Junze, Mechanical Structure" width="280"></a> | <a href="t-photos团队照片/黄鸣博.jpg"><img src="t-photos团队照片/黄鸣博.jpg" alt="黄鸣博，电子 / Huang Mingbo, Electronics" width="280"></a> |
 

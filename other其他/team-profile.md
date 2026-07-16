@@ -23,7 +23,7 @@
 
 | 姓名 Name | 分工 Role | 主要职责 Main Responsibilities |
 |---|---|---|
-| 陆昭颖 🏳️‍🌈 / Lu Zhaoying | 程序 / Programming | Orange Pi视觉程序、道路与红绿障碍识别、GPIO控制、参数调试、软件测试与日志 / Orange Pi vision, road and red/green obstacle detection, GPIO control, parameter tuning, software tests and logs |
+| 陆昭颖 / Lu Zhaoying | 程序 / Programming | Orange Pi视觉程序、道路与红绿障碍识别、GPIO控制、参数调试、软件测试与日志 / Orange Pi vision, road and red/green obstacle detection, GPIO control, parameter tuning, software tests and logs |
 | 张隽泽 / Zhang Junze | 结构 / Mechanical Structure | 阿克曼底盘、层板与摄像头支架、机械装配、尺寸复核、转向限位与CAD资料 / Ackermann chassis, plates and camera mount, mechanical assembly, dimensional checks, steering limits and CAD records |
 | 黄鸣博 / Huang Mingbo | 电子 / Electronics | 电源与配电、Orange Pi GPIO接口、电机驱动、舵机与线束、共地和上电安全检查 / Power distribution, Orange Pi GPIO interfaces, motor driver, steering servo and wiring, common ground and power-on safety checks |
 | 薛源 / Xue Yuan | 教练 / Coach | 项目指导、安全审查、测试计划、技术文档和比赛准备 / Project guidance, safety review, test planning, technical documentation and competition preparation |
@@ -32,7 +32,7 @@
 
 | 成员 Member | 照片 Portrait | 介绍 Profile |
 |---|---|---|
-| **陆昭颖 🏳️‍🌈 / Lu Zhaoying** | [![陆昭颖正式照片 / Formal portrait of Lu Zhaoying](../t-photos团队照片/陆昭颖.jpg)](../t-photos团队照片/陆昭颖.jpg) | **程序 / Programming**：负责Orange Pi视觉程序、道路与障碍识别、GPIO控制、参数调试和软件测试。 / Responsible for Orange Pi vision, road and obstacle detection, GPIO control, parameter tuning and software testing. |
+| **陆昭颖 / Lu Zhaoying** | [![陆昭颖正式照片 / Formal portrait of Lu Zhaoying](../t-photos团队照片/陆昭颖.jpg)](../t-photos团队照片/陆昭颖.jpg) | **程序 / Programming**：负责Orange Pi视觉程序、道路与障碍识别、GPIO控制、参数调试和软件测试。 / Responsible for Orange Pi vision, road and obstacle detection, GPIO control, parameter tuning and software testing. |
 | **张隽泽 / Zhang Junze** | [![张隽泽正式照片 / Formal portrait of Zhang Junze](../t-photos团队照片/张隽泽.jpg)](../t-photos团队照片/张隽泽.jpg) | **结构 / Mechanical Structure**：负责阿克曼底盘、摄像头支架、机械装配、尺寸复核和转向限位。 / Responsible for the Ackermann chassis, camera mount, mechanical assembly, dimensional verification and steering limits. |
 | **黄鸣博 / Huang Mingbo** | [![黄鸣博正式照片 / Formal portrait of Huang Mingbo](../t-photos团队照片/黄鸣博.jpg)](../t-photos团队照片/黄鸣博.jpg) | **电子 / Electronics**：负责供电、Orange Pi GPIO接口、电机驱动、舵机、线束和上电安全。 / Responsible for power, Orange Pi GPIO interfaces, motor driver, steering servo, wiring and power-on safety. |
 
