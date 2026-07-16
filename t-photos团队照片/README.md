@@ -19,11 +19,25 @@ This folder contains the official team photograph, the 2026 WRO China Qualificat
 |---|---|---|
 | 正式团队照：三名队员与校旗合影 / Official photograph of all three members with the school flag | [`team-official.jpg`](team-official.jpg) | 已完成 / Complete |
 | 北京站未来工程师无人驾驶冠军领奖照 / Beijing Future Engineers Autonomous Driving championship photograph | [`award-beijing-champion.jpg`](award-beijing-champion.jpg) | 已完成 / Complete |
+| 陆昭颖正式成员照 / Formal portrait of Lu Zhaoying | [`陆昭颖.jpg`](陆昭颖.jpg) | 已完成 / Complete |
+| 陆昭颖形象照 / Additional portrait of Lu Zhaoying | [`陆昭颖形象照.jpg`](陆昭颖形象照.jpg) | 已完成 / Complete |
+| 张隽泽正式成员照 / Formal portrait of Zhang Junze | [`张隽泽.jpg`](张隽泽.jpg) | 已完成 / Complete |
+| 黄鸣博成员照 / Portrait of Huang Mingbo | 待补充 / Pending | 待补充 / Pending |
 | 全员趣味团队照 / Informal team photograph | `team-funny.jpg` | 待补充 / Pending |
 
 [![南京博颂学校正式团队照](team-official.jpg)](team-official.jpg)
 
 [![南京博颂学校北京站冠军领奖照](award-beijing-champion.jpg)](award-beijing-champion.jpg)
+
+## 成员照片 Member Portraits
+
+| 陆昭颖 / Lu Zhaoying | 张隽泽 / Zhang Junze | 黄鸣博 / Huang Mingbo |
+|---|---|---|
+| [![陆昭颖正式成员照 / Formal portrait of Lu Zhaoying](陆昭颖.jpg)](陆昭颖.jpg) | [![张隽泽正式成员照 / Formal portrait of Zhang Junze](张隽泽.jpg)](张隽泽.jpg) | 照片待补充 / Portrait pending |
+
+### 陆昭颖形象照 Additional Portrait of Lu Zhaoying
+
+[![陆昭颖形象照 / Additional portrait of Lu Zhaoying](陆昭颖形象照.jpg)](陆昭颖形象照.jpg)
 
 ## 制作过程照片索引 Development Process Index
 

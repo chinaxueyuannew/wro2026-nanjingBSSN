@@ -35,6 +35,14 @@ We are the WRO Future Engineers team from **BONA SONORITY SCHOOL NANJING**. We w
 
 [查看完整团队介绍 / Read the full team profile](other其他/team-profile.md)
 
+### 成员照片 / Member Portraits
+
+| 陆昭颖 / Lu Zhaoying | 张隽泽 / Zhang Junze | 黄鸣博 / Huang Mingbo |
+|---|---|---|
+| [![陆昭颖，程序 / Lu Zhaoying, Programming](t-photos团队照片/陆昭颖.jpg)](t-photos团队照片/陆昭颖.jpg) | [![张隽泽，结构 / Zhang Junze, Mechanical Structure](t-photos团队照片/张隽泽.jpg)](t-photos团队照片/张隽泽.jpg) | 照片待补充 / Portrait pending |
+
+[陆昭颖形象照 / Additional portrait of Lu Zhaoying](t-photos团队照片/陆昭颖形象照.jpg)
+
 ### 正式团队照 / Official Team Photograph
 
 [![南京博颂学校WRO未来工程师参赛队](t-photos团队照片/team-official.jpg)](t-photos团队照片/team-official.jpg)

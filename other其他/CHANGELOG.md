@@ -71,3 +71,4 @@
 - 加入南京博颂学校队旗 / Added the BONA SONORITY SCHOOL NANJING flag;
 - 加入陆昭颖（程序）、张隽泽（结构）、黄鸣博（电子）和教练薛源的中英对照介绍 / Added bilingual member and coach roles;
 - 新增 `team-profile.md` 并从首页、照片目录和完整索引直接跳转 / Added a dedicated team profile linked from the landing page and photo index.
+- 加入陆昭颖正式照、陆昭颖形象照和张隽泽正式照，并同步到首页、团队介绍和照片索引 / Added the formal and additional portraits of Lu Zhaoying and the formal portrait of Zhang Junze to the landing page, team profile and photo index.
