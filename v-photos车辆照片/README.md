@@ -19,4 +19,6 @@
 | `vehicle-top.jpg` | 顶部 | 主控、电源、整体布局 |
 | `vehicle-bottom.jpg` | 底部 | 差速器、传动轴、走线与固定 |
 
-可额外加入：转向连杆特写、电机/编码器标签、电机驱动器标签、总开关与启动按钮、传感器安装尺寸以及最终接线特写。照片应与提交的代码、CAD 和物料表属于同一版本。
+可额外加入：转向连杆特写、电机标签、电机驱动器标签、总开关与启动按钮、摄像头安装尺寸以及最终接线特写。照片应与提交的代码、CAD 和物料表属于同一版本；当前不需要展示未使用的超声波或编码器接线。
+
+**English:** Additional photographs may show the steering linkage, motor and driver labels, power/start switches, camera mounting dimensions and final wiring. The current vehicle does not use ultrasonic sensors or encoder feedback.

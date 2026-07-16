@@ -1,21 +1,25 @@
 # 程序目录、运行方法与验证状态
 
-本目录同时保存 Arduino/ESP32 底层控制程序和 Orange Pi/Python 视觉程序。代码“已经进入仓库”不等于“已经通过实车比赛验证”；每个版本的功能边界如下。
+Source Programs, Running Instructions and Verification Status
+
+**当前方案 / Current approach:** `bev_road.py` 和 `bev_segmentation.py` 是当前视觉方向；超声波/编码器Arduino与ESP32程序只作历史和厂家参考。The Python vision programs are the current approach; ultrasonic/encoder Arduino and ESP32 programs are retained only as historical and vendor references.
+
+本目录同时保存 Arduino/ESP32 历史/厂家示例和 Orange Pi/Python 视觉程序。当前车辆只使用摄像头视觉感知，不使用超声波或编码器；因此旧Arduino/ESP32程序不能被标为当前比赛程序。代码“已经进入仓库”也不等于“已经通过实车比赛验证”。
 
 ## 1. 文件入口
 
 | 程序 | 运行平台 | 主要用途 | 当前状态 |
 |---|---|---|---|
-| [`main1.0/main1.0.ino`](main1.0/main1.0.ino) | Arduino UNO + PWM/DIR驱动 | 团队原始右侧巡墙P控制 | 基线代码；无启动状态和前方停车 |
-| [`UNO_AT8236_OpenChallenge/`](UNO_AT8236_OpenChallenge/UNO_AT8236_OpenChallenge.ino) | Arduino UNO + AT8236 | 双PWM、编码器速度PI、双超声波和开放赛道状态机 | 已做静态检查，待实车验证 |
-| [`UNO_DRV8701_OpenChallenge/`](UNO_DRV8701_OpenChallenge/UNO_DRV8701_OpenChallenge.ino) | Arduino UNO + DRV8701/MD02 Pro | PWM+DIR、编码器速度PI、双超声波和状态机 | 已做静态检查，待实车验证 |
-| [`ESP32_AT8236_OpenChallenge/`](ESP32_AT8236_OpenChallenge/ESP32_AT8236_OpenChallenge.ino) | ESP32 + AT8236 | ESP32底层控制试验版 | 启动时关闭Wi-Fi/蓝牙，待实车验证 |
+| [`main1.0/main1.0.ino`](main1.0/main1.0.ino) | Arduino UNO + PWM/DIR驱动 | 原始右侧超声波巡墙P控制 | 历史基线，当前不使用 |
+| [`UNO_AT8236_OpenChallenge/`](UNO_AT8236_OpenChallenge/UNO_AT8236_OpenChallenge.ino) | Arduino UNO + AT8236 | 双PWM、编码器速度PI、双超声波和开放赛道状态机 | 厂家示例改编，当前不使用 |
+| [`UNO_DRV8701_OpenChallenge/`](UNO_DRV8701_OpenChallenge/UNO_DRV8701_OpenChallenge.ino) | Arduino UNO + DRV8701/MD02 Pro | PWM+DIR、编码器速度PI、双超声波和状态机 | 厂家示例改编，当前不使用 |
+| [`ESP32_AT8236_OpenChallenge/`](ESP32_AT8236_OpenChallenge/ESP32_AT8236_OpenChallenge.ino) | ESP32 + AT8236 | ESP32底层控制试验版 | 当前车辆不使用ESP32 |
 | [`bev_road.py`](bev_road.py) | Python/OpenCV | 录像道路区域预处理与连通域可视化 | Python语法通过；算法实验工具 |
 | [`bev_segmentation.py`](bev_segmentation.py) | Orange Pi/Python/OpenCV | 红绿信标、道路密度、CW/CCW策略、串口控制和避障恢复 | Python语法通过；待板端与实车验证 |
 | [`requirements.txt`](requirements.txt) | Python环境 | 桌面开发依赖参考 | 已提供 |
 | [`serial_config.example.json`](serial_config.example.json) | Orange Pi串口配置 | 串口设备和波特率示例 | 复制后按实机修改 |
 
-AT8236 与 DRV8701 的电机接口不同，不得混用程序和接线。最终比赛只应指定一个底层程序为正式版本，其余保留为开发记录。
+AT8236 与 DRV8701 的电机接口不同，不得混用程序和接线。最终比赛需要补充并指定一个与Python `steer,speed` 串口协议匹配的Arduino执行程序；它只控制舵机、电机、启动和命令超时，不读取超声波或编码器。
 
 ## 2. `bev_road.py` 道路预处理工具
 
@@ -50,7 +54,7 @@ python bev_road.py --video-in "../video视频/测试录像.mp4" --far-mask-ratio
 - 20 Hz左右的有线串口命令输出；
 - 道路区域、信标、目标曲线、减速区和转向分量仪表板。
 
-本轮检查已经把启动目标速度改为 `0`、修正减速/避障阈值顺序、让 `BRAKING` 阶段先发送停止而不是立即倒车，并在视频源丢失或程序退出时发送停止命令。这些改动降低误启动风险，但不能代替 Arduino 上的物理启动按钮、命令超时和独立紧急停车。
+本轮检查已经把启动目标速度改为 `0`、修正减速/避障阈值顺序、让 `BRAKING` 阶段先发送停止而不是立即倒车，并在视频源丢失或程序退出时发送停止命令。这些改动降低误启动风险，但不能代替Arduino上的物理启动按钮和命令超时停车。当前没有独立距离传感器，因此底层不得在视觉/串口失效后继续执行旧命令。
 
 ### 运行环境
 
@@ -95,10 +99,10 @@ Python每约50 ms发送一行：
 
 ## 4. 上车前必须确认
 
-1. 根据实物驱动板选择唯一对应的 Arduino 程序。
-2. 抬起车轮确认电机正方向、编码器正方向和舵机左右方向。
+1. 根据实物驱动板编译唯一的视觉串口Arduino执行程序，不使用超声波/编码器示例作为比赛程序。
+2. 抬起车轮确认电机正方向、舵机左右方向和视觉命令正负号。
 3. 实测舵机安全极限后修改转向中位及左右限位。
-4. 核对 `CPR=12`、减速比 `1:8.864`、轮径 `47 mm` 与实物标签。
+4. 用固定距离计时建立视觉 `speed` 命令与实际车速、停车距离的对应表。
 5. 摄像头完成分辨率/FPS枚举、广角标定和固定支架复位测试。
 6. 实测CW/CCW模式、红绿柱通过侧以及串口正负号。
 7. 拔掉摄像头、停止Python进程、断开串口，确认底层均能停车。
@@ -108,7 +112,7 @@ Python每约50 ms发送一行：
 ## 5. 仍未完成的比赛级项目
 
 - Python与Arduino之间带序号、时间戳、CRC和确认的正式协议；
-- Arduino端通信看门狗与物理启动按钮联动；
+- 与视觉协议匹配的Arduino执行程序、通信看门狗与物理启动按钮联动；
 - 真实相机内参与地面透视标定；
 - 红绿识别率、边缘误差和多光照测试数据；
 - 停车区、圈数、方向初始化和最终停车策略；

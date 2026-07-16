@@ -1,5 +1,9 @@
 # Orange Pi Zero 3W 车载视觉计算机
 
+Orange Pi Zero 3W Onboard Vision Computer
+
+**当前配置 / Current configuration:** Orange Pi是唯一感知计算平台，输入为USB彩色摄像头，输出为有线转向/速度目标。The Orange Pi is the only perception computer; it receives USB colour-camera frames and sends wired steering/speed targets.
+
 ## 1. 团队实际购买版本
 
 团队订单截图显示购买 SKU 为 **OPi Zero 3W 4G**，商品标题标注 **Orange Pi Zero 3W、高性能混合八核、全志 A733**。该板与旧款 **Orange Pi Zero 3（H618、四核 Cortex-A53、LPDDR4）** 不是同一型号，仓库中的系统说明一律以带字母 **W** 的 Zero 3W 为准。
@@ -28,20 +32,18 @@
 
 ## 2. 在车辆中的职责
 
-Orange Pi 运行 Linux，负责 USB 摄像头采集、广角去畸变、红绿障碍识别、目标位置估计以及高层行为决策。Arduino UNO（或最终确认的 ESP32）负责硬实时性更强的超声波、编码器、舵机、电机驱动和紧急停车。高层计算机不能直接绕过底层安全状态机驱动电机。
+Orange Pi 运行 Linux，是当前车辆唯一的环境感知与高层决策设备，负责 USB 摄像头采集、广角去畸变、赛道判断、红绿障碍识别、目标位置估计以及目标转向/速度计算。Arduino UNO负责接收有线命令、输出限幅、舵机、电机驱动和通信超时停车；当前不连接超声波，也不读取编码器。
 
 ```mermaid
 flowchart LR
   CAM[USB彩色摄像头\n480p/30FPS] --> OPI[Orange Pi Zero 3W 4GB\nOpenCV视觉与高层决策]
   OPI -->|USB串口/UART\n带时间戳和校验| MCU[Arduino UNO\n实时控制与安全状态机]
-  US[前/右超声波] --> MCU
-  ENC[霍尔编码器] --> MCU
   MCU --> SERVO[转向舵机]
   MCU --> DRIVER[电机驱动器]
-  MCU -->|状态/速度/距离/故障| OPI
+  MCU -->|执行状态/命令超时/故障| OPI
 ```
 
-这种分层的优点是：Linux 短暂卡顿、摄像头掉帧或视觉进程退出时，Arduino 仍可根据命令超时和前方距离独立减速停车。Orange Pi 重启后不得自动让车辆运动，必须重新经过底层 `WAIT_START` 启动状态。
+这种分层的优点是：Linux 短暂卡顿、摄像头掉帧或视觉进程退出时，Arduino仍可根据命令超时停止电机。因为当前没有独立距离传感器，Arduino不能判断前方距离，必须在视觉或通信失效时停止而不是继续执行最后命令。Orange Pi重启后不得自动让车辆运动，必须重新经过底层 `WAIT_START` 启动状态。
 
 ## 3. 通信协议建议
 
@@ -53,7 +55,7 @@ flowchart LR
 
 底层回传消息建议包含：
 
-`{seq, state, front_cm, right_cm, wheel_speed, battery_mv, fault_bits, crc}`
+`{seq, state, command_age_ms, battery_mv, fault_bits, crc}`
 
 安全约束：
 
@@ -61,7 +63,7 @@ flowchart LR
 - 连续 200–300 ms 未收到有效命令时进入减速或停车，准确阈值通过实车制动试验确定；
 - `confidence` 低于阈值时不得发出激进绕障命令；
 - CRC/校验失败、字段越界或时间戳过旧时丢弃整帧；
-- 紧急停车条件由 Arduino 本地判定，优先级高于 Orange Pi 的速度命令。
+- 命令超时、字段错误、未启动或人工停止由Arduino本地判定，优先级高于Orange Pi的速度命令。
 
 ## 4. 视觉算力选型说明
 

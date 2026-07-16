@@ -55,7 +55,7 @@ WRO 障碍物挑战需要区分红色与绿色障碍物。120FPS 版本在商品
 - 安装在车辆纵向中心附近，减少左右视差不对称；
 - 光轴指向车辆正前方，支架应可重复定位并有角度标记；
 - 高度应能看到障碍物主体和地面接触区域，同时减少车身遮挡；
-- 镜头不能被超声波支架、线束或层板边缘遮挡；
+- 镜头不能被线束、摄像头支架自身或层板边缘遮挡；
 - USB 插头做机械固定，避免振动导致瞬断；
 - 避免直接朝向强灯，必要时增加小型遮光罩；
 - 完成焦距固定后再做标定，支架角度变化后需要重新验证。
@@ -72,7 +72,7 @@ WRO 障碍物挑战需要区分红色与绿色障碍物。120FPS 版本在商品
 6. 使用开运算去除小噪点、闭运算填补柱体区域；
 7. 按面积、长宽比、位置和连续帧稳定性筛选轮廓；
 8. 输出 `{color, center_x, bottom_y, area, confidence, timestamp}`；
-9. 状态机根据颜色和相对位置规划通过侧，并使用超声波做独立安全约束。
+9. 状态机根据颜色和相对位置规划通过侧；视觉帧超时或置信度不足时输出停车目标。
 
 ## 7. 建议性能指标
 
@@ -96,7 +96,9 @@ WRO 障碍物挑战需要区分红色与绿色障碍物。120FPS 版本在商品
 
 ## 9. 规则与安全
 
-摄像头作为传感器用于自主识别，处理必须在车载系统上完成。比赛期间不能依赖 Wi-Fi、蓝牙或其他无线连接传输画面或控制车辆。视觉模块失效时，车辆应由超声波安全层减速或停车，而不是继续盲行。
+摄像头是当前唯一环境感知设备，处理必须在车载系统上完成。比赛期间不能依赖 Wi-Fi、蓝牙或其他无线连接传输画面或控制车辆。视觉模块、USB摄像头或串口失效时，Arduino必须根据命令超时停车，而不是继续盲行；当前没有超声波安全层。
+
+**English:** The USB colour camera is the vehicle's only environmental sensor. All image processing runs onboard. Wi-Fi and Bluetooth are not used for video or control. If the camera, vision process or serial link fails, the Arduino must stop the motor through a command-timeout watchdog; no ultrasonic backup layer is installed.
 
 ## 10. 信息来源
 

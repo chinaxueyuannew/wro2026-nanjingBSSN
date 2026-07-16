@@ -1,6 +1,6 @@
 # 版本与工程迭代日志
 
-## V1.0 - 右侧巡墙基线（当前）
+## V1.0 - 右侧巡墙基线（历史版本，当前不使用）
 
 - Arduino UNO 控制；
 - 两路超声波读取；
@@ -56,3 +56,18 @@
 - 新增车辆在WRO场地运行的比赛现场照片；
 - 更新根README、照片目录说明、工程日志和比赛前检查表；
 - 保留全员趣味照和车辆六视图为待补项目。
+
+## 2026-07-16 - 当前方案改为视觉唯一感知
+
+- 确认当前车辆只使用USB摄像头和Orange Pi视觉，不使用超声波或编码器反馈；
+- 更新首页系统信号链为“摄像头 → Orange Pi → 有线串口 → Arduino → 舵机/电机”；
+- 将超声波巡墙、编码器速度PI和ESP32程序标记为历史/厂家参考；
+- 更新接线、BOM、软件架构、测试、FMEA、标定、复现和比赛检查表；
+- 明确视觉/摄像头/串口失效时必须通过底层命令超时停车。
+- 同步记录压缩演示视频为H.264、1080p/30FPS、约106.8秒、87.07 MiB，已进入Git记录。
+
+## 2026-07-16 - 团队资料中英对照 / Bilingual Team Profile
+
+- 加入南京博颂学校队旗 / Added the BONA SONORITY SCHOOL NANJING flag;
+- 加入陆昭颖（程序）、张隽泽（结构）、黄鸣博（电子）和教练薛源的中英对照介绍 / Added bilingual member and coach roles;
+- 新增 `team-profile.md` 并从首页、照片目录和完整索引直接跳转 / Added a dedicated team profile linked from the landing page and photo index.
