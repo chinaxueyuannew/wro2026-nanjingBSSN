@@ -1,99 +1,74 @@
-# 工程研发日志 Engineering Log
+# 工程研发日志 / Engineering Log
 
-本日志区分“已经在仓库中存在的成果”和“计划进行的工作”。未知日期不补写虚构事件；后续每次测试应在当天更新。
+本日志只记录已有成果和明确计划，不为未知日期虚构事件。 / This log records existing results and explicit plans only; unknown dates are never invented.
 
-## 阶段 1：建立工程仓库
+## 阶段1：建立仓库 / Stage 1: Repository Setup
 
-成果：采用 WRO Future Engineers 官方模板目录，建立团队照片、车辆照片、视频、原理图、源代码、模型和其他技术材料分类。Git 历史已存在多次提交。
+采用官方模板建立照片、视频、原理图、代码、模型和技术材料目录，并重写首页导航与缺口清单。 / Adopted the official template for photos, video, schematics, code, models and technical materials, then rebuilt landing-page navigation and the gap list.
 
-问题：早期 README 文字编码异常，技术说明、接线、CAD、车辆照片和视频均不完整。
+## 阶段2：历史巡墙基线 / Stage 2: Historical Wall-Following Baseline
 
-改进：重写结构化 README，增加评分维度导航与缺口清单。
+早期Arduino使用前/右超声波、舵机和PWM/DIR，实现30 cm右墙P控制。它缺少启动状态、速度闭环、转弯和异常停车，当前不使用。 / The early Arduino used front/right ultrasonic sensors, servo and PWM/DIR for 30 cm right-wall P control. It lacked start state, speed loop, turning and fault stop and is not currently used.
 
-## 阶段 2：右侧巡墙基线
+## 阶段3–4：底盘资料与参考程序 / Stages 3–4: Chassis Data and Reference Programs
 
-成果：原 `main1.0` 程序使用 Arduino、前/右两路超声波、舵机和 PWM/DIR 电机控制，实现 30 cm 目标距离的右侧 P 控制，并输出串口数据。
+确认RF-A101HE阿克曼结构及AT8236、DRV8701和ESP32示例，提取尺寸和编码器参考，并按驱动器分开代码。新增PI/PD、状态机和安全结构的参考程序，但当前只作历史资料。 / Confirmed RF-A101HE Ackermann structure and AT8236, DRV8701 and ESP32 examples, extracted dimensional/encoder references and separated code by driver. Added reference PI/PD, state-machine and safety structures, retained only as history.
 
-发现的局限：前传感器只记录不决策；上电缺少独立启动状态；没有编码器速度闭环、转弯状态机和异常停车。
+## 阶段5：Orange Pi视觉平台 / Stage 5: Orange Pi Vision Platform
 
-## 阶段 3：底盘厂家资料分析
+确认Orange Pi Zero 3W 4GB/A733，建立“Orange Pi视觉决策+Arduino执行安全”架构，记录USB摄像头、有线串口、独立5 V/3 A、散热和无线关闭。传统CPU/OpenCV为基线，NPU尚未验证。 / Confirmed Orange Pi Zero 3W 4GB/A733 and established “Orange Pi vision decisions + Arduino execution safety”, documenting USB camera, wired serial, independent 5 V/3 A, cooling and wireless shutdown. CPU/OpenCV is the baseline; NPU is unverified.
 
-成果：确认 RF-A101HE 为阿克曼结构，厂家示例涵盖 AT8236、DRV8701/MD02 Pro 和 ESP32；提取参考编码器、减速比、轮径、轴距、轮距和舵机范围。不同驱动板的输出接口不能混用。
+## 阶段6：视觉原型 / Stage 6: Vision Prototype
 
-工程决策：把程序按驱动器拆分，保留原代码；参考物理参数全部标记为待实车核对。
+加入 `bev_road.py` 和 `bev_segmentation.py`，完成语法检查及默认停车、阈值、制动和退出停车修正。串口可靠性、透视、HSV和实车验证仍待完成。 / Added both Python programs, completed syntax checks and corrected default stop, thresholds, braking and exit stop. Reliable serial, perspective, HSV and vehicle validation remain pending.
 
-## 阶段 4：安全与闭环基础版
+## 阶段7–8：照片与赛事证据 / Stages 7–8: Photos and Competition Evidence
 
-成果：新增 UNO+AT8236、UNO+DRV8701 和 ESP32+AT8236 程序；加入独立启动、速度 PI、巡墙 PD、转弯状态机、紧急停止、滤波、输出限幅和串口遥测。ESP32 版本主动关闭无线。
+整理11张制作过程照片，并加入三名成员照、正式团队照、北京站冠军照和比赛车辆照片。趣味团队照和车辆六视图待补。 / Indexed 11 process photos and added all three member portraits, the official team photograph, Beijing championship photograph and competition-vehicle photograph. The informal team photograph and six vehicle views are pending.
 
-当前状态：完成代码结构检查，但团队当前比赛方案不使用超声波或编码器；这些程序作为历史和厂家参考保留，不宣称比赛可用。
+## 阶段9：视觉唯一感知 / Stage 9: Vision-Only Perception
 
-## 阶段 5：Orange Pi 视觉计算平台设计
+确认当前只使用USB摄像头和Orange Pi；不安装超声波、不读取编码器。Arduino只执行视觉目标并负责启动、限幅和超时停车。 / Confirmed USB camera and Orange Pi as the only perception chain; no ultrasonic sensors or encoder readings. Arduino only executes vision targets and handles start, limits and timeout stop.
 
-成果：根据订单截图确认团队使用 Orange Pi Zero 3W 4GB（Allwinner A733），而非 H618 版 Zero 3；建立“Orange Pi 视觉与高层决策 + Arduino 实时执行和安全停车”的两级架构，并把 USB 摄像头、串口通信、独立 5 V/3 A 供电、散热和无线关闭纳入文档。
+## 阶段10：团队资料 / Stage 10: Team Profile
 
-工程决策：480p/30FPS 红绿识别先以 CPU/OpenCV 传统视觉实现。A733 的 3 TOPS NPU 只作为后续选项，在完成板端模型、延迟和精度验证前不宣称已经使用。当前只有摄像头视觉感知；Linux、视觉进程、摄像头或串口发生故障时，Arduino必须通过命令超时停车。
+加入队旗、双语校名、三名队员、教练、职责和成员照片，并从首页直接链接。 / Added flag, bilingual school name, three members, coach, roles and portraits, linked from the landing page.
 
-当前状态：已完成规格与架构文档，尚待 Orange Pi 实机系统枚举、UVC 摄像头测试、串口协议实现、功耗/温度压力测试和比赛无线合规验证。
+## 阶段11：规则复核与安全闭环 / Stage 11: Rule Audit and Safety Closure
 
-## 阶段 6：视觉原型代码入库与首页整合
+依据2026规则附录C和技术文档评分表重新核对五个评分维度，建立评分证据地图、实测/照片登记表和提交拆分建议。发现视觉程序已发送 `steer,speed`，但仓库没有与之匹配的当前UNO执行端，而且旧程序引脚与首页候选接线不一致。为消除该复现断点，新增PWM/DIR视觉执行候选：D2舵机、D6 PWM、D7 DIR、D8物理按钮，上电默认停车，畸形命令不刷新看门狗，250 ms无合法命令进入故障，恢复必须重新按键并收到新命令。正式PNG/SVG接线图与代码使用同一候选引脚。驱动器接口和全部限位仍须实物验证，不能仅凭文档确认。
 
-成果：加入 `bev_road.py` 道路掩膜/连通域实验工具和 `bev_segmentation.py` 红绿视觉控制原型；后者包含CW/CCW策略、道路密度与信标转向叠加、串口输出和避障恢复状态机。YouTube演示链接、源码、CAD、接线、测试、制作过程照片与全部工程文档已从根目录README直接跳转。
+The five rubric dimensions were re-audited against 2026 Appendix C and the engineering-documentation score sheet, producing a scoring-evidence map, a measurement/photograph register and a commit-grouping recommendation. The audit found that the vision program already transmitted `steer,speed`, but the repository had no current UNO executor matching that protocol, while historical sketch pins contradicted the landing-page candidate wiring. To close this reproduction break, a PWM/DIR vision-executor candidate was added: D2 servo, D6 PWM, D7 DIR and D8 physical button; stopped by default at power-up; malformed lines do not refresh the watchdog; more than 250 ms without a valid command enters fail-safe; recovery requires re-arm and a fresh command. The formal PNG/SVG wiring diagram uses the same candidate pins. The physical driver interface and every actuator limit still require hardware verification and cannot be confirmed by documentation alone.
 
-检查结果：两份Python文件均通过语法解析。检查中发现视觉主程序默认目标速度非零、减速阈值顺序错误、制动阶段直接倒车等问题，已改为安全默认停车、正确阈值顺序、先停车后恢复，并在视频源丢失/程序退出时发送停止命令。
+## 阶段12：UNO目标编译验证 / Stage 12: UNO-Target Build Verification
 
-当前状态：上述结果是静态检查，不代表完成Orange Pi或实车验证。简单串口协议仍缺少序号、时间戳、CRC、确认应答和Arduino端超时停车；视觉透视与HSV参数仍须现场标定。
+使用Arduino AVR Boards `1.8.8`和标准Servo库 `1.3.0`编译 `VisionSerialExecutor.ino`，UNO目标编译通过，占用5544 bytes程序空间（17%）和277 bytes全局变量（13%）。这消除了语法、目标平台和依赖层面的复现风险；烧录实物UNO、U-01至U-10串口测试、驱动器电气兼容性和整车动作仍必须现场验证。
 
-## 阶段 7：制作过程照片整理
+`VisionSerialExecutor.ino` was compiled using Arduino AVR Boards `1.8.8` and the standard Servo library `1.3.0`. The UNO-target build passed, using 5,544 bytes of program storage (17%) and 277 bytes of global-variable memory (13%). This closes syntax, target-platform and dependency reproducibility risks; physical UNO upload, serial tests U-01 through U-10, driver electrical compatibility and vehicle motion still require onsite verification.
 
-成果：将11张团队研发现场照片统一命名为 `making-process-01` 至 `making-process-11`，按团队工作、软件讨论、控制器装配、接线、程序检查和功能测试建立索引，并从根目录README直接跳转。
+## 下一轮实验 / Next Experiments
 
-当前状态：上述照片用于证明真实研发和制作过程；团队照与赛事成果的最新归档状态见阶段8。
+| 优先级 / Priority | 实验 / Experiment | 目标与证据 / Goal and Evidence |
+|---:|---|---|
+| 1 | 驱动器与引脚 / Driver and pins | 唯一比赛版本，照片+接线 / One competition version, photo+wiring |
+| 2 | 舵机极限 / Servo limits | 无顶死，角度+视频 / No stall, angles+video |
+| 3 | 摄像头标定 / Camera calibration | 内参、畸变、ROI、安装角 / Intrinsics, distortion, ROI, angle |
+| 4 | 电源负载 / Power load | 无复位，电压电流 / No reset, voltage/current |
+| 5 | 速度映射 / Speed mapping | 多电量可预测 / Predictable across battery levels |
+| 6 | 视觉转向 / Vision steering | 连续10回合无碰撞 / Ten collision-free laps |
+| 7 | CW/CCW弯道 / CW/CCW turns | 四角稳定 / Stable at four corners |
+| 8 | 系统验收 / System acceptance | 内存、摄像头、串口枚举 / Memory, camera, serial enumeration |
+| 9 | 延迟温度 / Latency and temperature | 30分钟日志 / 30-minute log |
+| 10 | 故障安全 / Fault safety | 遮挡/冻结/断连后停车 / Stop after obstruction/freeze/disconnection |
 
-## 阶段 8：赛事成果与现场证据归档
+## 单次日志模板 / Single-Test Template
 
-成果：加入2026 WRO中国区选拔赛（北京站）正式团队照、未来工程师无人驾驶冠军领奖照和车辆比赛现场照片，并统一命名、补充说明、链接到根目录README。
-
-当前状态：正式团队照已经完成；全员趣味照和车辆前、后、左、右、顶、底标准六视图仍待补充。比赛现场照片用于记录真实参赛状态，不替代结构审查照片和实测数据。
-
-## 阶段 9：确认视觉唯一感知方案
-
-工程确认：当前车辆只使用USB彩色摄像头和Orange Pi视觉，不安装前/右超声波，也不读取霍尔编码器。Arduino只执行视觉串口的转向/速度目标，并承担启动、输出限幅和命令超时停车。仓库中的超声波巡墙与编码器速度PI程序仅保留为历史和厂家示例。
-
-文档修正：同步更新首页信号链、接线、BOM、软件架构、测试、风险、标定、复现、程序状态和检查表，避免把未使用部件写成当前系统。
-
-## 阶段 10：团队资料中英对照 Team Profile
-
-成果 / Result：加入南京博颂学校队旗、学校中英文名称、三名队员和教练的分工说明，并在首页、照片目录和独立团队介绍页建立跳转。The school flag, bilingual school name, member roles and coach information were added to the landing page, photo index and a dedicated team-profile page.
-
-## 下一轮实验计划
-
-| 优先级 | 实验 | 目标 | 证据 |
-|---:|---|---|---|
-| 1 | 驱动板与引脚确认 | 选定唯一比赛版本 | 实物照片+接线表 |
-| 2 | 舵机极限标定 | 无顶死且直行稳定 | 角度记录+视频 |
-| 3 | 摄像头标定 | 固定内参、畸变、ROI和安装角 | 标定文件+支架照片 |
-| 4 | 电源负载测试 | 无复位、无异常压降 | 电流/电压表 |
-| 5 | 视觉速度映射 | 多电量下命令与实速可预测 | 固定距离测试表 |
-| 6 | 视觉转向调参 | 连续10回合无碰撞 | 视频+成功率 |
-| 7 | CW/CCW弯道测试 | 四角稳定通过 | 每角偏差记录 |
-| 8 | Orange Pi 系统验收 | 识别4GB、摄像头和串口 | 系统枚举截图 |
-| 9 | 视觉延迟与温度 | 30分钟无掉线/降频 | 帧率、温度与功耗日志 |
-| 10 | 视觉/通信故障安全 | 遮挡、冻结、断摄像头/串口后停车 | 视频+状态日志 |
-
-## 单次日志模板
-
-### YYYY-MM-DD - 实验名称
-
-- 参与人员：
-- Git 提交号：
-- 硬件配置：
-- 电池电压：
-- 场地与光照：
-- 目标：
-- 参数：
-- 过程：
-- 数据：
-- 结果：成功 / 部分成功 / 失败
-- 发现的问题：
-- 下一步：
+- 日期与实验 / Date and experiment:
+- 参与人员 / Participants:
+- Git提交 / Commit:
+- 硬件与电池 / Hardware and battery:
+- 场地与光照 / Field and lighting:
+- 目标与参数 / Goal and parameters:
+- 过程与数据 / Procedure and data:
+- 结果：成功/部分成功/失败 / Result: success/partial/failure:
+- 问题与下一步 / Issues and next step:

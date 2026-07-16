@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+src源代码/serial_config.json
+*.log
+tmp/
+.DS_Store
+Thumbs.db
+

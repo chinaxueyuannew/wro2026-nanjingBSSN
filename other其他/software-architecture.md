@@ -1,112 +1,73 @@
-# 软件架构、状态机与控制算法
+# 软件架构、状态机与控制算法 / Software Architecture, State Machine and Control Algorithms
 
-Software Architecture, State Machine and Control Algorithms
+**当前配置：** 摄像头和Orange Pi承担全部环境感知；Arduino只执行视觉命令并在超时时停车。
 
-**当前配置 / Current configuration:** 摄像头和Orange Pi承担全部环境感知；Arduino只执行视觉命令并在命令超时时停车。The camera and Orange Pi provide all environmental perception. The Arduino only executes vision-derived commands and stops on command timeout.
+**Current configuration:** The camera and Orange Pi provide all environmental perception; the Arduino only executes vision-derived commands and stops on timeout.
 
-## 1. 高层计算机与实时控制器分工
+## 1. 高低层分工 / High-Level and Low-Level Roles
 
-比赛系统采用 **Orange Pi Zero 3W + Arduino UNO** 两级架构，当前环境感知只使用USB摄像头。Orange Pi 运行 Linux/OpenCV，完成赛道、红绿障碍、方向和目标轨迹判断；Arduino不采集超声波或编码器，只接收有线串口的目标转向与速度，进行输出限幅、舵机/电机驱动和命令超时停车。Wi-Fi 和蓝牙不参与比赛运行。
+Orange Pi运行Linux/OpenCV，判断赛道、红绿障碍、方向和目标轨迹。Arduino不采集超声波或编码器，只接收有线目标，限制输出、驱动舵机/电机并执行超时停车。Wi-Fi和蓝牙不参与比赛。
 
-```mermaid
-flowchart TB
-  VISION[Orange Pi视觉进程\n采集/去畸变/颜色识别] --> PLAN[Orange Pi行为规划\n目标速度和转向]
-  PLAN -->|有线串口\n序号+时间戳+校验| FSM[Arduino安全状态机]
-  FSM --> LIMIT[转向/速度限幅]
-  LIMIT --> HAL[电机驱动器/舵机]
-  HAL --> HW[RF-A101HE实车]
-  HAL -->|执行状态/故障| VISION
-  WATCHDOG[视觉帧超时/串口命令超时] --> FSM
-```
-
-安全原则：Orange Pi 只提出目标，不直接写 PWM；Arduino 始终保留输出限幅、命令超时和 `WAIT_START`。视觉进程退出、Linux 卡顿、USB 摄像头断开或串口校验失败时，Arduino必须在规定时间内把电机目标置零。由于当前没有独立距离传感器，视觉故障后不得继续直行。通信字段与实机验收见 `processor-orange-pi.md`。
-
-### 当前代码与目标架构的对应关系
-
-| 架构模块 | 当前文件 | 已实现 | 尚未实现/验证 |
-|---|---|---|---|
-| 道路预处理 | `src源代码/bev_road.py` | 亮度归一化、实验性映射、道路掩膜和连通域 | 实车地面四点透视标定 |
-| 视觉与规划 | `src源代码/bev_segmentation.py` | 红绿HSV、道路密度、CW/CCW、恢复状态机 | 停车区、圈数、多光照精度和板端稳定性 |
-| 有线通信 | `bev_segmentation.py` 的 `VehicleIO` | 约50 ms发送 `steer,speed`，接收CW/CCW | 序号、时间戳、CRC、应答和底层超时 |
-| 底层执行 | 最终视觉串口Arduino程序待确认 | 目标功能为启动、命令解析、输出限幅和超时停车 | 当前仓库的超声波/编码器示例不是比赛程序 |
-
-上方架构图中的“序号+时间戳+校验”和 `COMMS_FAILSAFE` 是正式比赛目标设计，当前简单文本串口尚未达到这一要求，不能把设计图误当作已完成代码。
-
-## 2. Arduino 内部分层结构
+The Orange Pi runs Linux/OpenCV to interpret the track, red-green obstacles, direction and target path. The Arduino reads neither ultrasonic sensors nor encoders; it receives wired targets, limits outputs, drives the servo/motor and enforces timeout stopping. Wi-Fi and Bluetooth are not used in competition.
 
 ```mermaid
 flowchart TB
-  APP[任务层: 等待启动/视觉驾驶/故障停车] --> CTRL[控制层: 命令校验与输出限幅]
-  CTRL --> HAL[硬件抽象层: 电机驱动器/舵机]
-  HAL --> HW[RF-A101HE 实车]
-  LOG[串口遥测与测试记录] --- APP
-  LOG --- CTRL
+  V["视觉 / Vision"] --> P["规划 / Planning"]
+  P -->|"有线串口 / Wired serial"| F["Arduino安全状态机 / safety state machine"]
+  F --> L["输出限幅 / Output limits"]
+  L --> H["舵机和驱动器 / Servo and driver"]
+  W["帧与命令超时 / Frame and command timeout"] --> F
 ```
 
-硬件层只负责读写舵机和电机驱动引脚；控制层校验视觉目标、限制转向/速度并检查命令时间；任务层决定等待启动、执行视觉命令或故障停车。分层后更换驱动器时只需要修改电机输出函数，而不是重写视觉策略。
+Orange Pi只提出目标，不直接写PWM。视觉退出、Linux卡顿、摄像头断开或串口失败时，Arduino必须停车；无独立距离传感器时不得继续最后命令。
 
-## 3. 状态机
+The Orange Pi proposes targets but never writes PWM directly. If vision exits, Linux stalls, the camera disconnects or serial fails, the Arduino must stop; without an independent range sensor it must never continue the last command.
 
-| 状态 | 进入条件 | 行为 | 退出条件 |
+| 模块 / Module | 当前文件 / File | 已实现 / Implemented | 待完成 / Pending |
 |---|---|---|---|
-| `WAIT_START` | 上电复位 | 电机停止、舵机回中 | 独立启动按钮按下 |
-| `VISION_DRIVE` | 启动且持续收到有效视觉命令 | 执行受限幅的目标转向与速度 | 命令超时、视觉故障或人工停止 |
-| `VISION_RECOVERY` | 视觉程序进入制动/恢复阶段 | 按视觉状态机要求停车或低速恢复 | 恢复完成或命令超时 |
-| `COMMS_FAILSAFE` | Orange Pi 命令超时、校验失败或视觉故障 | 受控减速并停车 | 人工检查后重新启动 |
-| `MANUAL_STOP` | 测试中按停止或关闭运行许可 | 电机停止、舵机回中 | 人工检查后再次启动 |
+| 道路预处理 / Road preprocessing | `bev_road.py` | 亮度、实验BEV、掩膜、连通域 / Brightness, experimental BEV, masks, components | 实车透视标定 / Vehicle perspective calibration |
+| 视觉规划 / Vision planning | `bev_segmentation.py` | 红绿HSV、道路密度、CW/CCW、恢复 / Red-green HSV, road density, CW/CCW, recovery | 停车、圈数、精度和稳定性 / Parking, laps, accuracy, stability |
+| 通信 / Communication | `VehicleIO` | 约50 ms发送 `steer,speed` / Sends approximately every 50 ms | 序号、时间戳、CRC、应答 / Sequence, timestamp, CRC, acknowledgement |
+| 底层 / Low level | `VisionSerialExecutor.ino` | D8启动/停止、文本解析、限幅、D2舵机、D6/D7电机、250 ms超时 / D8 start/stop, text parsing, limits, D2 servo, D6/D7 motor and 250 ms timeout | UNO实机编译、驱动器接口与车辆测试 / Actual-UNO build, driver interface and vehicle tests |
 
-状态机比把所有判断写在同一个循环中更容易测试。每个状态都有明确入口、输出和退出条件，可以在串口中用状态编号复现故障发生时的行为。
+## 2. Arduino分层 / Arduino Layers
 
-## 4. 编码器速度 PI（保留参考，当前未使用）
+任务层决定等待、视觉驾驶或故障停车；控制层校验命令和时间并限幅；硬件层只读写舵机和驱动引脚。这样更换驱动器时无需改写视觉策略。
 
-当前车辆不接入编码器，不运行本节速度PI。以下公式仅解释仓库示例程序，不能写入当前比赛功能清单。
+The task layer selects waiting, vision driving or fault stop; the control layer validates command age and limits outputs; the hardware layer only accesses servo and driver pins. This isolates driver changes from vision strategy.
 
-误差为 `e_v = v_target - v_measured`，控制输出为：
+## 3. 状态机 / State Machine
 
-`PWM = Kp_v × e_v + Ki_v × ∫e_v dt`
+| 状态 / State | 进入 / Entry | 行为 / Action | 退出 / Exit |
+|---|---|---|---|
+| `WAIT_START` | 上电或行驶中按D8 / Power-up or D8 press while driving | 电机停、舵机中位，丢弃行驶命令 / Motor stopped, steering centred, motion commands discarded | D8启动 / D8 arm |
+| `VISION_DRIVE` | D8启动 / D8 arm | 等待按键之后的新合法命令，再执行限幅目标 / Wait for a fresh valid post-arm command, then execute limited targets | D8停止或250 ms无合法命令 / D8 stop or 250 ms without valid command |
+| `COMMS_FAILSAFE` | 命令超时 / Command timeout | 电机PWM=0、舵机回中，不自动恢复 / Motor PWM=0, steering centred, no automatic recovery | D8重新启动，再等待新命令 / D8 re-arm, then wait for a fresh command |
 
-积分项设有限幅，防止车辆被卡住时积分不断累积。PWM 同时设有首次测试上限和最小起步值。调试顺序为：先令 `Ki=0`，逐步增加 `Kp`；再增加较小 `Ki` 消除稳态误差。每组参数至少完成 3 次同条件测试。
+`VISION_RECOVERY` 是Orange Pi视觉策略内部状态，不是Arduino安全状态。这样高层可以改变恢复策略，但不能越过UNO的物理启动和命令年龄约束。
 
-## 5. 超声波巡墙 PD（保留参考，当前未使用）
+`VISION_RECOVERY` is an internal Orange Pi vision-strategy state, not an Arduino safety state. This lets the high level change its recovery strategy without bypassing the UNO physical-start and command-age constraints.
 
-当前车辆不安装右侧超声波，不运行本节巡墙PD。以下内容只用于理解早期代码。
+## 4. 历史算法参考 / Historical Algorithm References
 
-右侧距离误差为 `e_d = d_right - d_target`。当距离大于目标值时车辆需要向右修正；距离小于目标值时向左修正。控制律：
+编码器PI、超声波巡墙PD和 `pulseIn()` 处理只解释旧示例，当前车辆不运行。 / Encoder PI, ultrasonic wall-following PD and `pulseIn()` handling only explain old examples and do not run on the current vehicle.
 
-`steer = Kp_d × e_d + Kd_d × (e_d - e_previous) / dt`
+- 速度PI / Speed PI：`PWM = Kp_v × e_v + Ki_v × ∫e_v dt`
+- 巡墙PD / Wall-follow PD：`steer = Kp_d × e_d + Kd_d × (e_d - e_previous) / dt`
+- 历史滤波 / Historical filter：`filtered = 0.65 × previous + 0.35 × sample`
 
-比例项决定纠偏强度，微分项抑制蛇形振荡。输出经过最大转向限幅，再映射到舵机物理安全角度。无有效右侧回波时暂时直行，这是可预测的降级行为；最终版本可根据连续无效次数进入减速或停车。
-
-## 6. 超声波处理（保留参考，当前未使用）
-
-程序使用 10 μs 触发脉冲与超时读取，并顺序触发两只传感器以减少串扰。超范围或无回波统一表示为 999 cm。有效样本使用一阶低通滤波：
-
-`filtered = 0.65 × previous + 0.35 × sample`
-
-滤波能降低随机抖动，但会产生延迟。因此紧急停车阈值需要通过最坏车速下的停车距离试验确认，不能只依据静态测距设定。
-
-## 7. 示例代码的时间和阻塞风险（当前视觉方案无 `pulseIn()`）
-
-`pulseIn()` 是阻塞函数，两个传感器都超时时可能占用约 50 ms，加上其他处理会使实际周期超过目标 50 ms。代码使用真实 `dt` 计算速度和微分，减小周期变化影响。若后续增加更多传感器或视觉处理，应改用非阻塞测距或分时调度。
-
-## 8. 障碍赛视觉架构
-
-当前障碍赛方案完全基于视觉，需要完成方向确认、颜色目标检测、障碍物相对位置估计、合规侧通过、丢失目标恢复、圈数统计和停车区状态。视觉模块输出颜色、置信度、横向偏差以及目标转向/速度。安全停车依靠视觉帧超时、串口命令超时、上电默认停止和人工停止；目前没有底层距离传感器作为独立保障。
-
-建议视觉数据流：
+## 5. 当前视觉数据流 / Current Vision Data Flow
 
 ```mermaid
 flowchart LR
-  CAM[USB彩色摄像头 480p/30FPS] --> OPI[Orange Pi Zero 3W 4GB]
-  OPI --> UNDISTORT[广角畸变校正]
-  UNDISTORT --> ROI[裁剪赛道ROI]
-  ROI --> HSV[颜色空间转换]
-  HSV --> MASK[红/绿阈值分割]
-  MASK --> MORPH[形态学去噪]
-  MORPH --> CONTOUR[轮廓/连通域]
-  CONTOUR --> TARGET[颜色+中心位置+面积+置信度]
-  TARGET --> MSG[结构化目标消息\n序号/时间戳/置信度/CRC]
-  MSG --> FSM[Arduino障碍处理状态机]
+  C["USB摄像头 / Camera"] --> U["去畸变 / Undistort"]
+  U --> R["ROI"]
+  R --> M["红绿掩膜 / Red-green masks"]
+  M --> T["目标与置信度 / Target and confidence"]
+  T --> S["转向速度消息 / Steering-speed message"]
+  S --> A["Arduino限幅与执行 / limits and execution"]
 ```
 
-视觉处理不直接写电机 PWM，而是输出目标转向与速度，由Arduino完成限幅和执行。因为摄像头是唯一感知来源，摄像头暂时丢帧、画面冻结、视觉进程停止或串口中断时，Arduino必须根据命令时间戳/超时停止电机，不能维持最后一条运动命令。
+视觉输出目标转向和速度，而不是PWM。当前协议没有源时间戳，因此UNO只依据最近合法收包时间执行250 ms本地超时。画面冻结、进程停止或串口中断时，不能维持最后运动命令。
+
+Vision outputs target steering and speed, not PWM. The current protocol has no source timestamp, so the UNO enforces a 250 ms local timeout from the most recent valid line. If frames freeze, the process stops or serial communication breaks, it never holds the last motion command indefinitely.

@@ -1,74 +1,76 @@
-# 机械设计与理论计算
+# 机械设计与理论计算 / Mechanical Design and Theoretical Calculations
 
-Mechanical Design and Theoretical Calculations
+**当前配置：** 编码器数据仅作底盘规格参考，当前控制不使用编码器反馈。
 
-**当前配置 / Current configuration:** 编码器参数仅作为底盘规格参考，当前车辆不使用编码器反馈。Encoder values are retained as chassis reference data only and are not used for current control.
+**Current configuration:** Encoder data is retained only as chassis reference information and is not used for current control.
 
-## 1. 阿克曼转向原理
+## 1. 阿克曼转向 / Ackermann Steering
 
-转弯时内侧前轮行驶半径小于外侧前轮，因此内轮转角应大于外轮转角。理想阿克曼条件可写为：
+转弯时内前轮半径较小，所以内轮转角应大于外轮。理想关系为：
+
+During a turn, the inner front wheel follows a smaller radius, so its steering angle should be larger. The ideal relationship is:
 
 `cot(δ_outer) - cot(δ_inner) = W / L`
 
-其中 `L` 为轴距，`W` 为轮距。RF-A101HE 使用舵机与四根拉杆驱动左右转向节，使两个前轮形成不同转角。实际机构会受舵臂长度、拉杆孔位、间隙与轮胎变形影响，因此理论关系需要用俯视照片和转角实测验证。
+其中 `L` 为轴距，`W` 为轮距。实际关系受舵臂、拉杆孔位、间隙和轮胎变形影响，必须用俯视照片和实测转角验证。
 
-## 2. 转弯半径
+Here `L` is wheelbase and `W` is track width. Servo horn geometry, linkage holes, play and tyre deformation affect the real relationship, which must be verified with top-view photographs and angle measurements.
 
-以等效自行车模型近似，车辆中心线转弯半径为：
+## 2. 转弯半径 / Turning Radius
+
+等效自行车模型： / Equivalent bicycle model:
 
 `R = L / tan(δ)`
 
-团队确认轴距 `L=0.174 m`、轮距 `W=0.123 m`，底盘规格给出最小转弯半径 0.475 m。若使用等效自行车模型反推等效转角：
+使用 `L=0.174 m` 和标称 `R=0.475 m`： / With `L=0.174 m` and rated `R=0.475 m`:
 
 `δ_equivalent = atan(0.174 / 0.475) ≈ 20.1°`
 
-该结果与规格图“爬坡角小于20°”无关，前者是转向几何角度，后者是坡度能力。475 mm 是底盘标称最小转弯半径，实际参赛车辆仍受载荷、轮胎侧滑和舵机限位影响。最终应在地面标记后，以低速稳定转一整圈，分别测量左转与右转的轨迹半径。
+该角度是转向几何，不是“小于20°”的爬坡指标。最终应低速完整转圈，分别测量左右轨迹半径。
 
-## 3. 速度计算（厂家编码器参考，当前未用于控制）
+This is a steering-geometry angle, unrelated to the “below 20°” climbing specification. Complete low-speed circles and measure left and right path radii separately.
 
-当前车辆不连接霍尔编码器，也不运行编码器速度闭环。以下计算仅用于说明底盘规格和未来可能的测量方法；当前实际速度必须通过固定距离计时获得。
+## 3. 速度参考 / Speed Reference
 
-编码器速度换算使用：
+当前车辆不接编码器，实际速度用固定距离计时。以下公式只解释底盘规格参数：
+
+The current vehicle does not connect encoders; measure actual speed over a fixed distance. The following equation only explains the published chassis data:
 
 `v = ΔN × πD / (CPR × i × Δt)`
 
-团队确认编码器精度 `CPR=12`（一圈 12 个脉冲信号）、减速比 `i=8.864`、轮径 `D=0.047 m`。每个电机轴脉冲对应的理论行驶距离约为：
+使用 `CPR=12`、`i=8.864`、`D=0.047 m`，理论每脉冲约1.39 mm。必须确认CPR计数方式，否则可能产生2倍或4倍误差。
 
-`π × 0.047 / (12 × 8.864) ≈ 0.001388 m`
+With `CPR=12`, `i=8.864` and `D=0.047 m`, theoretical travel is about 1.39 mm per pulse. The CPR counting convention must be confirmed to avoid twofold or fourfold error.
 
-即约 1.39 mm/脉冲。必须确认 CPR 是单通道上升沿计数、双边沿计数还是完整正交计数；计数定义不同会造成 2 倍或 4 倍误差。
+1692 rpm对应约4.17 m/s，而底盘规格资料另列3.5 m/s参考值。前者视为理论值，后者视为运行参考值，最终以实测为准。
 
-规格图给出的车轮转速为 1692 rpm。按轮径 47 mm 计算理论圆周速度：
+The listed 1692 rpm corresponds to about 4.17 m/s, while the chassis specification also lists a 3.5 m/s reference. Treat the former as theoretical and the latter as practical reference; measurement is authoritative.
 
-`v = π × 0.047 × 1692 / 60 ≈ 4.17 m/s`
-
-同一规格图给出的 12 V 参考速度是 3.5 m/s。文档将 4.17 m/s 视为由标称转速得到的理论值，将 3.5 m/s 视为厂家参考运行值；差异可能来自负载、传动损失或转速定义，最终以实车固定距离计时为准。
-
-## 4. 驱动力与扭矩
-
-轮端扭矩与牵引力计算式：
+## 4. 驱动力与扭矩 / Traction and Torque
 
 - `T_wheel = T_motor × i × η`
 - `F_traction = T_wheel / r_wheel`
 
-其中 `η` 为齿轮、差速器和传动轴的综合效率。规格给出驱动电机工作电压 6-12 V、额定电流 1.9 A、额定功率 22.8 W，满足 `12 V × 1.9 A = 22.8 W`。舵机工作电压为 4.5-7 V、驱动电流 400-800 mA、标称扭矩 10 kg·cm。没有电机输出扭矩曲线和传动效率实测前，不推算虚假牵引力；应通过斜坡或已知阻力实验验证。
+电机规格为6–12 V、1.9 A、22.8 W；舵机为4.5–7 V、400–800 mA、10 kg·cm。没有扭矩曲线和效率实测时不虚构牵引力，应以斜坡或已知阻力试验验证。
 
-## 5. 重心与安装
+Motor specifications are 6–12 V, 1.9 A and 22.8 W; servo specifications are 4.5–7 V, 400–800 mA and 10 kg·cm. Do not invent traction without torque-curve and efficiency measurements; validate it with a ramp or known-resistance test.
 
-- 电池和较重的驱动器应尽量低且靠近车辆纵向中心，减少侧倾和左右载荷差。
-- 线束不能进入转向拉杆、传动轴或轮胎运动范围。
-- 摄像头支架需有足够刚度，行驶振动或轻触后高度和俯仰角不应改变。
-- UNO 与电源模块下方应使用绝缘垫柱，避免焊点接触金属件。
-- 所有可调结构应做位置标记，便于赛场拆装后恢复。
+## 5. 重心与安装 / Centre of Gravity and Mounting
 
-## 6. 机械验收项目
+- 电池和重件低位居中 / Keep the battery and heavy parts low and central.
+- 线束远离拉杆、轴和轮胎 / Keep wiring away from links, shafts and tyres.
+- 摄像头支架必须刚性且可重复定位 / Make the camera bracket rigid and repeatable.
+- 电路板使用绝缘垫柱 / Use insulating standoffs under circuit boards.
+- 可调结构做位置标记 / Mark all adjustable structures.
 
-| 项目 | 验收方法 | 合格判据 |
+## 6. 机械验收 / Mechanical Acceptance
+
+| 项目 / Item | 方法 / Method | 合格判据 / Criterion |
 |---|---|---|
-| 转向中位 | 车辆低速直行 2 m | 无明显持续偏转 |
-| 左右极限 | 抬轮逐度测试 | 无顶死、无拉杆干涉 |
-| 回差 | 左右接近中位并测轮角 | 可重复且差异可记录 |
-| 轮胎与车轴 | 手动转动 | 无明显卡滞、松旷 |
-| 紧固件 | 扭矩与标记检查 | 无松动、无缺件 |
-| 摄像头支架 | 轻触后复查画面ROI | 高度、俯仰角和画面位置稳定 |
-| 线束 | 全行程转向观察 | 无拉扯、夹线、摩擦 |
+| 转向中位 / Steering centre | 低速直行2 m / 2 m low-speed straight run | 无持续偏转 / No persistent drift |
+| 左右极限 / Limits | 抬轮逐度测试 / Lifted-wheel angle steps | 无顶死或干涉 / No stall or interference |
+| 回差 / Backlash | 双向回中测角 / Approach centre from both sides | 可重复并记录 / Repeatable and recorded |
+| 轮胎车轴 / Wheels and axles | 手动转动 / Rotate manually | 无卡滞松旷 / No binding or looseness |
+| 紧固件 / Fasteners | 扭矩与标记 / Torque and marks | 无松动缺件 / No loose or missing parts |
+| 摄像头支架 / Camera mount | 轻触后复查ROI / Recheck ROI after light touch | 画面稳定 / Image remains stable |
+| 线束 / Wiring | 全转向观察 / Observe full steering travel | 无拉扯夹擦 / No pull, pinch or rub |

@@ -1,19 +1,17 @@
-# 团队、赛事成果与制作过程照片
-
-Team, Competition and Development Process Photos
+# 团队、赛事成果与制作过程照片 / Team, Competition and Development Photographs
 
 本目录记录南京博颂学校 WRO Future Engineers 队伍的正式团队照、2026 WRO中国区选拔赛（北京站）冠军领奖照，以及控制器装配、接线、编程、讨论和调试阶段的真实制作过程。11张过程照片统一使用 `making-process-XX-内容.jpg` 命名，便于裁判从仓库首页直接查看并追溯研发过程。
 
 This folder contains the official team photograph, the 2026 WRO China Qualification Tournament (Beijing) championship photograph and eleven authentic development-process photographs covering assembly, wiring, programming, discussion and testing.
 
-## 学校队旗 School Flag
+## 学校队旗 / School Flag
 
 [![南京博颂学校队旗 / Bona Sonority School Nanjing flag](team-flag.jpg)](team-flag.jpg)
 
 - 学校 / School：南京博颂学校 / **BONA SONORITY SCHOOL NANJING**
 - 完整团队介绍 / Full team profile：[`other其他/team-profile.md`](../other其他/team-profile.md)
 
-## 团队与赛事成果 Team and Competition Results
+## 团队与赛事成果 / Team and Competition Results
 
 | 内容 Content | 文件 File | 状态 Status |
 |---|---|---|
@@ -22,24 +20,24 @@ This folder contains the official team photograph, the 2026 WRO China Qualificat
 | 陆昭颖正式成员照 / Formal portrait of Lu Zhaoying | [`陆昭颖.jpg`](陆昭颖.jpg) | 已完成 / Complete |
 | 陆昭颖形象照 / Additional portrait of Lu Zhaoying | [`陆昭颖形象照.jpg`](陆昭颖形象照.jpg) | 已完成 / Complete |
 | 张隽泽正式成员照 / Formal portrait of Zhang Junze | [`张隽泽.jpg`](张隽泽.jpg) | 已完成 / Complete |
-| 黄鸣博成员照 / Portrait of Huang Mingbo | 待补充 / Pending | 待补充 / Pending |
+| 黄鸣博正式成员照 / Formal portrait of Huang Mingbo | [`黄鸣博.jpg`](黄鸣博.jpg) | 已完成 / Complete |
 | 全员趣味团队照 / Informal team photograph | `team-funny.jpg` | 待补充 / Pending |
 
 [![南京博颂学校正式团队照](team-official.jpg)](team-official.jpg)
 
 [![南京博颂学校北京站冠军领奖照](award-beijing-champion.jpg)](award-beijing-champion.jpg)
 
-## 成员照片 Member Portraits
+## 成员照片 / Member Portraits
 
 | 陆昭颖 / Lu Zhaoying | 张隽泽 / Zhang Junze | 黄鸣博 / Huang Mingbo |
 |---|---|---|
-| [![陆昭颖正式成员照 / Formal portrait of Lu Zhaoying](陆昭颖.jpg)](陆昭颖.jpg) | [![张隽泽正式成员照 / Formal portrait of Zhang Junze](张隽泽.jpg)](张隽泽.jpg) | 照片待补充 / Portrait pending |
+| [![陆昭颖正式成员照 / Formal portrait of Lu Zhaoying](陆昭颖.jpg)](陆昭颖.jpg) | [![张隽泽正式成员照 / Formal portrait of Zhang Junze](张隽泽.jpg)](张隽泽.jpg) | [![黄鸣博正式成员照 / Formal portrait of Huang Mingbo](黄鸣博.jpg)](黄鸣博.jpg) |
 
-### 陆昭颖形象照 Additional Portrait of Lu Zhaoying
+### 陆昭颖形象照 / Additional Portrait of Lu Zhaoying
 
 [![陆昭颖形象照 / Additional portrait of Lu Zhaoying](陆昭颖形象照.jpg)](陆昭颖形象照.jpg)
 
-## 制作过程照片索引 Development Process Index
+## 制作过程照片索引 / Development Process Index
 
 | 编号 No. | 制作环节 Development Activity | 文件 File |
 |---:|---|---|
@@ -55,18 +53,20 @@ This folder contains the official team photograph, the 2026 WRO China Qualificat
 | 10 | 根据测试结果修改软件 / Software revision based on tests | [`making-process-10-software-test.jpg`](making-process-10-software-test.jpg) |
 | 11 | 控制器功能测试 / Controller functional test | [`making-process-11-controller-test.jpg`](making-process-11-controller-test.jpg) |
 
-## 首页展示图 Landing-page Image
+## 首页展示图 / Landing-page Image
 
 [![南京博颂学校团队制作过程](making-process-01-team-workshop.jpg)](making-process-01-team-workshop.jpg)
 
-## 规则要求的团队照 Required Team Photographs
+## 规则要求的团队照 / Required Team Photographs
 
 - [x] `team-official.jpg`：全体参赛队员正面、清晰、背景整洁 / all members visible clearly in a formal photograph;
 - [ ] `team-funny.jpg`：全体参赛队员入镜的趣味照片 / an informal photograph including all members.
 
 后续趣味团队照应确保所有参赛队员均清晰入镜，同时避免公开不必要的个人隐私。
 
-## 团队分工 Team Roles
+The future informal team photograph should show every member clearly while avoiding unnecessary disclosure of personal information.
+
+## 团队分工 / Team Roles
 
 | 角色 Role | 主要职责 Main Responsibilities | 姓名 Name |
 |---|---|---|

@@ -1,66 +1,66 @@
-# 完整复现指南 Reproduction Guide
+# 完整复现指南 / Complete Reproduction Guide
 
-**当前配置 / Current configuration:** 复现时只安装USB摄像头视觉链路，不安装超声波或编码器反馈。Reproduction uses only the USB-camera vision chain; ultrasonic sensors and encoder feedback are not installed.
+**当前配置：** 只安装USB摄像头视觉链路，不安装超声波或编码器反馈。
 
-## 1. 所需资料
+**Current configuration:** Install only the USB-camera vision chain, with no ultrasonic sensors or encoder feedback.
 
-- 本仓库全部文件；
-- `models模型/HSP94182层板.dxf`；
-- 最终物料表和部件规格书；
-- 最终接线图；
-- Arduino IDE 与 USB 数据线；
-- Orange Pi Zero 3W 4GB、已验证系统镜像、microSD 和读卡器；
-- USB-C 5 V/3 A 稳压电源、OTG 转接线/集线器和散热风扇；
-- 万用表、钢尺/卡尺、电子秤和串口记录工具。
+## 1. 所需资料与工具 / Required Materials and Tools
 
-## 2. 机械装配
+- 本仓库、层板DXF、最终BOM和接线图 / This repository, plate DXF, final BOM and wiring diagram.
+- Arduino IDE和USB线 / Arduino IDE and USB cable.
+- Orange Pi Zero 3W 4GB、已验证镜像、microSD和读卡器 / Orange Pi, verified image, microSD and reader.
+- 5 V/3 A稳压、OTG集线器和风扇 / 5 V/3 A regulator, OTG hub and fan.
+- 万用表、尺、卡尺、电子秤和日志工具 / Multimeter, ruler, caliper, scale and logging tools.
 
-1. 组装 RF-A101HE 底盘，检查差速器、传动轴、轮胎和转向拉杆。
-2. 使用层板 DXF 核对安装孔位，按最终装配照片固定层板。
-3. 电池尽量低位居中固定；控制板使用绝缘垫柱。
-4. 将USB摄像头固定在最终高度和俯仰角，确保支架不会在行驶中位移。
-5. 布置线束，确保全转向行程内不接触拉杆、轮胎和传动轴。
+## 2. 机械装配 / Mechanical Assembly
 
-## 3. 电气装配
+1. 检查差速器、传动轴、轮胎和拉杆 / Check differentials, shaft, tyres and links.
+2. 用DXF核对孔位并固定层板 / Verify holes with the DXF and mount the plates.
+3. 电池低位居中，板卡使用绝缘垫柱 / Keep battery low/central and use insulating standoffs.
+4. 固定摄像头最终高度和角度 / Fix final camera height and angle.
+5. 全转向检查线束不接触运动件 / Check wiring clearance through full steering travel.
 
-1. 确认驱动器是 AT8236 还是 DRV8701/MD02 Pro。
-2. 断电状态下按 `schemes原理图/wiring.md` 连接。
-3. 舵机棕色接 GND、红色接合规 4.5-7 V、黄色接信号。
-4. 电机和舵机使用满足电流要求的电源支路，不从 UNO 5 V 直接取大电流。
-5. Orange Pi 使用独立 5 V/3 A 稳压支路，不从 UNO 5 V 取电。
-6. 所有模块共地；上电前用万用表检查极性和电压。
+## 3. 电气装配 / Electrical Assembly
 
-## 4. 软件安装
+1. 确认AT8236或DRV8701/MD02 Pro / Identify AT8236 or DRV8701/MD02 Pro.
+2. 断电按[接线说明](../schemes原理图/wiring.md)连接 / Wire with power off using the [wiring guide](../schemes原理图/wiring.md).
+3. 舵机棕GND、红4.5–7 V、黄信号 / Servo: brown GND, red 4.5–7 V, yellow signal.
+4. 电机、舵机和Orange Pi使用合适独立支路 / Use suitable independent branches for motor, servo and Orange Pi.
+5. 全部共地，上电前检查极性和电压 / Use common ground and check polarity/voltage before power-up.
 
-1. 安装 Arduino IDE。
-2. 最终UNO视觉执行程序应只依赖必要库，负责串口命令、舵机、电机和超时停车；仓库的超声波/编码器程序不是当前比赛程序。
-3. 根据实物驱动器确认PWM/DIR或双PWM接口，并使用与 `steer,speed` 视觉协议匹配的唯一 `.ino`。
-4. 选择开发板和串口，编译并上传；以 115200 baud 打开串口监视器。
-5. 将团队冻结并记录校验值的 Orange Pi Zero 3W 系统镜像写入 microSD；首次配置使用有线显示/键盘或离线配置，不依赖比赛现场网络。
-6. 按 `src源代码/requirements.txt` 安装并记录 OpenCV、NumPy、PySerial 和视觉程序版本，保存 `uname -a`、`free -h`、`lsusb` 与摄像头格式枚举结果。
-7. 先用录像运行 `bev_road.py` 与 `bev_segmentation.py`，复制 `serial_config.example.json` 为 `serial_config.json` 并修改真实串口；再配置视觉程序为本地自动启动服务。程序未通过摄像头、串口和参数自检时不得发送运动命令。
-8. 关闭并验证 Wi-Fi 与蓝牙；保存 `ip link` 和 `rfkill list` 作为合规证据。
-9. 制作系统盘镜像备份，并准备一张已验证的备用 microSD。
+## 4. 软件安装 / Software Installation
 
-## 5. 首次启动
+1. 安装Arduino IDE、Arduino AVR Boards `1.8.8`和标准Servo库 `1.3.0` / Install Arduino IDE, Arduino AVR Boards `1.8.8` and the standard Servo library `1.3.0`.
+2. 打开并编译 [`VisionSerialExecutor.ino`](../src源代码/VisionSerialExecutor/VisionSerialExecutor.ino)；历史超声波/编码器程序不用于当前比赛车辆 / Open and build [`VisionSerialExecutor.ino`](../src源代码/VisionSerialExecutor/VisionSerialExecutor.ino); historical sensor sketches are not current competition code.
+3. 核实实物为PWM/DIR接口，再按D2舵机、D6 PWM、D7 DIR、D8常开按钮到GND接线；若为双PWM，先修改并重新审核程序与图纸 / Verify a PWM/DIR interface, then wire D2 servo, D6 PWM, D7 DIR and a normally-open D8-to-GND button. For dual PWM, revise and re-review the sketch and drawing first.
+4. 以Arduino UNO目标编译上传并匹配115200 baud；仓库记录的基线编译占用为5544 bytes程序空间和277 bytes全局变量；架空执行U-01至U-10 / Build and upload for the Arduino UNO target and match 115200 baud; the recorded baseline build uses 5,544 bytes of program storage and 277 bytes of global-variable memory; perform U-01 through U-10 with wheels lifted.
+5. 写入冻结且有校验值的Orange Pi镜像 / Flash a frozen checksummed Orange Pi image.
+6. 安装并记录OpenCV、NumPy、PySerial，保存系统和UVC枚举 / Install and record dependencies; save system and UVC enumeration.
+7. 先用录像运行视觉，填写串口配置，再设置本地自动启动 / Test vision with recordings, set serial configuration, then configure local autostart.
+8. 关闭Wi-Fi/蓝牙并保存证据 / Disable Wi-Fi/Bluetooth and preserve evidence.
+9. 制作系统盘备份 / Back up the system disk.
 
-1. 抬起驱动轮，只给控制系统上电。
-2. 确认车辆停在 `WAIT_START`，舵机处于中位。
-3. 给 Orange Pi 上电，确认系统、摄像头、`bev_segmentation.py` 和有线串口自检通过，且初始目标速度为0；拔掉摄像头验证 Arduino 会保持停车或进入故障安全状态。
-4. 按启动按钮，低速确认电机方向、舵机方向和视觉命令正负方向；当前不检查编码器速度。
-5. 若任何方向错误，立即停止并修改方向配置；不要在地面高速试错。
-6. 按 `calibration-guide.md` 完成标定，并连续运行30分钟记录 Orange Pi 温度、掉帧、USB重连和5 V电压。
+## 5. 首次启动 / First Start
 
-## 6. 可复现验收
+1. 抬轮，只给控制系统上电 / Lift wheels and power the control system only.
+2. 确认 `WAIT_START`、电机停止和舵机中位 / Confirm `WAIT_START`, stopped motor and centred servo.
+3. 启动Orange Pi，确认摄像头、视觉和串口自检且目标速度为0 / Start Orange Pi and confirm camera, vision and serial self-tests with zero target speed.
+4. 拔摄像头确认Arduino保持停车 / Unplug the camera and confirm the Arduino remains stopped.
+5. 按启动按钮，低速确认电机、舵机和命令符号 / Press start and verify motor, servo and command signs at low speed.
+6. 完成标定和30分钟稳定性测试 / Complete calibration and a 30-minute stability test.
 
-另一名未参与编程的队员应仅依据仓库完成以下任务：找到正确程序、恢复 Orange Pi 系统盘、完成接线核对、上传 Arduino 程序、解释高低层状态机、完成低速启动和读取测试日志。任何必须依靠口头提示的步骤都应补进文档。
+## 6. 复现验收 / Reproduction Acceptance
 
-## 7. 仍需补齐才能完全复现
+未参与编程的队员应仅依据仓库找到程序、恢复系统盘、核对接线、上传Arduino、解释状态机、低速启动并读取日志。任何需要口头提示的步骤都应写入文档。
 
-- 最终实车六视图和摄像头安装尺寸；
-- 最终部件准确型号与规格书；
-- 最终电路图和电源预算；
-- Orange Pi 最终镜像、系统版本、自动启动服务及恢复说明；
-- Orange Pi 到摄像头和 Arduino 的实际转接线/集线器型号；
-- 舵机、视觉命令对应速度与转弯实测参数；
-- 最终比赛程序及对应演示视频。
+A member not involved in programming should use only the repository to locate programs, restore the system disk, check wiring, upload Arduino code, explain the state machine, start at low speed and read logs. Any step requiring verbal help must be added to the documentation.
+
+## 7. 尚缺资料 / Remaining Material
+
+- 六视图和摄像头尺寸 / Six views and camera dimensions.
+- 准确型号与规格书 / Exact models and datasheets.
+- 最终实物型号、电源预算与接线照片 / Final physical models, power budget and wiring photographs.
+- 最终镜像、自动启动和恢复说明 / Final image, autostart and recovery instructions.
+- 实际OTG集线器型号 / Actual OTG hub model.
+- 舵机、速度和转弯实测 / Measured servo, speed and turning data.
+- 最终比赛参数、提交号和对应视频 / Final competition parameters, commit and matching video.

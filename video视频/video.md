@@ -1,59 +1,59 @@
-# 车辆驾驶演示视频 Vehicle Driving Demonstration
+# 车辆驾驶演示视频 / Vehicle Driving Demonstration
 
-**当前方案 / Current approach:** 视频对应的车辆以USB摄像头视觉作为唯一环境感知。The demonstrated vehicle uses USB-camera vision as its only environmental sensing method.
+视频车辆以USB摄像头视觉作为唯一环境感知。 / The demonstrated vehicle uses USB-camera vision as its only environmental sensing method.
 
-## 正式视频链接
+## 正式链接 / Official Link
 
-**视频标题 / Title:** 2026 WRO Future Engineers | 南京博颂学校 BONA SONORITY SCHOOL NANJING | Autonomous Driving Demonstration
+**标题 / Title:** 2026 WRO Future Engineers | 南京博颂学校 BONA SONORITY SCHOOL NANJING | Autonomous Driving Demonstration
 
-**YouTube URL:** <https://youtu.be/DJcxiJCEFdo>
+**YouTube:** <https://youtu.be/DJcxiJCEFdo>
 
-**链接状态：** 已于 2026-07-15 验证，可正常打开并显示上述标题。最终提交前再次用未登录浏览器确认公开或“不公开列出”访问权限。
+链接于2026-07-15验证。最终提交前应使用未登录浏览器再次确认公开或“不公开列出”权限。
 
-[![观看南京博颂学校WRO自动驾驶演示](https://img.youtube.com/vi/DJcxiJCEFdo/hqdefault.jpg)](https://youtu.be/DJcxiJCEFdo)
+The link was verified on 2026-07-15. Before final submission, verify public or unlisted access again in a signed-out browser.
 
-点击缩略图即可在 YouTube 观看。
+[![观看演示 / Watch demonstration](https://img.youtube.com/vi/DJcxiJCEFdo/hqdefault.jpg)](https://youtu.be/DJcxiJCEFdo)
 
-## 本地演示文件
+## 本地文件 / Local File
 
-仓库中已加入 `南京博颂学校未来工程师1.0演视视频.mp4`，检查结果为：
+`南京博颂学校未来工程师1.0演视视频.mp4`
 
-| 项目 | 检查值 |
+| 项目 / Item | 检查值 / Verified Value |
 |---|---:|
-| 时长 | 106.812秒（约1分47秒） |
-| 画面 | 1920×1080，30 FPS，H.264 |
-| 音频 | AAC |
-| 大小 | 91,299,421字节（87.07 MiB） |
+| 时长 / Duration | 106.812 s (约1:47 / approximately 1:47) |
+| 视频 / Video | 1920×1080, 30 FPS, H.264 |
+| 音频 / Audio | AAC |
+| 大小 / Size | 91,299,421 bytes (87.07 MiB) |
 
-该压缩版本已经进入Git记录并低于普通Git单文件100 MB限制。比赛公开观看仍以YouTube链接为准；未压缩原片应另外备份，不要再加入仓库。
+该版本低于GitHub 100 MB单文件限制。公开观看以YouTube为准；未压缩原片另行备份，不加入仓库。
 
-## 视频必须展示
+This version is below GitHub's 100 MB per-file limit. YouTube remains the public viewing source; back up the uncompressed original separately and do not add it to the repository.
 
-- 最终参赛车辆与仓库照片一致；
-- 独立启动按钮启动，启动前车辆保持停止；
-- 连续自动驾驶片段不少于规则要求的时长；
-- 完整展示视觉直线、转弯、赛道循迹和安全停车；
-- 若作为障碍挑战证明，应展示红绿障碍物的合规处理；
-- 视频无剪切到无法判断是否人工干预的程度；
-- 链接为公开或任何持有链接者可访问。
+## 视频展示要求 / Required Video Content
 
-## 对应版本记录
+- 最终车辆与仓库照片一致 / Final vehicle matches repository photographs.
+- 启动前停止，独立按钮启动 / Stopped before start and launched by an independent button.
+- 自动驾驶片段满足规则时长 / Autonomous segment meets the rule duration.
+- 展示直线、转弯、循迹和安全停车 / Shows straights, turns, tracking and safe stopping.
+- 若证明障碍赛，展示红绿合规处理 / If used for obstacle proof, shows compliant red-green handling.
+- 可判断无人工干预 / Editing still allows verification of no human intervention.
+- 链接公开或持链接可访问 / Public or unlisted-accessible link.
 
-| 项目 | 内容 |
+## 版本记录 / Version Record
+
+| 项目 / Item | 内容 / Content |
 |---|---|
-| 学校/队伍 School/Team | 南京博颂学校 / BONA SONORITY SCHOOL NANJING |
-| YouTube视频ID | `DJcxiJCEFdo` |
-| 拍摄日期 | 待填写 |
-| Git 提交号 | 待填写 |
-| 视觉程序 | `src源代码/bev_segmentation.py`（是否为视频版本待确认） |
-| 驱动器 | AT8236 / DRV8701，二选一 |
-| 高层计算机 | Orange Pi Zero 3W 4GB |
-| 底层控制器 | UNO / ESP32，最终版本待确认 |
-| 电池电压 | 待填写 |
-| 速度参数 | 待填写 |
-| 视觉参数 | 相机模式、ROI、HSV、道路/信标权重、最大转向待填写 |
-| 其他距离/速度传感器 | 当前不使用超声波和编码器 |
-| 场地配置 | 待填写 |
-| 连续成功回合 | 待填写 |
+| 学校 / School | 南京博颂学校 / BONA SONORITY SCHOOL NANJING |
+| YouTube ID | `DJcxiJCEFdo` |
+| 拍摄日期 / Recording date | 待填 / TBD |
+| Git提交 / Commit | 待填 / TBD |
+| 视觉程序 / Vision program | `bev_segmentation.py`，是否匹配待确认 / match pending |
+| 驱动器 / Driver | AT8236或DRV8701，待确认 / AT8236 or DRV8701; pending confirmation |
+| 高层 / High level | Orange Pi Zero 3W 4GB |
+| 底层 / Low level | UNO或ESP32，待确认 / UNO or ESP32; pending confirmation |
+| 电池与速度 / Battery and speed | 待填 / TBD |
+| 视觉参数 / Vision parameters | 相机、ROI、HSV、权重、转向待填 / camera, ROI, HSV, weights and steering TBD |
+| 其他传感器 / Other sensors | 不使用超声波或编码器 / No ultrasonic or encoder use |
+| 场地与成功回合 / Field and successful laps | 待填 / TBD |
 
-记录视频对应的提交号能证明演示行为与仓库代码一致，避免后续参数更新造成无法复现。
+提交号用于证明视频行为与仓库代码一致。 / The commit proves that video behaviour matches repository code.

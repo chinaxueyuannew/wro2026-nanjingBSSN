@@ -26,12 +26,12 @@ const byte PIN_US_RIGHT_ECHO = 11;
 const byte PIN_START = 12;     // button to GND, INPUT_PULLUP
 const byte PIN_LED = 13;
 
-// ---------- Chassis parameters from the vendor example; verify ----------
+// ---------- Chassis specification parameters; verify on the team vehicle ----------
 const float ENCODER_CPR = 12.0f;
 const float GEAR_RATIO = 8.864f;
 const float WHEEL_DIAMETER_M = 0.047f;
 
-// Servo calibration. Vendor test range is about 55..115 degrees.
+// Servo calibration. The team's early test range is about 55..115 degrees.
 const int SERVO_RIGHT = 55;
 const int SERVO_CENTER = 90;
 const int SERVO_LEFT = 115;
@@ -99,7 +99,7 @@ void setMotorPwm(int pwm) {
     digitalWrite(PIN_MOTOR_A, LOW);
     analogWrite(PIN_MOTOR_B, -pwm);
   } else {
-    // Vendor AT8236 example uses both HIGH as braking/stop.
+    // The team's AT8236 experiment uses both HIGH as braking/stop.
     digitalWrite(PIN_MOTOR_A, HIGH);
     digitalWrite(PIN_MOTOR_B, HIGH);
   }

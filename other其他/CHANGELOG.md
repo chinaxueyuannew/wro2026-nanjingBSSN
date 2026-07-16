@@ -1,74 +1,58 @@
-# 版本与工程迭代日志
+# 版本与工程迭代日志 / Version and Engineering Changelog
 
-## V1.0 - 右侧巡墙基线（历史版本，当前不使用）
+## V1.0 历史巡墙基线 / Historical Wall-Following Baseline
 
-- Arduino UNO 控制；
-- 两路超声波读取；
-- 舵机角度映射与软件限位；
-- PWM/DIR 电机控制；
-- 右侧 30 cm 目标距离的 P 控制；
-- 串口实时输出调试数据。
+- Arduino UNO、双超声波、舵机、PWM/DIR、30 cm右墙P控制和串口日志 / Arduino UNO, dual ultrasonic, servo, PWM/DIR, 30 cm right-wall P control and serial logging.
+- 局限：无启动、颜色、速度闭环、停车区或滤波 / Limits: no start state, colour, speed loop, parking zone or filtering.
 
-已知限制：前方距离未参与决策；无启动按钮状态机；无障碍物颜色识别；无编码器速度闭环；无停车区策略；无传感器滤波。
+## V1.1–V2.0 早期计划 / Early Plans
 
-## V1.1 - 计划
+- 曾计划超声波滤波、编码器PID和完整状态机 / Previously planned ultrasonic filtering, encoder PID and a full state machine.
+- 当前路线改为Orange Pi视觉+Arduino安全执行，并加入有线协议、绕障、圈数和停车 / Current route changed to Orange Pi vision + Arduino safety execution with wired protocol, avoidance, lap count and parking.
 
-- 增加前方减速、转弯与紧急停止；
-- 增加超声波滤波和异常计数；
-- 用测试数据确定 KP、速度与目标墙距；
-- 修正文档中的实测机械与动力参数。
+## 2026-07-15 视觉计算平台 / Vision Compute Platform
 
-## V2.0 - 计划
+- 确认Zero 3W 4GB/A733并区别Zero 3/H618 / Confirmed Zero 3W 4GB/A733, distinct from Zero 3/H618.
+- 记录CPU、NPU、接口、5 V/3 A、散热、验收、BOM、接线、风险和复现 / Documented CPU, NPU, interfaces, power, cooling, acceptance, BOM, wiring, risk and reproduction.
+- 实机枚举、协议和稳定性待验 / Hardware enumeration, protocol and stability pending.
 
-- 引入编码器速度 PID；
-- 建立完整状态机；
-- 使用 Orange Pi Zero 3W 4GB 采集 USB 摄像头并识别红绿障碍；
-- 建立 Orange Pi 高层决策与 Arduino 安全控制的有线通信协议；
-- 增加合规绕行、通信超时、圈数与停车策略；
-- 完成长时间可靠性测试与正式演示视频。
+## 2026-07-16 视觉源码与安全 / Vision Source and Safety
 
-## 2026-07-15 - 视觉计算平台资料补充
+- 加入两份Python程序、依赖和串口示例 / Added two Python programs, dependencies and serial example.
+- 默认速度改0，修正阈值和制动，丢源/退出发送停止 / Set default speed to zero, corrected thresholds/braking and stop on source loss/exit.
+- 首页整合视频、照片、状态和索引 / Integrated video, photos, status and index on landing page.
 
-- 确认团队购买 SKU 为 Orange Pi Zero 3W 4GB（Allwinner A733），并与旧款 Zero 3/H618 区分；
-- 增加 CPU、NPU、内存、接口、5 V/3 A 供电、散热和系统验收文档；
-- 更新物料表、视觉架构、接线、电源预算、FMEA、复现流程和赛前检查表；
-- 当前仅完成设计与资料核对，系统镜像、摄像头枚举、串口协议和实车稳定性仍待验证。
+## 2026-07-16 照片和赛事资料 / Photos and Competition Material
 
-## 2026-07-16 - 视觉源码、安全检查与首页导航
+- 统一命名11张制作过程照片 / Renamed 11 process photographs consistently.
+- 加入正式团队照、北京冠军照和比赛车辆照 / Added official team, Beijing championship and competition-vehicle photos.
+- 趣味团队照和六视图待补 / Informal team photo and six views pending.
 
-- 记录新加入的 `bev_road.py` 与 `bev_segmentation.py`，补充依赖、运行命令、串口配置和验证边界；
-- 视觉主程序默认目标速度改为0，修正减速/避障阈值顺序和制动阶段输出，并增加视频源丢失/退出停车；
-- 加入Python依赖文件与串口配置示例；
-- 根README首页直接展示南京博颂学校、YouTube视频、团队研发照片、当前状态和完整文件索引；
-- 更新视频原片参数：1080p/30FPS、约106.8秒、132.37 MiB，并注明GitHub普通单文件限制。
+## 2026-07-16 视觉唯一感知 / Vision-Only Perception
 
-## 2026-07-16 - 制作过程照片分类
+- 确认只使用USB摄像头和Orange Pi，不使用超声波/编码器 / Confirmed USB camera and Orange Pi only, with no ultrasonic/encoder use.
+- 信号链改为摄像头→Orange Pi→有线串口→Arduino→执行器 / Updated chain to camera→Orange Pi→wired serial→Arduino→actuators.
+- 历史传感器程序统一标记为参考 / Marked historical sensor programs as references.
+- 压缩视频为H.264 1080p/30 FPS、106.8秒、87.07 MiB并进入Git / Added compressed H.264 1080p/30 FPS, 106.8 s, 87.07 MiB video to Git.
 
-- 将11张团队研发现场照片统一重命名为 `making-process-01` 至 `making-process-11`；
-- 按团队协作、装配、接线、编程和测试环节建立中英文照片说明与逐张链接；
-- 更新根README首页主图、当前状态、完整文件索引和提交前缺口；
-- 明确制作过程照片不替代规则另需的正式团队照与全员趣味照。
+## 2026-07-16 团队资料 / Team Profile
 
-## 2026-07-16 - 北京站赛事成果与现场照片
+- 加入队旗、校名、成员、教练和职责 / Added flag, school name, members, coach and roles.
+- 加入陆昭颖两张照片和张隽泽照片 / Added two Lu Zhaoying portraits and one Zhang Junze portrait.
+- 加入黄鸣博正式成员照并补齐三名队员个人照片 / Added Huang Mingbo's formal portrait and completed the three-member portrait set.
+- 首页、团队页和照片索引互链 / Linked landing page, team profile and photo index.
 
-- 新增正式团队照 `team-official.jpg`，三名参赛队员均清晰入镜；
-- 新增2026 WRO中国区选拔赛（北京站）未来工程师无人驾驶冠军领奖照；
-- 新增车辆在WRO场地运行的比赛现场照片；
-- 更新根README、照片目录说明、工程日志和比赛前检查表；
-- 保留全员趣味照和车辆六视图为待补项目。
+## 2026-07-16 全仓库中英对照 / Repository-Wide Bilingual Documentation
 
-## 2026-07-16 - 当前方案改为视觉唯一感知
+- 首页及全部Markdown文档改为中文后紧跟英文 / Converted the landing page and all Markdown documents to Chinese followed directly by English.
+- 标题、正文、表格、检查项和图片说明均双语化 / Made headings, prose, tables, checklists and image captions bilingual.
 
-- 确认当前车辆只使用USB摄像头和Orange Pi视觉，不使用超声波或编码器反馈；
-- 更新首页系统信号链为“摄像头 → Orange Pi → 有线串口 → Arduino → 舵机/电机”；
-- 将超声波巡墙、编码器速度PI和ESP32程序标记为历史/厂家参考；
-- 更新接线、BOM、软件架构、测试、FMEA、标定、复现和比赛检查表；
-- 明确视觉/摄像头/串口失效时必须通过底层命令超时停车。
-- 同步记录压缩演示视频为H.264、1080p/30FPS、约106.8秒、87.07 MiB，已进入Git记录。
+## 2026-07-16 规则评分审计与工程归档 / Rule-Rubric Audit and Engineering Archive
 
-## 2026-07-16 - 团队资料中英对照 / Bilingual Team Profile
-
-- 加入南京博颂学校队旗 / Added the BONA SONORITY SCHOOL NANJING flag;
-- 加入陆昭颖（程序）、张隽泽（结构）、黄鸣博（电子）和教练薛源的中英对照介绍 / Added bilingual member and coach roles;
-- 新增 `team-profile.md` 并从首页、照片目录和完整索引直接跳转 / Added a dedicated team profile linked from the landing page and photo index.
-- 加入陆昭颖正式照、陆昭颖形象照和张隽泽正式照，并同步到首页、团队介绍和照片索引 / Added the formal and additional portraits of Lu Zhaoying and the formal portrait of Zhang Junze to the landing page, team profile and photo index.
+- 逐页核对2026规则第8页和附录C五维30分技术文档量表 / Audited rule page 8 and the Appendix C five-dimension, 30-point documentation rubric page by page.
+- 新增五维评分证据地图、缺失证据登记、提交计划和双语工程日志PDF / Added a five-dimension evidence map, missing-evidence register, commit plan and bilingual engineering-log PDF.
+- 新增正式PNG/SVG接线图和可重复生成PDF的脚本 / Added formal PNG/SVG wiring diagrams and a reproducible PDF build script.
+- 新增当前视觉串口执行程序：D8物理启动、严格解析、输出限幅、250 ms看门狗和故障后重新启动 / Added the current vision serial executor with D8 physical start, strict parsing, output limits, a 250 ms watchdog and post-fault re-arm.
+- 使用Arduino AVR Boards `1.8.8`和Servo `1.3.0`完成UNO目标编译：5544 bytes程序空间、277 bytes全局变量 / Completed an UNO-target build with Arduino AVR Boards `1.8.8` and Servo `1.3.0`: 5,544 bytes of program storage and 277 bytes of global-variable memory.
+- 明确区分当前ASCII协议与尚未实现的序号/时间戳/CRC增强协议 / Clearly separated the current ASCII protocol from the unimplemented sequence/timestamp/CRC hardened protocol.
+- 本轮只更新工作区，未暂存、提交或推送 / Updated the working tree only; nothing was staged, committed or pushed.
