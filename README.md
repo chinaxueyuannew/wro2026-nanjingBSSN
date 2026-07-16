@@ -41,9 +41,9 @@ We collaborate on programming, mechanical structure and electronics for a vision
 
 ### 成员照片 / Member Portraits
 
-| 陆昭颖 / Lu Zhaoying | 张隽泽 / Zhang Junze | 黄鸣博 / Huang Mingbo |
+| 陆昭颖 🏳️‍🌈 / Lu Zhaoying | 张隽泽 / Zhang Junze | 黄鸣博 / Huang Mingbo |
 |---|---|---|
-| [![陆昭颖，程序 / Lu Zhaoying, Programming](t-photos团队照片/陆昭颖.jpg)](t-photos团队照片/陆昭颖.jpg) | [![张隽泽，结构 / Zhang Junze, Mechanical Structure](t-photos团队照片/张隽泽.jpg)](t-photos团队照片/张隽泽.jpg) | [![黄鸣博，电子 / Huang Mingbo, Electronics](t-photos团队照片/黄鸣博.jpg)](t-photos团队照片/黄鸣博.jpg) |
+| <a href="t-photos团队照片/陆昭颖.jpg"><img src="t-photos团队照片/陆昭颖.jpg" alt="陆昭颖，程序 / Lu Zhaoying, Programming" width="280"></a> | <a href="t-photos团队照片/张隽泽.jpg"><img src="t-photos团队照片/张隽泽.jpg" alt="张隽泽，结构 / Zhang Junze, Mechanical Structure" width="280"></a> | <a href="t-photos团队照片/黄鸣博.jpg"><img src="t-photos团队照片/黄鸣博.jpg" alt="黄鸣博，电子 / Huang Mingbo, Electronics" width="280"></a> |
 
 [陆昭颖形象照 / Additional portrait of Lu Zhaoying](t-photos团队照片/陆昭颖形象照.jpg)
 
