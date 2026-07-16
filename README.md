@@ -14,12 +14,28 @@
 
 视频详情、原片参数与对应版本记录见 [`video视频/video.md`](video视频/video.md)。
 
+## 队伍与赛事成果 / Team and Competition
+
+### 正式团队照
+
+[![南京博颂学校WRO未来工程师参赛队](t-photos团队照片/team-official.jpg)](t-photos团队照片/team-official.jpg)
+
+### 2026 WRO中国区选拔赛（北京站）未来工程师无人驾驶冠军
+
+[![南京博颂学校北京站冠军领奖照片](t-photos团队照片/award-beijing-champion.jpg)](t-photos团队照片/award-beijing-champion.jpg)
+
+### 车辆比赛现场
+
+[![南京博颂学校未来工程师车辆比赛现场](v-photos车辆照片/vehicle-competition-run.jpg)](v-photos车辆照片/vehicle-competition-run.jpg)
+
+更多研发记录见[制作过程照片索引](t-photos团队照片/README.md)，车辆结构检查仍需补充标准六视图。
+
 ## 快速跳转
 
-- [系统概述](#2-系统概述) · [机械设计](#3-移动性与机械设计) · [动力与传感器](#4-动力与传感器架构) · [软件与算法](#5-软件架构与控制策略)
+- [队伍与赛事成果](#队伍与赛事成果--team-and-competition) · [系统概述](#2-系统概述) · [机械设计](#3-移动性与机械设计) · [动力与传感器](#4-动力与传感器架构) · [软件与算法](#5-软件架构与控制策略)
 - [源代码总览](src源代码/README.md) · [接线与供电](schemes原理图/wiring.md) · [机械模型](models模型/README.md) · [物料表](other其他/BOM.md)
 - [测试记录](other其他/tests.md) · [工程日志](other其他/engineering-log.md) · [FMEA](other其他/FMEA.md) · [比赛检查表](other其他/competition-checklist.md)
-- [团队照片](t-photos团队照片/README.md) · [车辆照片要求](v-photos车辆照片/README.md) · [视频资料](video视频/video.md) · [完整文件索引](#10-完整文件索引)
+- [制作过程照片](t-photos团队照片/README.md) · [车辆照片要求](v-photos车辆照片/README.md) · [视频资料](video视频/video.md) · [完整文件索引](#10-完整文件索引)
 
 ## 当前成果状态
 
@@ -31,10 +47,10 @@
 | Orange Pi道路预处理 | `bev_road.py` 已入库 | Python语法通过，透视标定仍为实验配置 |
 | Orange Pi红绿视觉控制 | `bev_segmentation.py` 已入库 | Python语法通过，板端/实车/通信安全待验 |
 | YouTube自动驾驶演示 | 链接已公开提供 | 需补拍摄日期、提交号和硬件参数对应表 |
-| 团队照片 | 11张候选图已入库 | 正式照与趣味照尚未最终命名 |
-| 车辆六视图 | 拍摄规范已入库 | 六方向最终实车照片尚未上传 |
+| 团队与制作过程照片 | 正式团队照、冠军领奖照及11张制作过程照片已入库 | 全员趣味照仍需补充 |
+| 车辆照片 | 1张WRO比赛现场照片及六视图规范已入库 | 前、后、左、右、顶、底六视图仍需补充 |
 
-![南京博颂学校团队研发现场](t-photos团队照片/2026-05-30_14-57-55_523.jpg)
+![南京博颂学校团队制作过程](t-photos团队照片/making-process-01-team-workshop.jpg)
 
 ## 1. 仓库导航
 
@@ -45,8 +61,8 @@
 | [`schemes原理图/`](schemes原理图/wiring.md) | 引脚表、串口、供电与接线说明 | 复现电气连接 |
 | [`models模型/`](models模型/README.md) | 底盘结构、尺寸和层板DXF | 复现机械结构 |
 | [`other其他/`](other其他/engineering-log.md) | 物料、测试、标定、风险和版本日志 | 追溯研发过程 |
-| [`t-photos团队照片/`](t-photos团队照片/README.md) | 11张团队研发照片 | 选择正式照和趣味照 |
-| [`v-photos车辆照片/`](v-photos车辆照片/README.md) | 车辆六视图拍摄规范（照片待补） | 检查机械与布线 |
+| [`t-photos团队照片/`](t-photos团队照片/README.md) | 正式团队照、北京站冠军照和11张制作过程照片 | 展示团队、赛事成果及研发过程 |
+| [`v-photos车辆照片/`](v-photos车辆照片/README.md) | 1张比赛现场照片和车辆六视图拍摄规范 | 展示参赛车辆并检查机械与布线 |
 | [`video视频/`](video视频/video.md) | YouTube演示链接与本地原片参数 | 驾驶证明与版本追溯 |
 
 ### 详细工程文件
@@ -66,8 +82,8 @@
 - [比赛前检查表](other其他/competition-checklist.md)
 - [测试流程与数据表](other其他/tests.md)
 - [版本迭代记录](other其他/CHANGELOG.md)
-- [团队照片说明](t-photos团队照片/README.md)
-- [车辆六视图要求](v-photos车辆照片/README.md)
+- [团队、赛事成果与制作过程照片](t-photos团队照片/README.md)
+- [车辆比赛现场照片与六视图要求](v-photos车辆照片/README.md)
 - [演示视频与版本记录](video视频/video.md)
 
 ## 2. 系统概述
@@ -240,8 +256,9 @@ flowchart TD
 - [x] 已提供公开YouTube自动驾驶演示链接，视频约1分47秒。
 - [x] 已加入Arduino/ESP32底层程序、Orange Pi视觉原型及源码说明。
 - [x] 已加入层板DXF、物料表、接线说明、风险、标定、测试和复现文档。
+- [x] 已加入正式团队照、北京站冠军领奖照和车辆比赛现场照片。
 - [ ] 补充车辆前、后、左、右、顶、底六视图到 [`v-photos车辆照片/`](v-photos车辆照片/README.md)。
-- [ ] 从11张团队候选照片中选定1张正式照和1张趣味照，并使用规则要求的最终文件名。
+- [ ] 另行补充并命名1张全员趣味团队照；正式团队照已保存为 `team-official.jpg`。
 - [ ] 在 [`video视频/video.md`](video视频/video.md) 填写拍摄日期、对应提交号、驱动器、控制器、电池和参数；本地132.37 MiB原片不应直接用普通Git推送。
 - [ ] 上传最终 CAD/STL/尺寸图、传动参数与传感器安装尺寸。
 - [ ] 上传最终电路图，并填写电池、稳压、电机、舵机、驱动器、传感器的准确型号。
@@ -289,15 +306,17 @@ flowchart TD
 ### 照片与视频
 
 - [YouTube自动驾驶演示](https://youtu.be/DJcxiJCEFdo) · [`video视频/video.md`](video视频/video.md)
-- [`t-photos团队照片/README.md`](t-photos团队照片/README.md) · [研发现场1](t-photos团队照片/2026-05-30_14-57-55_523.jpg) · [研发现场2](t-photos团队照片/2026-05-30_14-58-03_706.jpg) · [研发现场3](t-photos团队照片/2026-05-30_14-58-05_895.jpg)
-- [团队候选照01](t-photos团队照片/IMG_20251220_140837.jpg) · [02](t-photos团队照片/IMG_20251220_140841.jpg) · [03](t-photos团队照片/IMG_20251220_140844.jpg) · [04](t-photos团队照片/IMG_20251220_143704.jpg) · [05](t-photos团队照片/IMG_20251220_143706.jpg) · [06](t-photos团队照片/IMG_20251220_151008.jpg) · [07](t-photos团队照片/IMG_20251220_151010.jpg) · [08](t-photos团队照片/IMG_20251220_151015.jpg)
-- [`v-photos车辆照片/README.md`](v-photos车辆照片/README.md)：六视图拍摄与命名要求；最终车辆照片尚待上传。
+- [正式团队照](t-photos团队照片/team-official.jpg) · [2026 WRO北京站冠军领奖照](t-photos团队照片/award-beijing-champion.jpg) · [车辆比赛现场](v-photos车辆照片/vehicle-competition-run.jpg)
+- [`t-photos团队照片/README.md`](t-photos团队照片/README.md) · [01 团队工作现场](t-photos团队照片/making-process-01-team-workshop.jpg) · [02 软件方案讨论](t-photos团队照片/making-process-02-software-discussion.jpg) · [03 硬件调试](t-photos团队照片/making-process-03-hardware-debug.jpg)
+- [04 控制器装配](t-photos团队照片/making-process-04-controller-assembly.jpg) · [05 底盘检查](t-photos团队照片/making-process-05-chassis-check.jpg) · [06 控制器接线](t-photos团队照片/making-process-06-controller-wiring.jpg) · [07 零件调试](t-photos团队照片/making-process-07-parts-debug.jpg)
+- [08 程序调试](t-photos团队照片/making-process-08-program-debug.jpg) · [09 代码检查](t-photos团队照片/making-process-09-code-review.jpg) · [10 软件测试](t-photos团队照片/making-process-10-software-test.jpg) · [11 控制器测试](t-photos团队照片/making-process-11-controller-test.jpg)
+- [`v-photos车辆照片/README.md`](v-photos车辆照片/README.md)：比赛现场照片、六视图拍摄与命名要求；标准六视图仍待上传。
 
 ---
 
 ## English reproducibility summary
 
-This repository contains the 2026 WRO Future Engineers engineering materials of Nanjing Bosong School. The public driving demonstration is available on [YouTube](https://youtu.be/DJcxiJCEFdo). The repository landing page links directly to all source code, mechanical files, wiring, BOM, calibration procedures, tests, risk analysis, photographs and video records.
+This repository contains the 2026 WRO Future Engineers engineering materials of Nanjing Bosong School. The public driving demonstration is available on [YouTube](https://youtu.be/DJcxiJCEFdo). The repository landing page links directly to all source code, mechanical files, wiring, BOM, calibration procedures, tests, risk analysis, photographs and video records. It also records the team's championship result in the Future Engineers Autonomous Driving category at the 2026 WRO China Qualification Tournament (Beijing) with a team photograph, award photograph and competition-field vehicle photograph.
 
 The vehicle uses an RF-A101HE-109010203 Ackermann chassis with front-wheel steering, four-wheel mechanical drive, front and rear differentials and a longitudinal shaft. The documented base dimensions are 260 × 140 × 85 mm, with a 174 mm wheelbase, 123 mm track and 47 mm wheels. These catalogue values must still be checked on the final assembled vehicle.
 
