@@ -1,4 +1,5 @@
 {
+  "status": "previous Arduino version only / 仅用于上一版Arduino架构",
   "port": "/dev/ttyACM0",
   "baudrate": 115200
 }

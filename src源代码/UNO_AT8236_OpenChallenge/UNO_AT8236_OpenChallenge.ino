@@ -1,6 +1,6 @@
 /*
  * 2026 WRO Future Engineers - Open Challenge baseline
- * Hardware: Arduino UNO + AT8236 + RF-A101HE Ackermann chassis
+ * Hardware: Arduino UNO + AT8236 + four-wheel-drive Ackermann chassis (previous experiment)
  *
  * Functions:
  * - independent start button; the vehicle remains stopped after power-on

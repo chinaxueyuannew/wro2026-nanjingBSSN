@@ -1,73 +1,82 @@
-# 软件架构、状态机与控制算法 / Software Architecture, State Machine and Control Algorithms
+# 软件架构 / Software Architecture
 
-**当前配置：** 摄像头和Orange Pi承担全部环境感知；Arduino只执行视觉命令并在超时时停车。
+> 当前版本由Orange Pi同时承担视觉、决策、安全状态和GPIO/PWM执行；Arduino只属于上一版本。 / The current version uses the Orange Pi for vision, decisions, safety state and GPIO/PWM execution; Arduino belongs only to the previous version.
 
-**Current configuration:** The camera and Orange Pi provide all environmental perception; the Arduino only executes vision-derived commands and stops on timeout.
-
-## 1. 高低层分工 / High-Level and Low-Level Roles
-
-Orange Pi运行Linux/OpenCV，判断赛道、红绿障碍、方向和目标轨迹。Arduino不采集超声波或编码器，只接收有线目标，限制输出、驱动舵机/电机并执行超时停车。Wi-Fi和蓝牙不参与比赛。
-
-The Orange Pi runs Linux/OpenCV to interpret the track, red-green obstacles, direction and target path. The Arduino reads neither ultrasonic sensors nor encoders; it receives wired targets, limits outputs, drives the servo/motor and enforces timeout stopping. Wi-Fi and Bluetooth are not used in competition.
-
-```mermaid
-flowchart TB
-  V["视觉 / Vision"] --> P["规划 / Planning"]
-  P -->|"有线串口 / Wired serial"| F["Arduino安全状态机 / safety state machine"]
-  F --> L["输出限幅 / Output limits"]
-  L --> H["舵机和驱动器 / Servo and driver"]
-  W["帧与命令超时 / Frame and command timeout"] --> F
-```
-
-Orange Pi只提出目标，不直接写PWM。视觉退出、Linux卡顿、摄像头断开或串口失败时，Arduino必须停车；无独立距离传感器时不得继续最后命令。
-
-The Orange Pi proposes targets but never writes PWM directly. If vision exits, Linux stalls, the camera disconnects or serial fails, the Arduino must stop; without an independent range sensor it must never continue the last command.
-
-| 模块 / Module | 当前文件 / File | 已实现 / Implemented | 待完成 / Pending |
-|---|---|---|---|
-| 道路预处理 / Road preprocessing | `bev_road.py` | 亮度、实验BEV、掩膜、连通域 / Brightness, experimental BEV, masks, components | 实车透视标定 / Vehicle perspective calibration |
-| 视觉规划 / Vision planning | `bev_segmentation.py` | 红绿HSV、道路密度、CW/CCW、恢复 / Red-green HSV, road density, CW/CCW, recovery | 停车、圈数、精度和稳定性 / Parking, laps, accuracy, stability |
-| 通信 / Communication | `VehicleIO` | 约50 ms发送 `steer,speed` / Sends approximately every 50 ms | 序号、时间戳、CRC、应答 / Sequence, timestamp, CRC, acknowledgement |
-| 底层 / Low level | `VisionSerialExecutor.ino` | D8启动/停止、文本解析、限幅、D2舵机、D6/D7电机、250 ms超时 / D8 start/stop, text parsing, limits, D2 servo, D6/D7 motor and 250 ms timeout | UNO实机编译、驱动器接口与车辆测试 / Actual-UNO build, driver interface and vehicle tests |
-
-## 2. Arduino分层 / Arduino Layers
-
-任务层决定等待、视觉驾驶或故障停车；控制层校验命令和时间并限幅；硬件层只读写舵机和驱动引脚。这样更换驱动器时无需改写视觉策略。
-
-The task layer selects waiting, vision driving or fault stop; the control layer validates command age and limits outputs; the hardware layer only accesses servo and driver pins. This isolates driver changes from vision strategy.
-
-## 3. 状态机 / State Machine
-
-| 状态 / State | 进入 / Entry | 行为 / Action | 退出 / Exit |
-|---|---|---|---|
-| `WAIT_START` | 上电或行驶中按D8 / Power-up or D8 press while driving | 电机停、舵机中位，丢弃行驶命令 / Motor stopped, steering centred, motion commands discarded | D8启动 / D8 arm |
-| `VISION_DRIVE` | D8启动 / D8 arm | 等待按键之后的新合法命令，再执行限幅目标 / Wait for a fresh valid post-arm command, then execute limited targets | D8停止或250 ms无合法命令 / D8 stop or 250 ms without valid command |
-| `COMMS_FAILSAFE` | 命令超时 / Command timeout | 电机PWM=0、舵机回中，不自动恢复 / Motor PWM=0, steering centred, no automatic recovery | D8重新启动，再等待新命令 / D8 re-arm, then wait for a fresh command |
-
-`VISION_RECOVERY` 是Orange Pi视觉策略内部状态，不是Arduino安全状态。这样高层可以改变恢复策略，但不能越过UNO的物理启动和命令年龄约束。
-
-`VISION_RECOVERY` is an internal Orange Pi vision-strategy state, not an Arduino safety state. This lets the high level change its recovery strategy without bypassing the UNO physical-start and command-age constraints.
-
-## 4. 历史算法参考 / Historical Algorithm References
-
-编码器PI、超声波巡墙PD和 `pulseIn()` 处理只解释旧示例，当前车辆不运行。 / Encoder PI, ultrasonic wall-following PD and `pulseIn()` handling only explain old examples and do not run on the current vehicle.
-
-- 速度PI / Speed PI：`PWM = Kp_v × e_v + Ki_v × ∫e_v dt`
-- 巡墙PD / Wall-follow PD：`steer = Kp_d × e_d + Kd_d × (e_d - e_previous) / dt`
-- 历史滤波 / Historical filter：`filtered = 0.65 × previous + 0.35 × sample`
-
-## 5. 当前视觉数据流 / Current Vision Data Flow
+## 1. 现行架构 / Current Architecture
 
 ```mermaid
 flowchart LR
-  C["USB摄像头 / Camera"] --> U["去畸变 / Undistort"]
-  U --> R["ROI"]
-  R --> M["红绿掩膜 / Red-green masks"]
-  M --> T["目标与置信度 / Target and confidence"]
-  T --> S["转向速度消息 / Steering-speed message"]
-  S --> A["Arduino限幅与执行 / limits and execution"]
+  C["USB摄像头 / USB camera"] --> A["采集与时间戳 / Capture and timestamp"]
+  A --> V["透视、道路、红绿识别 / Perspective, road, red-green perception"]
+  V --> D["方向、转向、速度与恢复 / Direction, steering, speed and recovery"]
+  D --> B["输出限幅 / Output bounds"]
+  B --> S["GPIO安全状态机 / GPIO safety state machine"]
+  P["物理按钮 / Physical button"] --> S
+  S --> M["电机PWM + DIR GPIO / Motor PWM + DIR GPIO"]
+  S --> R["舵机PWM / Steering PWM"]
+  W["250 ms进程看门狗 / Process watchdog"] --> S
 ```
 
-视觉输出目标转向和速度，而不是PWM。当前协议没有源时间戳，因此UNO只依据最近合法收包时间执行250 ms本地超时。画面冻结、进程停止或串口中断时，不能维持最后运动命令。
+Orange Pi不经过板间串口，直接使用内核GPIO/PWM接口。控制程序只产生逻辑转向和速度目标；`OrangePiGpioVehicle`负责硬件映射、限幅、物理授权、方向切换前归零、看门狗和安全释放。这样可以把所有危险输出集中到一个可审查模块。
 
-Vision outputs target steering and speed, not PWM. The current protocol has no source timestamp, so the UNO enforces a 250 ms local timeout from the most recent valid line. If frames freeze, the process stops or serial communication breaks, it never holds the last motion command indefinitely.
+The Orange Pi uses kernel GPIO/PWM interfaces directly, without an inter-board serial link. The controller produces only logical steering and speed targets; `OrangePiGpioVehicle` owns hardware mapping, limits, physical arming, zero-before-direction-change, watchdog behaviour and safe release. This centralises all hazardous outputs in one reviewable module.
+
+## 2. 分层与接口 / Layers and Interfaces
+
+| 层级 / Layer | 实现 / Implementation | 输入 / Input | 输出 / Output | 失效处理 / Failure Handling |
+|---|---|---|---|---|
+| 采集 / Capture | OpenCV/UVC | USB摄像头 / USB camera | 帧 + 单调时间 / Frame + monotonic time | 读取失败立即速度0 / Read failure immediately requests zero speed |
+| 感知 / Perception | `bev_road.py`, `bev_segmentation.py` | 图像帧 / Image frame | 道路、边界、红绿障碍 / Road, border and red-green obstacles | 低置信度减速或停车 / Slow or stop on low confidence |
+| 决策 / Decision | 方向与恢复状态机 / Direction and recovery state machine | 感知结果 / Perception result | `steer`, `speed` in `-100...100` | 制动动作先置速度0 / Braking actions set speed to zero first |
+| 安全输出 / Safety output | `orange_pi_gpio.py` | 逻辑目标 + 按钮 / Logical targets + button | GPIO/PWM / GPIO/PWM | 默认停车、限幅、250 ms失效停车 / Stopped by default, bounded, 250 ms fail-safe |
+| 清理 / Cleanup | `stop()` / `close()` | 退出、异常、中断 / Exit, exception, interrupt | PWM 0/禁用，舵机中位 / PWM zero/disabled, steering centred | 幂等执行 / Idempotent execution |
+
+## 3. 配置与硬件抽象 / Configuration and Hardware Abstraction
+
+`gpio_config.json`是本地实机文件并被Git忽略，模板为 `gpio_config.example.json`。模板的 `enabled=false` 且所有映射为 `-1`，因此克隆仓库后不会意外打开执行器。只有完成以下证据后才可启用：
+
+`gpio_config.json` is a local hardware file ignored by Git; `gpio_config.example.json` is the template. The template uses `enabled=false` and `-1` for every mapping, so a fresh clone cannot accidentally activate actuators. Enable it only after collecting the following evidence:
+
+1. 冻结的Orange Pi镜像、内核和设备树版本 / Frozen Orange Pi image, kernel and device-tree version.
+2. `/dev/gpiochip*` 与 `/sys/class/pwm` 枚举 / GPIO-chip and PWM enumeration.
+3. 物理排针对GPIO line及PWM chip/channel的签字映射 / Signed header-to-line and PWM mapping.
+4. 驱动器3.3 V输入兼容性、舵机电源和共地核对 / Driver 3.3 V compatibility, servo supply and common-ground check.
+5. 示波器或逻辑分析仪记录的频率、占空比、脉宽和失效停车时间 / Recorded frequency, duty, pulse width and fail-safe timing.
+
+## 4. 安全状态机 / Safety State Machine
+
+```mermaid
+stateDiagram-v2
+  [*] --> DRY_RUN: enabled=false
+  [*] --> WAIT_START: enabled=true and hardware open
+  WAIT_START --> GPIO_DRIVE: debounced press + fresh command
+  GPIO_DRIVE --> WAIT_START: physical stop press
+  GPIO_DRIVE --> CONTROL_FAILSAFE: control age > 250 ms
+  CONTROL_FAILSAFE --> WAIT_START: debounced re-arm
+  DRY_RUN --> CLOSED: exit
+  WAIT_START --> CLOSED: exit or exception
+  GPIO_DRIVE --> CLOSED: exit or exception
+  CONTROL_FAILSAFE --> CLOSED: exit or exception
+```
+
+- `DRY_RUN`不打开GPIO/PWM，仅显示请求值。 / `DRY_RUN` opens no GPIO/PWM and only reports requested values.
+- `WAIT_START`保持电机0、舵机中位，旧控制值不能触发运动。 / `WAIT_START` keeps zero motor and centred steering; stale targets cannot cause motion.
+- `GPIO_DRIVE`只执行新鲜、有限幅的目标。 / `GPIO_DRIVE` executes only fresh, bounded targets.
+- `CONTROL_FAILSAFE`在超过250 ms无更新后停车，并要求重新按键。 / `CONTROL_FAILSAFE` stops after over 250 ms without an update and requires re-arming.
+- `CLOSED`禁用PWM并释放资源。 / `CLOSED` disables PWM and releases resources.
+
+## 5. 时间与故障语义 / Timing and Fault Semantics
+
+所有年龄判断使用单调时钟，避免系统时间调整造成误判。视觉读取失败、处理异常、控制循环停滞、物理停止和正常退出都必须把电机置零。方向GPIO改变前先把电机PWM置零，防止带扭矩反向。
+
+All age checks use a monotonic clock so wall-clock changes cannot alter safety timing. Camera-read failure, processing exceptions, a stalled control loop, physical stop and normal exit must all set motor output to zero. Motor PWM is zeroed before changing the direction GPIO to avoid reversing under torque.
+
+**残余风险：** 250 ms看门狗线程与视觉程序位于同一Orange Pi。它可覆盖控制循环停止或异常，但不能保证覆盖Linux内核、PWM子系统、供电或整板冻结。最终风险关闭需要实测故障注入，并决定是否增加独立硬件使能门、常闭急停或驱动器使能的硬件失效保护。
+
+**Residual risk:** The 250 ms watchdog thread shares the Orange Pi with the vision program. It covers a stalled control loop or exception but cannot guarantee coverage of a Linux-kernel, PWM-subsystem, power or complete-board freeze. Closing this risk requires fault-injection testing and a decision on an independent hardware enable gate, normally-closed emergency stop or driver-enable fail-safe.
+
+## 6. 上一版本边界 / Previous-Version Boundary
+
+上一版使用Orange Pi通过文本串口向Arduino发送 `steer,speed`，并由Arduino输出舵机和电机信号。相关 `VisionSerialExecutor.ino`、D2/D6/D7/D8接线和串口配置只作为版本演进证据保留，不属于当前BOM、接线图、运行命令或测试验收。
+
+The previous version sent `steer,speed` text from the Orange Pi to an Arduino, which drove steering and motor signals. Its `VisionSerialExecutor.ino`, D2/D6/D7/D8 wiring and serial configuration remain only as version-history evidence and are not part of the current BOM, wiring, run commands or acceptance tests.

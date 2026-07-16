@@ -1,95 +1,104 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1150" viewBox="0 0 1600 1150" role="img" aria-labelledby="title desc">
-  <title id="title">南京博颂学校WRO未来工程师系统接线图 / BSSN WRO Future Engineers system wiring</title>
-  <desc id="desc">Vision-only vehicle power, data and safety wiring for Orange Pi, Arduino UNO, USB camera, start button, steering servo and PWM DIR motor driver.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1200" viewBox="0 0 1600 1200" role="img" aria-labelledby="title desc">
+  <title id="title">南京博颂学校 WRO 未来工程师现行系统接线图 / BSSN WRO Future Engineers Current System Wiring</title>
+  <desc id="desc">Current vision-only vehicle architecture: Orange Pi directly controls the steering servo and motor driver through GPIO and PWM. Arduino is not installed.</desc>
   <defs>
     <style>
-      .bg{fill:#f7f9fc}.panel{fill:#fff;stroke:#17375e;stroke-width:3;rx:18}.power{stroke:#c62828;stroke-width:5;fill:none}.ground{stroke:#222;stroke-width:5;fill:none}.signal{stroke:#1565c0;stroke-width:4;fill:none}.usb{stroke:#6a1b9a;stroke-width:4;fill:none;stroke-dasharray:12 8}.safe{stroke:#ef6c00;stroke-width:4;fill:none}.h1{font:700 34px Arial,"Microsoft YaHei",sans-serif;fill:#102a43}.h2{font:700 23px Arial,"Microsoft YaHei",sans-serif;fill:#17375e}.body{font:18px Arial,"Microsoft YaHei",sans-serif;fill:#243b53}.small{font:15px Arial,"Microsoft YaHei",sans-serif;fill:#486581}.wire{font:700 17px Arial,"Microsoft YaHei",sans-serif}.legend{font:16px Arial,"Microsoft YaHei",sans-serif;fill:#243b53}.note{fill:#fff8e1;stroke:#ef6c00;stroke-width:2;rx:14}.tag{fill:#e8f1fb;stroke:#1565c0;stroke-width:2;rx:8}
+      .bg{fill:#f4f7fb}.panel{fill:#fff;stroke:#17375e;stroke-width:3}.power{stroke:#c62828;stroke-width:5;fill:none}.ground{stroke:#263238;stroke-width:5;fill:none}.signal{stroke:#1565c0;stroke-width:4;fill:none}.usb{stroke:#6a1b9a;stroke-width:4;fill:none;stroke-dasharray:12 8}.safe{stroke:#ef6c00;stroke-width:4;fill:none}.h1{font:700 34px Arial,"Microsoft YaHei",sans-serif;fill:#102a43}.h2{font:700 23px Arial,"Microsoft YaHei",sans-serif;fill:#17375e}.body{font:18px Arial,"Microsoft YaHei",sans-serif;fill:#243b53}.small{font:15px Arial,"Microsoft YaHei",sans-serif;fill:#486581}.wire{font:700 16px Arial,"Microsoft YaHei",sans-serif}.note{fill:#fff8e1;stroke:#ef6c00;stroke-width:2}.info{fill:#e8f1fb;stroke:#1565c0;stroke-width:2}.history{fill:#f2f4f7;stroke:#7b8794;stroke-width:2;stroke-dasharray:9 7}
     </style>
     <marker id="arrowBlue" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#1565c0"/></marker>
     <marker id="arrowPurple" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#6a1b9a"/></marker>
     <marker id="arrowRed" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#c62828"/></marker>
+    <marker id="arrowOrange" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#ef6c00"/></marker>
   </defs>
-  <rect class="bg" width="1600" height="1150"/>
-  <text class="h1" x="800" y="55" text-anchor="middle">纯视觉车辆系统接线图 / Vision-only Vehicle System Wiring</text>
-  <text class="body" x="800" y="88" text-anchor="middle">南京博颂学校 / BONA SONORITY SCHOOL NANJING · 2026 WRO Future Engineers</text>
 
-  <rect class="panel" x="60" y="150" width="300" height="170"/>
-  <text class="h2" x="210" y="190" text-anchor="middle">车载电池 / Battery</text>
-  <text class="body" x="90" y="230">额定电压与容量：待实物确认</text>
-  <text class="body" x="90" y="260">Rating and capacity: verify</text>
-  <text class="small" x="90" y="295">总开关 + 保险 / Main switch + fuse</text>
+  <rect class="bg" width="1600" height="1200"/>
+  <text class="h1" x="800" y="52" text-anchor="middle">现行纯视觉车辆系统接线图 / Current Vision-only Vehicle System Wiring</text>
+  <text class="body" x="800" y="86" text-anchor="middle">南京博颂学校 / BONA SONORITY SCHOOL NANJING · 2026 WRO Future Engineers</text>
+  <text class="small" x="800" y="112" text-anchor="middle">当前版本：香橙派直接 GPIO/PWM 控制；不安装 Arduino / Current: direct Orange Pi GPIO/PWM control; no Arduino installed</text>
 
-  <rect class="panel" x="510" y="125" width="360" height="230"/>
-  <text class="h2" x="690" y="168" text-anchor="middle">稳压与配电 / Regulation</text>
-  <text class="body" x="545" y="210">A. 电机动力支路 / Motor branch</text>
-  <text class="body" x="545" y="245">B. Orange Pi 5 V / 3 A支路</text>
-  <text class="body" x="545" y="280">C. UNO与舵机支路 / Control branch</text>
-  <text class="small" x="545" y="320">所有控制设备共地 / Common control ground</text>
+  <rect class="panel" x="55" y="155" width="285" height="160" rx="16"/>
+  <text class="h2" x="198" y="198" text-anchor="middle">车载电池 / Battery</text>
+  <text class="body" x="82" y="238">额定值：按实物记录</text>
+  <text class="body" x="82" y="266">Rating: record actual value</text>
+  <text class="small" x="82" y="296">总开关 + 保险 / Main switch + fuse</text>
 
-  <rect class="panel" x="1030" y="115" width="390" height="190"/>
-  <text class="h2" x="1225" y="158" text-anchor="middle">Orange Pi Zero 3W 4GB</text>
-  <text class="body" x="1065" y="202">视觉处理与高层策略</text>
-  <text class="body" x="1065" y="232">Vision and high-level strategy</text>
-  <text class="small" x="1065" y="270">有线串口；比赛时关闭无线 / Wired serial; radios off</text>
+  <rect class="panel" x="445" y="140" width="420" height="215" rx="16"/>
+  <text class="h2" x="655" y="182" text-anchor="middle">稳压与配电 / Regulation and Distribution</text>
+  <text class="body" x="480" y="222">A. 电机动力支路 / Motor-power branch</text>
+  <text class="body" x="480" y="258">B. Orange Pi 独立 5 V / 3 A 支路</text>
+  <text class="body" x="480" y="294">C. 舵机独立 4.5–7 V 支路</text>
+  <text class="small" x="480" y="328">控制信号共地；大电流回路短且分开布线</text>
+  <text class="small" x="480" y="348">Common signal ground; keep high-current returns short</text>
 
-  <rect class="panel" x="1110" y="390" width="310" height="145"/>
-  <text class="h2" x="1265" y="432" text-anchor="middle">USB彩色摄像头</text>
-  <text class="h2" x="1265" y="462" text-anchor="middle">USB Colour Camera</text>
-  <text class="small" x="1140" y="500">当前唯一环境传感器 / Only sensor</text>
+  <rect class="panel" x="1000" y="130" width="445" height="245" rx="16"/>
+  <text class="h2" x="1222" y="174" text-anchor="middle">Orange Pi Zero 3W 4GB</text>
+  <text class="body" x="1035" y="214">视觉、决策、安全状态机 / Vision, decision, safety state</text>
+  <text class="body" x="1035" y="248">GPIO：方向与物理按钮 / Direction and button</text>
+  <text class="body" x="1035" y="282">PWM：电机速度与转向 / Motor speed and steering</text>
+  <text class="small" x="1035" y="318">实际 GPIO line、PWM chip/channel 待实物冻结</text>
+  <text class="small" x="1035" y="344">Freeze actual mappings from the competition image</text>
 
-  <rect class="panel" x="610" y="480" width="360" height="230"/>
-  <text class="h2" x="790" y="525" text-anchor="middle">Arduino UNO</text>
-  <text class="body" x="650" y="570">D2：转向舵机信号 / Servo signal</text>
-  <text class="body" x="650" y="605">D6：电机PWM / Motor PWM</text>
-  <text class="body" x="650" y="640">D7：电机方向 / Motor DIR</text>
-  <text class="body" x="650" y="675">D8：启动/停止按钮 / Start-stop</text>
+  <rect class="panel" x="1050" y="445" width="350" height="145" rx="16"/>
+  <text class="h2" x="1225" y="492" text-anchor="middle">USB 彩色摄像头</text>
+  <text class="h2" x="1225" y="524" text-anchor="middle">USB Colour Camera</text>
+  <text class="small" x="1085" y="560">唯一环境传感器 / Only environmental sensor</text>
 
-  <rect class="panel" x="70" y="455" width="310" height="155"/>
-  <text class="h2" x="225" y="500" text-anchor="middle">PWM/DIR电机驱动器</text>
-  <text class="h2" x="225" y="530" text-anchor="middle">PWM/DIR Motor Driver</text>
-  <text class="small" x="100" y="570">具体型号与逻辑电平待实物核对</text>
-  <text class="small" x="100" y="592">Model and logic levels: verify</text>
+  <rect class="panel" x="555" y="470" width="365" height="180" rx="16"/>
+  <text class="h2" x="738" y="512" text-anchor="middle">PWM/DIR 电机驱动器</text>
+  <text class="h2" x="738" y="544" text-anchor="middle">PWM/DIR Motor Driver</text>
+  <text class="body" x="590" y="582">逻辑输入：3.3 V 兼容性待核实</text>
+  <text class="body" x="590" y="612">Verify 3.3 V logic compatibility</text>
 
-  <rect class="panel" x="70" y="700" width="310" height="145"/>
-  <text class="h2" x="225" y="745" text-anchor="middle">四轮驱动电机</text>
-  <text class="h2" x="225" y="777" text-anchor="middle">Four-wheel-drive Motor</text>
-  <text class="small" x="100" y="815">机械传动至前后差速器 / To differentials</text>
+  <rect class="panel" x="75" y="500" width="320" height="145" rx="16"/>
+  <text class="h2" x="235" y="548" text-anchor="middle">四轮驱动电机</text>
+  <text class="h2" x="235" y="580" text-anchor="middle">Four-wheel-drive Motor</text>
+  <text class="small" x="108" y="618">机械传动至前后差速器 / To differentials</text>
 
-  <rect class="panel" x="1090" y="660" width="330" height="150"/>
-  <text class="h2" x="1255" y="705" text-anchor="middle">转向舵机 / Steering Servo</text>
-  <text class="body" x="1120" y="748">信号D2；独立4.5–7 V供电</text>
-  <text class="body" x="1120" y="778">D2 signal; separate 4.5–7 V power</text>
+  <rect class="panel" x="1030" y="700" width="390" height="155" rx="16"/>
+  <text class="h2" x="1225" y="748" text-anchor="middle">转向舵机 / Steering Servo</text>
+  <text class="body" x="1065" y="790">信号：PWM 映射待冻结</text>
+  <text class="body" x="1065" y="820">Power: separate 4.5–7 V branch</text>
 
-  <rect class="panel" x="620" y="805" width="340" height="130"/>
-  <text class="h2" x="790" y="850" text-anchor="middle">物理启动/停止按钮</text>
-  <text class="h2" x="790" y="880" text-anchor="middle">Physical Start/Stop Button</text>
-  <text class="small" x="660" y="915">D8 ↔ 常开按钮 ↔ GND / NO button</text>
+  <rect class="panel" x="540" y="735" width="395" height="155" rx="16"/>
+  <text class="h2" x="738" y="782" text-anchor="middle">物理启动/停止按钮</text>
+  <text class="h2" x="738" y="814" text-anchor="middle">Physical Start/Stop Button</text>
+  <text class="small" x="575" y="850">常开按钮 + 外部上拉；GPIO 映射待冻结</text>
+  <text class="small" x="575" y="875">Normally open + external pull-up; mapping pending</text>
 
-  <path class="power" d="M360 190 H510" marker-end="url(#arrowRed)"/><text class="wire" x="385" y="178" fill="#c62828">经保险 / fused</text>
-  <path class="power" d="M870 170 H1030" marker-end="url(#arrowRed)"/><text class="wire" x="900" y="155" fill="#c62828">5 V / 3 A</text>
-  <path class="power" d="M585 355 V410 H320 V455" marker-end="url(#arrowRed)"/><text class="wire" x="335" y="400" fill="#c62828">动力 / power</text>
-  <path class="power" d="M720 355 V480" marker-end="url(#arrowRed)"/><text class="wire" x="730" y="420" fill="#c62828">控制供电 / control</text>
-  <path class="power" d="M835 355 V370 H1480 V635 H1325 V660" marker-end="url(#arrowRed)"/><text class="wire" x="1375" y="620" fill="#c62828">4.5–7 V</text>
+  <path class="power" d="M340 205 H445" marker-end="url(#arrowRed)"/>
+  <text class="wire" x="360" y="190" fill="#c62828">经保险 / fused</text>
+  <path class="power" d="M865 205 H1000" marker-end="url(#arrowRed)"/>
+  <text class="wire" x="890" y="190" fill="#c62828">5 V / 3 A</text>
+  <path class="power" d="M555 355 V430 H740 V470" marker-end="url(#arrowRed)"/>
+  <text class="wire" x="568" y="420" fill="#c62828">电机动力 / motor power</text>
+  <path class="power" d="M780 355 V405 H1480 V675 H1325 V700" marker-end="url(#arrowRed)"/>
+  <text class="wire" x="1365" y="660" fill="#c62828">4.5–7 V</text>
 
-  <path class="usb" d="M1265 390 V305" marker-end="url(#arrowPurple)"/><text class="wire" x="1285" y="355" fill="#6a1b9a">USB/UVC</text>
-  <path class="usb" d="M1030 255 H970 V520" marker-end="url(#arrowPurple)"/><text class="wire" x="980" y="342" fill="#6a1b9a">115200, steer,speed</text>
-  <path class="signal" d="M610 585 H380" marker-end="url(#arrowBlue)"/><text class="wire" x="430" y="570" fill="#1565c0">D6 PWM + D7 DIR</text>
-  <path class="signal" d="M970 620 H1090 V725" marker-end="url(#arrowBlue)"/><text class="wire" x="995" y="605" fill="#1565c0">D2</text>
-  <path class="safe" d="M790 710 V805"/><text class="wire" x="805" y="765" fill="#ef6c00">D8 + GND</text>
-  <path class="signal" d="M225 610 V700" marker-end="url(#arrowBlue)"/><text class="wire" x="240" y="662" fill="#1565c0">M+/M−</text>
+  <path class="usb" d="M1225 445 V375" marker-end="url(#arrowPurple)"/>
+  <text class="wire" x="1245" y="415" fill="#6a1b9a">USB / UVC</text>
+  <path class="signal" d="M1000 270 H945 V550 H920" marker-end="url(#arrowBlue)"/>
+  <text class="wire" x="948" y="420" fill="#1565c0">Motor PWM + DIR（映射待冻结 / pending）</text>
+  <path class="signal" d="M1220 375 V675 H1225 V700" marker-end="url(#arrowBlue)"/>
+  <text class="wire" x="1238" y="642" fill="#1565c0">Servo PWM（映射待冻结 / pending）</text>
+  <path class="safe" d="M935 810 H980 V330 H1000" marker-end="url(#arrowOrange)"/>
+  <text class="wire" x="948" y="775" fill="#ef6c00">3.3 V GPIO input</text>
+  <path class="signal" d="M555 560 H395" marker-end="url(#arrowBlue)"/>
+  <text class="wire" x="430" y="545" fill="#1565c0">M+ / M−</text>
 
-  <path class="ground" d="M420 970 H1500"/>
-  <path class="ground" d="M690 355 H470 V970 M790 710 V760 H1010 V970 M1380 305 H1500 V970 M225 610 H420 V970 M1255 810 V845 H1050 V970"/>
-  <text class="wire" x="430" y="1000" fill="#222">控制共地 / Common control ground（电机大电流回路应短且独立布线 / keep motor return short and separate）</text>
+  <path class="ground" d="M355 955 H1490"/>
+  <path class="ground" d="M650 355 V955 M1100 375 V955 M738 650 V955 M235 645 V955 M1225 855 V955 M738 890 V955"/>
+  <text class="wire" x="375" y="985" fill="#263238">控制共地 / Common control ground（电机大电流回流单独短路径 / separate short motor return）</text>
 
-  <rect class="note" x="50" y="1030" width="650" height="95"/>
-  <text class="body" x="75" y="1064">安全状态 / Safety: 上电停车 → 按钮启动 → 新鲜合法命令</text>
-  <text class="body" x="75" y="1094">Power-on stop → button arm → fresh valid command</text>
-  <text class="small" x="75" y="1118">超过250 ms无合法命令即停车并要求重新按键 / 250 ms timeout requires re-arm</text>
+  <rect class="note" x="55" y="1025" width="735" height="135" rx="14"/>
+  <text class="h2" x="80" y="1063">安全状态 / Safety State</text>
+  <text class="body" x="80" y="1098">上电默认停车 → 按钮授权 → 新鲜控制更新 → GPIO/PWM 执行</text>
+  <text class="body" x="80" y="1128">Stopped by default → button arm → fresh update → GPIO/PWM output</text>
+  <text class="small" x="80" y="1152">250 ms进程看门狗触发后归零并要求重新授权 / 250 ms process watchdog stops and requires re-arm</text>
 
-  <rect class="tag" x="910" y="1030" width="620" height="95"/>
-  <text class="body" x="935" y="1064">核对后再接线 / Verify before wiring:</text>
-  <text class="small" x="935" y="1092">电池、驱动器型号、逻辑电平、保险、稳压额定值</text>
-  <text class="small" x="935" y="1117">battery, driver model, logic levels, fuse and regulator ratings</text>
+  <rect class="info" x="825" y="1025" width="720" height="135" rx="14"/>
+  <text class="h2" x="850" y="1063">工程边界 / Engineering Boundary</text>
+  <text class="body" x="850" y="1098">进程看门狗不等于独立硬件看门狗；Linux或PWM冻结时可能无法停车。</text>
+  <text class="body" x="850" y="1128">A process watchdog is not an independent hardware watchdog.</text>
+  <text class="small" x="850" y="1152">冻结引脚前核对3.3 V逻辑、设备树、PWM占用、保险与稳压额定值 / Verify before freezing</text>
 </svg>

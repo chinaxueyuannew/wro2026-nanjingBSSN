@@ -1,160 +1,109 @@
-# Orange Pi Zero 3W车载视觉计算机 / Orange Pi Zero 3W Onboard Vision Computer
+# Orange Pi Zero 3W 4GB 车载计算与控制平台 / Onboard Computing and Control Platform
 
-**当前配置：** Orange Pi是唯一感知计算平台，输入USB彩色摄像头，输出有线转向和速度目标。
+> 当前版本由Orange Pi同时完成视觉、决策和GPIO/PWM执行；Arduino属于上一版本且不安装。 / In the current version, the Orange Pi performs vision, decisions and GPIO/PWM execution; Arduino belongs to the previous version and is not installed.
 
-**Current configuration:** The Orange Pi is the only perception computer. It receives USB colour-camera frames and outputs wired steering and speed targets.
+## 1. 角色 / Role
 
-## 1. 团队购买版本 / Team-Purchased Version
+Orange Pi接收USB摄像头画面，运行OpenCV视觉、方向判断、红绿障碍策略、恢复逻辑和安全状态机，并直接通过GPIO/PWM控制物理按钮输入、转向舵机和PWM/DIR电机驱动器。比赛运行不依赖互联网、云服务、手机或无线遥控。
 
-订单SKU为 **OPi Zero 3W 4G**，商品标题标注 **Orange Pi Zero 3W、全志A733混合八核**。它不是旧款H618四核Orange Pi Zero 3；本仓库一律以带字母W的Zero 3W为准。
+The Orange Pi receives USB-camera frames, runs OpenCV vision, direction detection, red-green obstacle strategy, recovery logic and the safety state machine, and directly controls the physical button input, steering servo and PWM/DIR motor driver through GPIO/PWM. Competition operation does not depend on the Internet, cloud services, a phone or wireless remote control.
 
-The ordered SKU is **OPi Zero 3W 4G**, described as an **Orange Pi Zero 3W with an Allwinner A733 heterogeneous octa-core processor**. It is not the older H618 quad-core Orange Pi Zero 3; this repository consistently refers to the Zero 3W with the letter W.
+## 2. 已记录配置 / Recorded Configuration
 
-商品链接 / Product link：<https://detail.tmall.com/item.htm?id=1044546976818>
+团队当前使用 **Orange Pi Zero 3W 4GB**。采购信息记录全志A733八核平台、4 GB内存、USB、Wi-Fi 6、蓝牙5.4、Mini HDMI 2.0和PCIe 3.0等信息。比赛真正使用的能力是USB主机、Linux/OpenCV、本地存储、GPIO和PWM；无线功能必须关闭。处理器宣传参数不能替代最终实机枚举与压力测试。
 
-| 项目 / Item | 团队版本或公开规格 / Team Version or Published Specification | 状态 / Status |
-|---|---|---|
-| 型号 / Model | Orange Pi Zero 3W | 订单确认 / Order confirmed |
-| 内存 / Memory | 4 GB LPDDR5 | SKU确认，系统待验 / SKU confirmed; system pending |
-| SoC | Allwinner A733 | 商品与公开资料一致 / Product and published data agree |
-| CPU | 2× Cortex-A76 up to 2.0 GHz + 6× Cortex-A55 up to ~1.79 GHz | 公开规格，实机待验 / Published; hardware pending |
-| 实时协处理器 / Real-time core | 1× XuanTie E902 RISC-V up to 200 MHz | 当前未使用 / Not currently used |
-| GPU | Imagination BXM-4-64 MC1 | 当前OpenCV不依赖 / Current OpenCV does not depend on it |
-| NPU | Up to 3 TOPS INT8 | 尚未证明调用 / Use not yet demonstrated |
-| 存储 / Storage | microSD; optional eMMC/UFS pads | 系统盘待填写 / System storage pending |
-| 摄像头接口 / Camera | 2× MIPI CSI; 本车使用USB/UVC / vehicle uses USB/UVC | 接口确认 / Interface confirmed |
-| USB | USB 3.1 OTG Type-C + USB-C power | 转接方案待实机验证 / Hub setup pending |
-| 显示 / Display | Mini HDMI 2.0, USB-C DP Alt | 比赛非必需 / Not required in competition |
-| 扩展 / Expansion | 40Pin UART/I²C/SPI/PWM, PCIe 3.0 ×1 FPC | UART可用于底层通信 / UART may link controller |
-| 无线 / Wireless | Wi-Fi 6, Bluetooth 5.4 | 比赛必须关闭 / Must be disabled in competition |
-| 供电 / Power | USB-C 5 V/3 A | 独立稳压并实测 / Independent regulation and measurement |
-| 尺寸质量 / Size and mass | 65×32 mm, ~14 g | 最终整车实测 / Measure final vehicle |
+The team currently uses an **Orange Pi Zero 3W 4GB**. Purchase records note an Allwinner A733 octa-core platform, 4 GB memory, USB, Wi-Fi 6, Bluetooth 5.4, Mini HDMI 2.0 and PCIe 3.0. Competition-relevant capabilities are USB host, Linux/OpenCV, local storage, GPIO and PWM; wireless functions must be disabled. Advertised processor specifications do not replace final hardware enumeration and stress testing.
 
-公开规格用于设计，不等于实车验证。最终应保存板卡照片、SKU截图、系统信息和供电测试。
+## 3. 选择理由与取舍 / Selection Rationale and Trade-offs
 
-Published specifications support design but are not equivalent to vehicle validation. Preserve board photographs, SKU screenshots, system information and power tests in the final record.
+| 选择 / Choice | 优点 / Benefit | 代价 / Cost | 缓解 / Mitigation |
+|---|---|---|---|
+| Linux SBC处理视觉 / Linux SBC for vision | OpenCV生态、调试工具、USB摄像头支持 / OpenCV ecosystem, diagnostics and USB-camera support | 启动和调度不如微控制器确定 / Less deterministic startup and scheduling than an MCU | 固定镜像、禁用无关服务、离线启动测试 / Freeze image, disable services, test offline startup |
+| 同板GPIO/PWM执行 / Same-board GPIO/PWM execution | 减少控制器、线束、协议和板间延迟 / Fewer controllers, wires, protocols and inter-board latency | 视觉与执行共享故障域 / Vision and execution share a fault domain | 默认停车、物理按钮、进程看门狗、故障注入与硬件失效保护评估 / Stopped default, physical button, process watchdog, fault injection and hardware-fail-safe assessment |
+| USB单摄像头 / Single USB camera | 同时获得边界、颜色和方向信息 / Borders, colour and direction in one sensor | 光照、畸变、遮挡和掉帧敏感 / Sensitive to lighting, distortion, occlusion and frame drops | 标定、固定安装、低置信度减速、帧超时 / Calibration, rigid mount, low-confidence slowdown, frame timeout |
 
-## 2. 车辆职责 / Vehicle Role
+## 4. GPIO/PWM资源冻结 / GPIO/PWM Resource Freeze
 
-Orange Pi运行Linux，负责USB采集、广角去畸变、赛道判断、红绿识别、目标估计和转向/速度计算。Arduino接收有线命令、限制输出、控制舵机和电机并在通信超时时停车；当前无超声波和编码器输入。
+Orange Pi的物理排针号、SoC管脚名、设备树功能、libgpiod line号以及PWM chip/channel并不等价。当前仓库故意把实际映射设为 `-1`，避免在未确认的板卡或镜像上误动作。
 
-The Orange Pi runs Linux and handles USB capture, wide-angle undistortion, track interpretation, red-green recognition, target estimation and steering/speed calculation. The Arduino receives wired commands, limits outputs, controls the servo and motor and stops on communication timeout; it receives no ultrasonic or encoder input.
+Orange Pi physical-header numbers, SoC pin names, device-tree functions, libgpiod line numbers and PWM chip/channels are not interchangeable. The repository intentionally sets real mappings to `-1` to prevent unintended motion on an unverified board or image.
 
-```mermaid
-flowchart LR
-  CAM["USB彩色摄像头 480p/30 FPS / USB colour camera"] --> OPI["Orange Pi Zero 3W 4GB / OpenCV视觉与决策 / vision and decisions"]
-  OPI -->|"有线串口 / Wired serial"| MCU["Arduino UNO / 实时执行与安全 / execution and safety"]
-  MCU --> SERVO["转向舵机 / Steering servo"]
-  MCU --> DRIVER["电机驱动器 / Motor driver"]
-  MCU -->|"状态和故障 / State and faults"| OPI
-```
+最终冻结表 / Final freeze table:
 
-Linux卡顿、掉帧或进程退出时，Arduino必须根据命令年龄停车。Orange Pi重启后不能自动行驶，必须重新通过底层 `WAIT_START` 状态。
+| 功能 / Function | 物理排针 / Header Pin | gpiochip/line或PWM chip/channel | 复用/overlay | 有效电平 / Active Level | 证据 / Evidence |
+|---|---|---|---|---|---|
+| 电机方向 / Motor direction | 待填 / Pending | 待填 / Pending | 待填 / Pending | 待填 / Pending | gpioinfo + 示波器 / gpioinfo + scope |
+| 电机速度PWM / Motor-speed PWM | 待填 / Pending | 待填 / Pending | 待填 / Pending | 高有效待核 / Verify active high | sysfs + scope |
+| 舵机PWM / Steering PWM | 待填 / Pending | 待填 / Pending | 待填 / Pending | 正脉冲 / Positive pulse | sysfs + scope |
+| 启动/停止按钮 / Start-stop button | 待填 / Pending | 待填 / Pending | GPIO input | 外部上拉、按下为低 / External pull-up, active low | gpioinfo + multimeter |
 
-If Linux stalls, frames drop or the process exits, the Arduino must stop based on command age. The vehicle must not move automatically after an Orange Pi restart; it must pass through the lower-level `WAIT_START` state again.
-
-## 3. 通信协议与实现边界 / Communication Protocol and Implementation Boundary
-
-使用有线USB串口或3.3 V UART，禁止无线控制。裸UART需要解决UNO 5 V与Orange Pi 3.3 V电平兼容，并共地。
-
-Use wired USB serial or 3.3 V UART; wireless control is prohibited. A raw UART requires proper level compatibility between the UNO's 5 V logic and Orange Pi's 3.3 V logic, plus common ground.
-
-### 3.1 当前已实现协议 / Currently Implemented Protocol
-
-当前 `bev_segmentation.py` 以115200 baud约每50 ms发送一行ASCII命令，`VisionSerialExecutor.ino` 接收并验证：
-
-The current `bev_segmentation.py` sends one ASCII command line at 115200 baud approximately every 50 ms, and `VisionSerialExecutor.ino` receives and validates it:
-
-`steer,speed\n`
-
-- `steer` 与 `speed` 都必须是 `-100...100` 的十进制整数 / Both fields must be decimal integers in `-100...100`.
-- 格式错误、多余逗号、溢出或越界命令整帧丢弃 / Malformed, extra-comma, overflowing or out-of-range commands are discarded in full.
-- Arduino只在 `VISION_DRIVE` 状态执行命令；上电为 `WAIT_START` / The Arduino executes commands only in `VISION_DRIVE` and powers up in `WAIT_START`.
-- 连续250 ms未收到有效命令时电机归零、舵机回中并进入 `COMMS_FAILSAFE` / After 250 ms without a valid command, the motor is set to zero, steering is centred and `COMMS_FAILSAFE` is entered.
-- 故障后必须再次按D8，并收到启动后的新命令，车辆才可恢复 / Recovery requires another D8 press and a fresh post-arm command.
-
-该协议是当前代码的可复现基线，不包含序号、时间戳或CRC。测试编号U-01至U-10覆盖启动、解析、限幅和超时行为。
-
-This protocol is the reproducible code baseline. It does not yet contain sequence numbers, timestamps or a CRC. Tests U-01 through U-10 cover start, parsing, limiting and timeout behaviour.
-
-### 3.2 后续增强协议（尚未实现） / Future Hardened Protocol (Not Yet Implemented)
-
-在完成当前基线的实车验证后，可评估带版本、序号、时间戳、状态和CRC的定长或CBOR帧。以下字段仅是设计候选，不能标记为当前比赛实现：
-
-After the current baseline has passed vehicle testing, a fixed-length or CBOR frame with version, sequence, timestamp, state and CRC may be evaluated. The following fields are design candidates only and must not be presented as the current competition implementation:
-
-高层命令候选 / Candidate high-level command:
-
-`{seq, timestamp_ms, mode, target_speed, target_steer, obstacle_color, confidence, crc}`
-
-底层回传候选 / Candidate lower-level feedback:
-
-`{seq, state, command_age_ms, battery_mv, fault_bits, crc}`
-
-- 序号递增，旧命令不重放 / Sequence numbers increase; stale commands are never replayed.
-- 增强协议也必须保留不长于250 ms的底层停车上限；最终阈值由制动试验确认 / The hardened protocol must retain a lower-level stop limit no longer than 250 ms; braking tests must confirm the final threshold.
-- 低置信度禁止激进绕障 / Low confidence prohibits aggressive avoidance.
-- CRC失败、越界或过期帧整帧丢弃 / Discard frames with bad CRC, out-of-range fields or stale timestamps.
-- Arduino本地安全优先于Orange Pi速度命令 / Arduino-local safety overrides Orange Pi speed commands.
-
-## 4. 视觉算力 / Vision Compute Rationale
-
-480p/30 FPS下，HSV、形态学、轮廓和简单几何可由CPU完成，4 GB内存足够传统视觉。3 TOPS NPU只是未来选项，未完成模型转换、板端运行、延迟和精度比较前不得声称已使用。
-
-At 480p/30 FPS, HSV, morphology, contours and simple geometry can run on the CPU, and 4 GB is sufficient for traditional vision. The 3 TOPS NPU is only a future option and must not be claimed as used before model conversion, onboard execution, latency and accuracy comparisons are complete.
-
-开发顺序 / Development order:
-
-1. 完成UVC、去畸变、HSV和串口闭环 / Complete UVC, undistortion, HSV and serial closed-loop operation.
-2. 测量延迟、CPU、温度、掉帧和30分钟稳定性 / Measure latency, CPU, temperature, frame drops and 30-minute stability.
-3. 传统视觉不足时再评估NPU / Evaluate NPU only if traditional vision is insufficient.
-4. 保留可回退CPU基线 / Preserve a fallback CPU baseline.
-
-## 5. 供电、散热与安装 / Power, Cooling and Mounting
-
-Orange Pi使用独立 **5 V/3 A USB-C** 稳压支路，不能从Arduino 5 V取电。连续能力不低于3 A，并为启动、摄像头和风扇留余量；记录待机、视觉和满负载电流。
-
-Power the Orange Pi from an independent regulated **5 V/3 A USB-C** branch, never from Arduino 5 V. Provide at least 3 A continuous capacity plus margin for startup, camera and fan; record idle, vision and full-load current.
-
-- 使用绝缘垫柱 / Use insulating standoffs.
-- 固定USB-C和摄像头线，避开拉杆与传动轴 / Secure USB-C and camera cables away from links and driveshaft.
-- 安装风扇并记录环境和SoC最高温度 / Install a fan and record ambient and peak SoC temperatures.
-- 动力线与USB/串口分开 / Separate power wiring from USB/serial.
-- 共地但大电流不走细信号地 / Share ground without routing high current through thin signal grounds.
-- 总开关一次断电，不依赖软件关机 / Use a single main switch; do not depend on software shutdown.
-
-## 6. 系统验收 / System Acceptance
-
-保存以下命令结果 / Save the output of:
+冻结命令 / Freeze commands:
 
 ```bash
-cat /proc/cpuinfo
-free -h
 uname -a
-lsblk
-lsusb
-v4l2-ctl --list-devices
-v4l2-ctl --list-formats-ext -d /dev/video0
-ip link
-rfkill list
+cat /etc/os-release
+gpiodetect
+gpioinfo
+ls -l /dev/gpiochip*
+find /sys/class/pwm -maxdepth 3 -type f -o -type l
 ```
 
-还要记录镜像校验、内核、OpenCV、运行环境、自动启动服务、设备路径、冷启动/进程重启时间、峰值温度和5 V峰值电流。
+每次更换镜像、内核、设备树、排针或overlay后必须重新核验。不能把其他Orange Pi型号或不同镜像中的管脚号直接复制到本车。
 
-Also record image checksum, kernel, OpenCV, runtime, autostart service, device paths, cold-start/process-restart time, peak temperature and peak 5 V current.
+Reverify after any image, kernel, device-tree, header or overlay change. Never copy pin numbers from another Orange Pi model or a different image directly into this vehicle.
 
-## 7. 无线合规 / Wireless Compliance
+## 5. 直接控制实现 / Direct-Control Implementation
 
-比赛程序不使用Wi-Fi 6或Bluetooth 5.4。上场前禁用服务或设备，使用 `ip link` 和 `rfkill list` 留证，确认无热点、配对或无线控制。日志通过有线或存储卡导出。
+`orange_pi_gpio.py`使用python-periphery访问字符设备GPIO与内核PWM。硬件访问延迟导入，因此 `enabled=false` 的DRY_RUN不需要打开硬件设备。现行职责如下：
 
-The competition program uses neither Wi-Fi 6 nor Bluetooth 5.4. Before a run, disable the services/devices and retain `ip link` and `rfkill list` evidence showing no hotspot, pairing or wireless control. Export logs by cable or storage card.
+`orange_pi_gpio.py` uses python-periphery for character-device GPIO and kernel PWM. Hardware access is imported lazily, so DRY_RUN with `enabled=false` opens no hardware devices. Current responsibilities are:
 
-## 8. 来源与待核验 / Sources and Pending Verification
+- GPIO输入去抖并实现物理启动/停止。 / Debounce the GPIO input for physical start/stop.
+- GPIO输出电机方向。 / Output motor direction through GPIO.
+- PWM输出电机速度和舵机脉宽。 / Output motor speed and steering pulse width through PWM.
+- 把逻辑量限制在 `-100...100`，把舵机限制在配置脉宽范围。 / Bound logical values to `-100...100` and steering to configured pulse widths.
+- 方向改变前先把电机占空比置零。 / Set motor duty to zero before changing direction.
+- 250 ms无新控制更新后停车并要求重新授权。 / Stop and require re-arming after 250 ms without a fresh update.
+- 异常、Ctrl+C和退出时清零、禁用并关闭资源。 / Zero, disable and close resources on exceptions, Ctrl+C and exit.
 
-- 购买版本来自团队订单截图和商品链接，整理于2026-07-15 / Purchased version from the team order screenshot and product link, compiled 2026-07-15.
-- Orange Pi产品索引 / Orange Pi product index：<https://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/index.html>
-- 接口和规格参考 / Interface and specification reference：<https://www.cnx-software.com/2026/04/15/orange-pi-zero-3w-an-allwinner-a733-sbc-in-raspberry-pi-zero-form-factor/>
+## 6. 电气约束 / Electrical Constraints
 
-仓库只确认4 GB SKU。eMMC、UFS、风扇、转接板和存储卡是否安装，以实物和系统枚举为准。比赛镜像必须冻结并备份。
+1. Orange Pi GPIO仅为逻辑信号，不得给舵机、电机或驱动器动力端供电。 / Orange Pi GPIO is logic-only and must not power the servo, motor or driver power stage.
+2. Orange Pi使用独立稳压 **5 V / 3 A** 支路，舵机使用独立4.5–7 V支路，电机使用动力支路。 / Use an independent regulated **5 V / 3 A** Orange Pi branch, a separate 4.5–7 V servo branch and a motor-power branch.
+3. 所有控制信号共地；大电流回流短且与USB、GPIO和摄像头线分开。 / All control signals share ground; high-current returns are short and separated from USB, GPIO and camera wiring.
+4. 电机驱动器方向/PWM输入必须确认兼容3.3 V；否则使用合适的电平转换或缓冲。 / Confirm motor-driver direction/PWM inputs accept 3.3 V; otherwise use an appropriate level shifter or buffer.
+5. 物理按钮使用外部上拉，避免依赖未验证的内部偏置。 / Use an external pull-up for the physical button rather than an unverified internal bias.
+6. 最终保险、线径、稳压额定值和散热必须依据实测电流与温升确定。 / Determine fuse, wire gauge, regulator rating and cooling from measured current and temperature rise.
 
-Only the 4 GB SKU is confirmed. Whether eMMC, UFS, fan, adapter board and storage card are installed must be verified physically and by system enumeration. Freeze and back up the competition image.
+## 7. 启动与运行基线 / Startup and Runtime Baseline
+
+| 项目 / Item | 要求 / Requirement | 证据 / Evidence |
+|---|---|---|
+| 冷启动 / Cold boot | 无网络、无人机交互，进入停车状态 / No network or user interaction; enter stopped state | 五次冷启动视频与日志 / Five cold-boot videos and logs |
+| 摄像头枚举 / Camera enumeration | 固定设备识别策略，避免 `/dev/videoN`漂移 / Stable device identification, not fragile `/dev/videoN` assumptions | UVC枚举 / UVC enumeration |
+| 配置 / Configuration | 缺失或非法映射时拒绝启用 / Refuse enable on missing or invalid mapping | G-01日志 / G-01 log |
+| 按钮 / Button | 上电不运动，去抖后才授权 / No power-on motion; arm only after debounce | G-02/G-03 |
+| 看门狗 / Watchdog | 控制更新年龄超过250 ms停车 / Stop when control age exceeds 250 ms | G-05五次测量 / Five G-05 measurements |
+| 退出 / Exit | 电机PWM归零、舵机回中、PWM禁用 / Motor PWM zero, steering centred, PWM disabled | G-09 |
+| 稳定性 / Stability | 30分钟无重启、无资源泄漏、温度可接受 / 30 minutes without restart or resource leak; acceptable temperature | R-03日志 / R-03 log |
+
+## 8. 故障域与硬件保护决策 / Fault Domain and Hardware Protection Decision
+
+进程看门狗与控制进程位于同一Linux系统。它能在主控制循环停止更新时独立调用停车，但若内核、PWM驱动、供电或整板冻结，就不一定有机会执行。这是从双控制器架构切换到单板直控后必须公开说明的取舍。
+
+The watchdog and controller share one Linux system. It can call stop independently when the main control loop stops updating, but may not run if the kernel, PWM driver, power or whole board freezes. This trade-off must be stated openly after moving from a two-controller architecture to single-board direct control.
+
+关闭该风险前需完成：
+
+Before closing this risk:
+
+1. 抬轮、限流和可立即断电条件下完成进程挂起、线程停止、设备异常和受控系统失联测试。 / Test process suspension, stopped threads, device errors and controlled system unresponsiveness with lifted wheels, current limiting and immediate power removal.
+2. 记录失效时PWM是否保持最后值、归零或禁用。 / Record whether PWM holds the last value, goes to zero or disables on each fault.
+3. 依据结果决定是否增加独立硬件使能门、驱动器EN下拉、硬件看门狗或常闭急停。 / Decide on an independent enable gate, driver-EN pull-down, hardware watchdog or normally-closed emergency stop from the results.
+4. 在FMEA、接线图、BOM与测试表中同步最终决定。 / Synchronise the final decision in the FMEA, wiring diagram, BOM and test table.
+
+## 9. 上一版本说明 / Previous-Version Note
+
+上一版本由Orange Pi运行视觉，通过115200 baud文本串口向Arduino发送转向和速度，Arduino负责D2/D6/D7/D8输出。该架构、配置和程序保留在仓库中用于说明迭代过程，但不应出现在当前装车、当前运行命令或当前验收结果中。
+
+The previous version ran vision on the Orange Pi and sent steering and speed over a 115200-baud text serial link to an Arduino that owned D2/D6/D7/D8 outputs. This architecture, configuration and code remain for iteration history but must not appear in current assembly, run commands or acceptance results.

@@ -50,7 +50,7 @@ This version is below GitHub's 100 MB per-file limit. YouTube remains the public
 | 视觉程序 / Vision program | `bev_segmentation.py`，是否匹配待确认 / match pending |
 | 驱动器 / Driver | AT8236或DRV8701，待确认 / AT8236 or DRV8701; pending confirmation |
 | 高层 / High level | Orange Pi Zero 3W 4GB |
-| 底层 / Low level | UNO或ESP32，待确认 / UNO or ESP32; pending confirmation |
+| 执行控制 / Execution control | Orange Pi GPIO/PWM直接控制；实际映射待补 / Direct Orange Pi GPIO/PWM control; physical mapping pending |
 | 电池与速度 / Battery and speed | 待填 / TBD |
 | 视觉参数 / Vision parameters | 相机、ROI、HSV、权重、转向待填 / camera, ROI, HSV, weights and steering TBD |
 | 其他传感器 / Other sensors | 不使用超声波或编码器 / No ultrasonic or encoder use |

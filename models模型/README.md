@@ -4,9 +4,9 @@
 
 **Current configuration:** The final assembly requires only a camera mount for vision, with no ultrasonic mounts or encoder signal wiring.
 
-基础底盘为 **RF-A101HE-109010203 阿克曼智能车**。已确认结构包括前轮舵机转向、四根转向拉杆、四轮驱动、前后差速器、中间传动轴和带霍尔编码器接口的电机。当前只使用电机驱动功能，编码器接口不接线。底部亚克力板预留Arduino UNO R3孔位，顶部安装Orange Pi、USB摄像头和电源模块。
+基础机械平台为阿克曼四驱底盘。已确认结构包括前轮舵机转向、四根转向拉杆、四轮驱动、前后差速器、中间传动轴和带霍尔编码器接口的电机。当前只使用电机驱动功能，编码器接口不接线。当前版本由顶部Orange Pi通过GPIO/PWM直接控制舵机和电机驱动器；底板上的UNO安装孔仅是底盘原有孔位，不代表当前安装Arduino。
 
-The base platform is the **RF-A101HE-109010203 Ackermann smart-car chassis**. Confirmed features include servo-operated front-wheel steering, four steering links, four-wheel drive, front and rear differentials, a longitudinal driveshaft and motors with Hall-encoder interfaces. Only motor drive is currently used; encoder signals are not connected. The lower acrylic plate provides Arduino UNO R3 holes, while the upper plate carries the Orange Pi, USB camera and power modules.
+The mechanical platform is a four-wheel-drive Ackermann chassis. Confirmed features include servo-operated front-wheel steering, four steering links, four-wheel drive, front and rear differentials, a longitudinal driveshaft and motors with Hall-encoder interfaces. Only motor drive is currently used; encoder signals are not connected. In the current version, the upper Orange Pi controls the steering servo and motor driver directly through GPIO/PWM. UNO mounting holes on the lower plate are inherited chassis features and do not indicate that an Arduino is currently installed.
 
 ## 团队确认的尺寸与性能 / Team-Confirmed Dimensions and Performance
 

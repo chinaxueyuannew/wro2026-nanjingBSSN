@@ -1,16 +1,18 @@
-import argparse, cv2, json, threading, time, serial
+import argparse, cv2, time
 import numpy as np
 from pathlib import Path
 from typing import Dict, Tuple, List, Optional, Any
 from collections import deque
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum, auto
+
+from orange_pi_gpio import OrangePiGpioVehicle
 
 # --- 1. 领域模型与配置 (SSOT) ---
 
 NORMALIZED_SIZE = (320, 240)
 PROCESS_SIZE = (512, 512)
-CONFIG_FILE = Path(__file__).with_name("serial_config.json")
+CONFIG_FILE = Path(__file__).with_name("gpio_config.json")
 
 class DriveState(Enum):
     NORMAL = auto()
@@ -97,65 +99,24 @@ PROFILE_CCW = ControlProfile(
 
 # --- 2. 硬件抽象层 (IO) ---
 class VehicleIO:
-    def __init__(self):
-        self.config = self._load_config()
-        self.ser: Optional[serial.Serial] = None
+    def __init__(self, config_path: Path):
+        self.output = OrangePiGpioVehicle(config_path)
         self.current_steer = 0
         self.current_speed = 0
         # 安全默认值：程序启动后保持停车，必须由明确操作设置速度。
         self.target_speed = 0
-        self.running = True
-        self.switch_command: Optional[str] = None
-        self._init_serial()
-        threading.Thread(target=self._io_loop, daemon=True).start()
-
-    def _load_config(self) -> dict:
-        if not CONFIG_FILE.exists():
-            print(f"ℹ️ Serial config not found: {CONFIG_FILE}; using safe defaults")
-            return {"port": "COM3", "baudrate": 115200}
-        try:
-            return json.loads(CONFIG_FILE.read_text(encoding="utf-8"))
-        except Exception as exc:
-            print(f"⚠️ Invalid serial config: {exc}; using safe defaults")
-            return {"port": "COM3", "baudrate": 115200}
-
-    def _init_serial(self):
-        try: 
-            self.ser = serial.Serial(
-                self.config.get('port', 'COM3'), 
-                self.config.get('baudrate', 115200), 
-                timeout=0.1
-            )
-        except Exception as e: print(f"⚠️ Serial Error: {e}")
-
-    def _io_loop(self):
-        while self.running:
-            if self.ser and self.ser.is_open:
-                try:
-                    cmd_str = f"{self.current_steer},{self.current_speed}\n"
-                    self.ser.write(cmd_str.encode())
-                    if self.ser.in_waiting:
-                        line = self.ser.readline().decode(errors='ignore').strip()
-                        if line in ["CW", "CCW"]: self.switch_command = line
-                except Exception: pass
-            time.sleep(0.05)
     
     def stop(self):
         self.current_steer = 0
         self.current_speed = 0
-        if self.ser and self.ser.is_open:
-            try:
-                self.ser.write(b"0,0\n")
-                self.ser.flush()
-            except Exception as exc:
-                print(f"⚠️ Failed to send final stop command: {exc}")
-        self.running = False
-        if self.ser:
-            self.ser.close()
+        self.output.close()
 
     def set_control(self, steer: float, speed: int):
-        self.current_steer = int(np.clip(steer * 100, -100, 100))
-        self.current_speed = int(np.clip(speed, -100, 100))
+        requested_steer = int(np.clip(steer * 100, -100, 100))
+        requested_speed = int(np.clip(speed, -100, 100))
+        self.output.set_control(requested_steer, requested_speed)
+        self.current_steer = self.output.current_steer
+        self.current_speed = self.output.current_speed
 
     def mouse_callback(self, event, x, y, flags, param):
         if event == cv2.EVENT_MOUSEWHEEL:
@@ -164,17 +125,18 @@ class VehicleIO:
         elif event == cv2.EVENT_RBUTTONDOWN:
             self.target_speed = 0
             self.current_speed = 0
+            self.output.stop_and_wait()
             print("🛑 EMERGENCY STOP (User)")
 
 # --- 3. 核心自动驾驶逻辑 (Autopilot) ---
 class Autopilot:
-    def __init__(self, video_source: Optional[str], profile: ControlProfile):
+    def __init__(self, video_source: Optional[str], profile: ControlProfile, gpio_config: Path):
         src = int(video_source) if (video_source and video_source.isdigit()) else (video_source or 0)
         self.cap = cv2.VideoCapture(src)
         if not self.cap.isOpened():
             raise RuntimeError(f"Unable to open video source: {src}")
         self.profile = profile
-        self.io = VehicleIO()
+        self.io = VehicleIO(gpio_config)
         
         self.reference_color = np.array([128, 128, 128.0])
         self.color_history = deque(maxlen=120)
@@ -384,14 +346,6 @@ class Autopilot:
         
         try:
             while True:
-                if new_cmd := self.io.switch_command:
-                    self.io.switch_command = None
-                    new_profile = PROFILE_CW if new_cmd == "CW" else PROFILE_CCW
-                    if new_profile != self.profile:
-                        self.profile = new_profile
-                        self.obs_hits_counter = 0
-                        print(f"🔄 MODE SWITCHED: {new_cmd}")
-
                 ret, frame = self.cap.read()
                 if not ret:
                     self.io.set_control(0, 0)
@@ -410,7 +364,7 @@ class Autopilot:
                 self.obs_hits_counter = (self.obs_hits_counter + 1) if obs_risk else 0 
                 is_confirmed_risk = (self.obs_hits_counter >= self.emergency_cfg['min_hits'])
                 
-                current_time = time.time()
+                current_time = time.monotonic()
                 
                 if self.drive_state == DriveState.NORMAL:
                     if is_confirmed_risk:
@@ -606,7 +560,8 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--video-in", type=str, help="Video file path or camera index")
     p.add_argument("--mode", default="cw", choices=["cw", "ccw"])
+    p.add_argument("--gpio-config", type=Path, default=CONFIG_FILE)
     args = p.parse_args()
     
     initial_profile = PROFILE_CCW if args.mode == "ccw" else PROFILE_CW
-    Autopilot(args.video_in, initial_profile).run()
+    Autopilot(args.video_in, initial_profile, args.gpio_config).run()

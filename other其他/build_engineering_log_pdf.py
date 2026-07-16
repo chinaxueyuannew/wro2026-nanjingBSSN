@@ -211,8 +211,8 @@ story += [
     p("YouTube: https://youtu.be/DJcxiJCEFdo", "SmallCN"),
     Spacer(1, 0.35 * cm),
     p(
-        "状态声明 / Status statement: 当前架构为USB彩色摄像头 + Orange Pi视觉 + Arduino UNO安全执行；不使用超声波或编码器反馈。"
-        "文档中所有待测字段保持空缺，不以推测数据冒充实测。 / The current architecture is USB colour camera + Orange Pi vision + Arduino UNO safe execution; no ultrasonic or encoder feedback is used. Every pending measurement remains explicit and is never replaced by assumed data.",
+        "状态声明 / Status statement: 当前架构为USB彩色摄像头 + Orange Pi视觉/决策 + GPIO/PWM直接执行；不安装Arduino，不使用超声波或编码器反馈。"
+        "文档中所有待测字段保持空缺，不以推测数据冒充实测。 / The current architecture is USB colour camera + Orange Pi vision/decisions + direct GPIO/PWM execution; no Arduino, ultrasonic or encoder feedback is used. Every pending measurement remains explicit and is never replaced by assumed data.",
         "CalloutCN",
     ),
 ]
@@ -228,7 +228,7 @@ if LU_PORTRAIT.exists() and ZHANG_PORTRAIT.exists() and HUANG_PORTRAIT.exists():
     portrait_table = Table([
         [fit_image(LU_PORTRAIT, 4.7 * cm, 6.1 * cm), fit_image(ZHANG_PORTRAIT, 4.7 * cm, 6.1 * cm), fit_image(HUANG_PORTRAIT, 4.7 * cm, 6.1 * cm)],
         [cell("陆昭颖 / Lu Zhaoying<br/><b>程序 / Programming</b>"), cell("张隽泽 / Zhang Junze<br/><b>结构 / Mechanical</b>"), cell("黄鸣博 / Huang Mingbo<br/><b>电子 / Electronics</b>")],
-        [cell("视觉、算法、串口、参数与软件测试 / Vision, algorithms, serial, parameters and software tests"), cell("底盘、支架、装配、尺寸与转向复核 / Chassis, mounts, assembly, dimensions and steering review"), cell("供电、UNO、驱动器、舵机、线束与上电安全 / Power, UNO, driver, servo, wiring and power-on safety")],
+        [cell("视觉、算法、GPIO控制、参数与软件测试 / Vision, algorithms, GPIO control, parameters and software tests"), cell("底盘、支架、装配、尺寸与转向复核 / Chassis, mounts, assembly, dimensions and steering review"), cell("供电、GPIO/PWM接口、驱动器、舵机、线束与上电安全 / Power, GPIO/PWM interfaces, driver, servo, wiring and power-on safety")],
     ], colWidths=[5.6 * cm, 5.6 * cm, 5.6 * cm], hAlign="CENTER")
     portrait_table.setStyle(TableStyle([
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
@@ -277,16 +277,16 @@ story += [p(
 
 story += [heading("1.", "项目摘要与当前边界", "Project Summary and Current Boundaries")]
 story += bilingual(
-    "车辆以RF-A101HE-109010203阿克曼四驱底盘为机械基础。USB彩色摄像头是唯一环境传感器；Orange Pi Zero 3W 4GB运行视觉和高层策略；Arduino UNO解析有线转向/速度命令，控制舵机与PWM/DIR电机接口，并在通信失效时本地停车。",
-    "The vehicle uses an RF-A101HE-109010203 four-wheel-drive Ackermann chassis. A USB colour camera is the only environmental sensor; an Orange Pi Zero 3W 4GB runs vision and high-level strategy; an Arduino UNO parses wired steering/speed commands, controls the servo and PWM/DIR motor interface, and stops locally on communication failure.",
+    "车辆以阿克曼四轮驱动底盘为机械基础。USB彩色摄像头是唯一环境传感器；Orange Pi Zero 3W 4GB在同一平台上完成视觉、路径决策、安全状态和GPIO/PWM执行，直接控制转向舵机与PWM/DIR电机驱动器。当前不安装Arduino。",
+    "The vehicle uses a four-wheel-drive Ackermann chassis. A USB colour camera is the only environmental sensor; an Orange Pi Zero 3W 4GB performs vision, path decisions, safety state and GPIO/PWM execution on the same platform, directly controlling the steering servo and PWM/DIR motor driver. No Arduino is currently installed.",
 )
 summary_rows = [
     ["子系统 / Subsystem", "当前实现 / Current Implementation", "验证边界 / Validation Boundary"],
     ["机械 / Mechanical", "阿克曼前轮转向、四轮机械驱动、前后差速 / Ackermann front steering, mechanical 4WD, front/rear differentials", "装车尺寸、质量、舵角和半径待测 / Final dimensions, mass, angles and radii pending"],
     ["感知 / Perception", "160°广角、480p、30 FPS USB彩色摄像头 / 160° wide-angle, 480p, 30 FPS USB colour camera", "内参、畸变、位姿和识别指标待测 / Intrinsics, distortion, pose and metrics pending"],
     ["计算 / Compute", "Orange Pi Zero 3W 4GB；CPU/OpenCV基线 / Orange Pi Zero 3W 4GB; CPU/OpenCV baseline", "板端版本、温度、延迟和镜像校验待冻结 / Board versions, temperature, latency and image checksum pending"],
-    ["执行 / Execution", "UNO D2舵机、D6 PWM、D7 DIR、D8按钮；UNO目标编译通过 / UNO D2 servo, D6 PWM, D7 DIR, D8 button; UNO-target build passed", "实物上传、驱动器接口和机械限位待核 / Physical upload, driver interface and mechanical limits pending"],
-    ["安全 / Safety", "上电停车、物理启动、畸形行过滤、250 ms看门狗 / Power-on stop, physical arm, malformed-line rejection, 250 ms watchdog", "实际停车时间、故障注入和最坏停车距离待测 / Actual stop time, faults and worst stopping distance pending"],
+    ["执行 / Execution", "Orange Pi GPIO方向/按钮 + 内核PWM速度/舵机；默认禁用 / Orange Pi GPIO direction/button + kernel PWM speed/steering; disabled by default", "真实line/channel、波形、驱动接口和机械限位待核 / Real line/channel, waveforms, driver interface and limits pending"],
+    ["安全 / Safety", "上电停车、物理启动、输出限幅、方向切换前归零、250 ms进程看门狗 / Power-on stop, physical arm, limits, zero-before-direction-change and 250 ms process watchdog", "实际停车时间、Linux/PWM冻结边界、独立硬件保护和最坏停车距离待测 / Stop timing, Linux/PWM freeze boundary, hardware fail-safe and worst stopping distance pending"],
 ]
 story += [table(summary_rows, [2.65 * cm, 7.2 * cm, 6.95 * cm])]
 
@@ -309,7 +309,7 @@ rubric_rows = [
     ["维度 / Dimension", "当前证据 / Current Evidence", "6分目标证据 / Target Evidence for 6"],
     ["1 移动与机械 / Mobility and mechanical", "阿克曼选型、几何/速度公式、层板DXF、机械测试表 / Rationale, geometry/speed formulas, plate DXF and test tables", "扭矩/速度实测、左右半径、刚度/稳定性、改动前后数据 / Measured torque/speed, left/right radii, stiffness/stability and before/after data"],
     ["2 动力与传感 / Power and sensing", "分支供电、正式接线图、视觉选型、标定与FMEA / Branch power, formal wiring, vision rationale, calibration and FMEA", "准确型号、电流预算、相机位姿/标定、光影/断连故障结果 / Exact models, current budget, camera pose/calibration and lighting/disconnection results"],
-    ["3 软件与障碍 / Software and obstacles", "视觉模块、恢复逻辑、UNO状态机、协议、测试表 / Vision modules, recovery, UNO state machine, protocol and tests", "停车/圈数、边界场景、识别/延迟/FPS、连续回合 / Parking/laps, edge cases, recognition/latency/FPS and consecutive laps"],
+    ["3 软件与障碍 / Software and obstacles", "视觉模块、恢复逻辑、GPIO安全状态机、默认禁用、250 ms看门狗 / Vision modules, recovery, GPIO safety state, disabled default and 250 ms watchdog", "真实GPIO/PWM映射、停车/圈数、识别/延迟/FPS、冻结边界和连续回合 / Real mapping, parking/laps, recognition/latency/FPS, freeze boundary and consecutive laps"],
     ["4 系统与决策 / Systems and decisions", "高低层分工、约束、方案取舍、FMEA、阶段日志 / Layer roles, constraints, trade-offs, FMEA and staged log", "至少3条由实测支撑的X/Y选择与迭代影响 / At least three measured X/Y decisions and quantified iteration effects"],
     ["5 可复现与GitHub / Reproducibility and GitHub", "官方模板结构、README>5000字符、代码/DXF/接线/测试/日志 / Official structure, README >5,000, code/DXF/wiring/tests/log", "3+有效提交、六视图、最终CAD、镜像校验、独立复现 / 3+ meaningful commits, six views, final CAD, image checksum and independent reproduction"],
 ]
@@ -322,7 +322,7 @@ quick_rows = [
     ["评分证据 / Rubric evidence", "other其他/scoring-evidence.md"],
     ["机械与计算 / Mechanics and calculations", "other其他/mechanical-analysis.md + models模型/"],
     ["正式电路图 / Formal wiring", "schemes原理图/system-wiring.png + wiring.md"],
-    ["视觉与执行代码 / Vision and executor code", "src源代码/bev_segmentation.py + VisionSerialExecutor/"],
+    ["视觉与执行代码 / Vision and executor code", "src源代码/bev_segmentation.py + orange_pi_gpio.py"],
     ["测试、FMEA和标定 / Tests, FMEA and calibration", "other其他/tests.md + FMEA.md + calibration-guide.md"],
     ["缺失证据 / Missing evidence", "other其他/evidence-register.md"],
 ]
@@ -331,30 +331,31 @@ story += [table(quick_rows, [5.0 * cm, 11.8 * cm])]
 # Architecture
 story += [heading("3.", "系统架构与接口", "System Architecture and Interfaces")]
 story += bilingual(
-    "架构采用“非实时视觉计算 + 实时安全执行”分层。Orange Pi只发送目标，不直接控制PWM；UNO只执行本地可验证的限幅和安全规则。这样Linux卡顿、视觉退出或USB断开不会让最后运动命令无限持续。",
-    "The architecture separates non-real-time vision computation from real-time safe execution. The Orange Pi sends targets but never writes PWM directly; the UNO enforces locally verifiable limits and safety rules. Linux stalls, vision exits or USB loss therefore cannot hold the last motion command indefinitely.",
+    "当前采用单板分层：Orange Pi上的视觉与决策层只产生逻辑目标，集中式GPIO安全输出层执行限幅、物理授权、PWM/DIR、250 ms控制更新看门狗和退出清理。该方案减少控制器和板间协议，但视觉与执行共享故障域。",
+    "The current single-board design is layered: vision and decision code produces logical targets, while a central GPIO safety-output layer owns limits, physical arming, PWM/DIR, a 250 ms control-update watchdog and exit cleanup. This reduces controllers and inter-board protocol, but vision and execution share one fault domain.",
 )
 if WIRING_IMAGE.exists():
     story += [fit_image(WIRING_IMAGE, 17.0 * cm, 12.3 * cm), p("图1 / Figure 1. 当前纯视觉系统候选接线；所有待核字段必须由实物闭环。 / Current vision-only candidate wiring; every pending field requires physical closure.", "SmallCN")]
 
-story += [subheading("3.1", "串口契约", "Serial Contract")]
-story += [p("steer,speed\\n", "CodeCN")]
+story += [subheading("3.1", "GPIO/PWM执行契约", "GPIO/PWM Execution Contract")]
+story += [p("set_control(steer, speed)    # -100...100", "CodeCN")]
 contract_rows = [
     ["属性 / Property", "当前定义 / Current Definition", "工程含义 / Engineering Meaning"],
-    ["范围 / Range", "两个十进制整数，-100...100 / Two decimal integers, -100...100", "超范围或畸形行不执行且不刷新看门狗 / Invalid lines do not execute or refresh watchdog"],
-    ["周期 / Period", "约50 ms / Approximately 50 ms", "约20 Hz目标更新 / Approximately 20 Hz target updates"],
-    ["超时 / Timeout", "250 ms", "电机PWM=0、舵机回中、进入故障 / Zero motor PWM, centre steering, enter fail-safe"],
-    ["启动 / Arming", "D8常开按钮到GND / Normally-open D8-to-GND button", "上电和故障后都需要物理动作 / Physical action required after power-up and fault"],
-    ["完整性 / Integrity", "无序号、源时间戳、CRC或确认 / No sequence, source timestamp, CRC or acknowledgement", "当前局限；更强协议需单独升级和测试 / Current limitation; stronger protocol needs separate validation"],
+    ["范围 / Range", "同进程逻辑量-100...100 / In-process logical values -100...100", "输出层二次限幅 / Output layer applies final bounds"],
+    ["周期 / Period", "约50 ms / Approximately 50 ms", "约20 Hz控制更新；单调时钟记录年龄 / Approximately 20 Hz; monotonic control age"],
+    ["超时 / Timeout", "250 ms", "电机PWM=0、舵机回中、进入CONTROL_FAILSAFE / Zero motor PWM, centre steering, enter CONTROL_FAILSAFE"],
+    ["启动 / Arming", "外部上拉常开按钮，GPIO映射待冻结 / External-pull-up NO button; mapping pending", "上电和故障后都需要物理动作 / Physical action required after power-up and fault"],
+    ["边界 / Boundary", "进程线程，不是硬件看门狗 / Process thread, not a hardware watchdog", "Linux/PWM整体冻结需独立硬件保护评估 / Linux/PWM freeze needs hardware-fail-safe assessment"],
 ]
 story += [table(contract_rows, [3.0 * cm, 6.3 * cm, 7.5 * cm])]
 
 story += [subheading("3.2", "安全状态机", "Safety State Machine")]
 state_rows = [
     ["状态 / State", "进入 / Entry", "动作 / Action", "退出 / Exit"],
-    ["WAIT_START", "上电或行驶中按D8 / Power-up or D8 while driving", "电机0、舵机中位、丢弃运动命令 / Motor zero, steering centre, discard motion", "按D8启动 / D8 arm"],
-    ["VISION_DRIVE", "按D8 / D8 arm", "等待按键后的新合法命令并执行限幅 / Wait for fresh post-arm valid line and execute limits", "D8停止或250 ms超时 / D8 stop or 250 ms timeout"],
-    ["COMMS_FAILSAFE", "命令超时 / Command timeout", "电机0、舵机中位、不自动恢复 / Motor zero, centre, no auto-recovery", "D8重新启动 + 新命令 / D8 re-arm + fresh line"],
+    ["DRY_RUN", "enabled=false", "不打开GPIO/PWM，只显示请求值 / Open no GPIO/PWM; report requested values", "核验配置后人工启用 / Enable after verification"],
+    ["WAIT_START", "硬件打开或物理停车 / Hardware opened or physical stop", "电机0、舵机中位 / Motor zero, steering centre", "去抖后的物理按键 / Debounced physical arm"],
+    ["GPIO_DRIVE", "已授权且有新鲜更新 / Armed with fresh update", "执行限幅GPIO/PWM / Execute bounded GPIO/PWM", "按钮、异常或250 ms超时 / Button, exception or 250 ms timeout"],
+    ["CONTROL_FAILSAFE", "控制更新超时 / Control-update timeout", "电机0、舵机中位、不自动恢复 / Motor zero, centre, no auto-recovery", "物理重新授权 / Physical re-arm"],
 ]
 story += [table(state_rows, [3.1 * cm, 4.4 * cm, 5.6 * cm, 3.7 * cm])]
 
@@ -365,14 +366,15 @@ stages = [
     ("2", "超声波巡墙基线", "Ultrasonic wall-follow baseline", "早期以右侧/前方超声波验证底盘、电机和舵机方向；控制简单但不能处理颜色，当前不使用。", "An early right/front ultrasonic baseline verified chassis, motor and servo directions; it could not handle colour and is not currently used."),
     ("3", "编码器与驱动试验", "Encoder and driver experiments", "团队完成双PWM、PWM/DIR和编码器PI试验程序，用于理解接口和闭环；当前车辆不连接编码器。", "The team developed dual-PWM, PWM/DIR and encoder-PI experiments to understand interfaces and feedback; the current vehicle does not connect encoders."),
     ("4", "阿克曼机械资料", "Ackermann mechanical record", "整理底盘尺寸、轴距、轮距、轮径、传动与层板DXF，并区分现有规格记录和装车待测值。", "Recorded chassis dimensions, wheelbase, track, wheel diameter, drivetrain and plate DXF, separating existing specification records from assembled measurements."),
-    ("5", "车载视觉计算", "Onboard vision compute", "建立Orange Pi视觉 + Arduino执行分层，使用USB摄像头、有线串口和独立5 V支路。", "Established Orange Pi vision + Arduino execution with USB camera, wired serial and independent 5 V branch."),
+    ("5", "车载视觉计算", "Onboard vision compute", "当时建立Orange Pi视觉 + Arduino执行试验分层，使用USB摄像头、有线串口和独立5 V支路；阶段13已替代该方案。", "At that stage, established experimental Orange Pi vision + Arduino execution using a USB camera, wired serial and independent 5 V branch; Stage 13 later replaced it."),
     ("6", "视觉原型", "Vision prototype", "加入道路预处理和红绿分割，完成默认停车、丢源/退出停车和恢复阶段修正。", "Added road preprocessing and red-green segmentation, correcting default stop, source-loss/exit stop and recovery behaviour."),
     ("7", "照片与赛事证据", "Photographs and competition evidence", "整理制作过程、三名成员、正式团队、赛事和比赛车辆照片，并明确趣味团队照和六视图缺口。", "Indexed development, all three member portraits, official team, competition and vehicle photographs and identified the missing informal team photograph and six views."),
     ("8", "纯视觉范围冻结", "Vision-only scope freeze", "明确当前不安装超声波、不读取编码器，避免历史代码与当前配置混淆。", "Defined no ultrasonic installation and no encoder reading to prevent historical code from being confused with current configuration."),
     ("9", "团队职责", "Team responsibilities", "明确程序、结构、电子和教练职责以及接口复核流程。", "Defined programming, mechanical, electronics and coach responsibilities and interface review flow."),
     ("10", "中英对照与导航", "Bilingual documentation and navigation", "统一同页中英对照，建立首页、目录和跨文件跳转。", "Standardised same-page Chinese-English presentation and built landing-page, index and cross-file navigation."),
-    ("11", "规则复核与安全闭环", "Rule audit and safety closure", "发现视觉文本协议无当前UNO执行端、旧引脚与文档矛盾，新增D2/D6/D7/D8执行候选、250 ms看门狗、正式接线图、评分证据地图和本PDF。", "Found that the vision text protocol lacked a current UNO executor and historical pins contradicted documentation; added the D2/D6/D7/D8 executor candidate, 250 ms watchdog, formal wiring, rubric map and this PDF."),
-    ("12", "UNO目标编译验证", "UNO-target build verification", "使用Arduino AVR Boards 1.8.8和Servo 1.3.0完成UNO目标编译：5544 bytes程序空间（17%）、277 bytes全局变量（13%）。实物上传和U-01至U-10仍待完成。", "Built for the UNO target with Arduino AVR Boards 1.8.8 and Servo 1.3.0: 5,544 bytes of program storage (17%) and 277 bytes of global-variable memory (13%). Physical upload and U-01 through U-10 remain pending."),
+    ("11", "上一版规则复核", "Previous-version rule audit", "发现当时的视觉文本协议无匹配执行端，新增D2/D6/D7/D8 Arduino串口候选、250 ms看门狗和接线图；现仅作上一版本记录。", "Found that the previous-stage visual text protocol lacked a matching executor and added a D2/D6/D7/D8 Arduino serial candidate, 250 ms watchdog and wiring; now retained only as previous-version history."),
+    ("12", "上一版UNO编译", "Previous-version UNO build", "完成上一版UNO目标编译：5544 bytes程序空间、277 bytes全局变量；该结果不代表当前装车。", "Built the previous-version UNO target using 5,544 bytes of program storage and 277 bytes of global memory; this does not represent the current vehicle."),
+    ("13", "Orange Pi GPIO/PWM直控", "Direct Orange Pi GPIO/PWM", "当前链路改为摄像头→Orange Pi视觉/决策/安全状态→GPIO/PWM→执行器；新增默认禁用配置、物理按钮、方向切换前归零和250 ms控制更新看门狗。真实line/channel待冻结，Linux/PWM冻结需独立硬件保护评估。", "Changed the current chain to camera→Orange Pi vision/decision/safety state→GPIO/PWM→actuators; added disabled defaults, physical arming, zero-before-direction-change and a 250 ms control-update watchdog. Real line/channels require freezing, and Linux/PWM freezes require an independent-hardware-fail-safe assessment."),
 ]
 for num, zh_title, en_title, zh, en in stages:
     story.append(KeepTogether([
@@ -423,16 +425,16 @@ story += [table(mechanical_test_rows, [3.8 * cm, 5.3 * cm, 4.6 * cm, 3.1 * cm])]
 # Power and sensing
 story += [heading("6.", "动力与纯视觉传感架构", "Power and Vision-Only Sensing")]
 story += bilingual(
-    "单摄像头方案能同时提取赛道边界、行驶方向和红绿障碍颜色，机械布置简单且信息密度高；但没有独立距离冗余，对光照、反光、遮挡、畸变、掉帧和延迟更加敏感。缓解措施包括固定支架、内参/畸变标定、ROI、曝光/白平衡控制、低置信度降速、进程退出停止和UNO命令超时。",
-    "A single camera can extract track borders, direction and red-green obstacle colour with a simple mount and high information density. However, it provides no independent ranging redundancy and is more sensitive to lighting, reflections, occlusion, distortion, dropped frames and latency. Mitigations include a rigid mount, intrinsic/distortion calibration, ROI, exposure/white-balance control, low-confidence slowdown, stop-on-exit and the UNO command timeout.",
+    "单摄像头方案能同时提取赛道边界、行驶方向和红绿障碍颜色，机械布置简单且信息密度高；但没有独立距离冗余，对光照、反光、遮挡、畸变、掉帧和延迟更加敏感。缓解措施包括固定支架、内参/畸变标定、ROI、曝光/白平衡控制、低置信度降速、进程退出清零和GPIO控制更新看门狗。",
+    "A single camera can extract track borders, direction and red-green obstacle colour with a simple mount and high information density. However, it provides no independent ranging redundancy and is more sensitive to lighting, reflections, occlusion, distortion, dropped frames and latency. Mitigations include a rigid mount, intrinsic/distortion calibration, ROI, exposure/white-balance control, low-confidence slowdown, zero-on-exit and a GPIO control-update watchdog.",
 )
 story += [subheading("6.1", "配电原则", "Power-Distribution Principles")]
 power_rows = [
     ["支路 / Branch", "规划 / Plan", "风险 / Risk", "必须验证 / Required Verification"],
     ["电机 / Motor", "电池经总开关/保险到驱动器 / Battery through main switch/fuse to driver", "启动峰值导致压降/噪声 / Start surge causes sag/noise", "峰值电流、电池最低电压、线径、保险 / Peak current, minimum voltage, wire and fuse"],
     ["Orange Pi + camera", "独立稳定5 V/3 A支路 / Independent stable 5 V/3 A branch", "掉压重启、USB断连 / Brownout reboot, USB loss", "视觉工况电流、5 V最小值、温度 / Vision current, 5 V minimum, temperature"],
-    ["UNO + servo", "控制/舵机支路，不从UNO 5 V取舵机电流 / Control/servo branch; servo not powered by UNO 5 V", "舵机峰值干扰控制器 / Servo peaks disturb controller", "左右极限电流、复位、抖动 / Limit current, resets, jitter"],
-    ["地与信号 / Ground and signals", "控制共地；大电流回路短且与USB分开 / Common control ground; short motor return, separated from USB", "地弹、串口错误 / Ground bounce, serial errors", "布线照片、故障注入 / Harness photos, fault injection"],
+    ["Steering servo", "独立4.5–7 V支路，不从Orange Pi排针取电 / Separate 4.5–7 V branch; not from Orange Pi header", "舵机峰值干扰控制器 / Servo peaks disturb controller", "左右极限电流、复位、抖动 / Limit current, resets, jitter"],
+    ["地与信号 / Ground and signals", "控制共地；大电流回路短且与USB/GPIO分开 / Common ground; short motor return, separated from USB/GPIO", "地弹、GPIO误动作 / Ground bounce, false GPIO action", "布线照片、故障注入 / Harness photos, fault injection"],
 ]
 story += [table(power_rows, [3.0 * cm, 5.4 * cm, 4.1 * cm, 4.3 * cm])]
 
@@ -440,7 +442,6 @@ story += [subheading("6.2", "动力预算方法", "Power-Budget Method")]
 story += [p("I_peak = I_motor_start + I_servo_peak + I_orange_pi_camera + I_controller + safety_margin", "CodeCN")]
 power_budget_rows = [
     ["负载 / Load", "电压 / Voltage", "典型 / Typical", "峰值 / Peak", "当前状态 / Current Status"],
-    ["Arduino UNO", "5 V", "待测 / TBD", "待测 / TBD", "不得以估算替代实测 / Measurement required"],
     ["Orange Pi + camera", "5 V", "待测 / TBD", "设计支路3 A / 3 A branch design", "板端负载测试待做 / Board load test pending"],
     ["转向舵机 / Servo", "4.5–7 V", "记录400–800 mA / Recorded 400–800 mA", "堵转待测 / Stall TBD", "架空极限和温升待测 / Lifted limit and temperature pending"],
     ["驱动电机 / Drive motor", "6–12 V", "记录额定1.9 A / Recorded rated 1.9 A", "启动待测 / Start TBD", "5次峰值测试待做 / Five surge trials pending"],
@@ -463,8 +464,8 @@ story += [heading("7.", "软件、状态机与障碍应对策略", "Software, St
 module_rows = [
     ["模块 / Module", "输入 / Input", "处理 / Processing", "输出 / Output", "状态 / Status"],
     ["bev_road.py", "摄像头/录像 / Camera/video", "亮度、Sobel/HSV、实验BEV、连通域 / Brightness, Sobel/HSV, experimental BEV, components", "道路候选与调试 / Road candidates and debug", "语法通过；标定待做 / Syntax passed; calibration pending"],
-    ["bev_segmentation.py", "320×240彩色帧 / 320×240 colour frame", "红绿HSV、道路密度、CW/CCW、恢复状态 / Red-green HSV, road density, CW/CCW, recovery", "steer,speed，约20 Hz", "原型；实车指标待做 / Prototype; vehicle metrics pending"],
-    ["VisionSerialExecutor.ino", "ASCII命令 + D8 / ASCII lines + D8", "解析、边界、限幅、状态、250 ms看门狗 / Parse, bounds, limits, state, watchdog", "D2舵机 + D6/D7电机 / D2 servo + D6/D7 motor", "UNO目标编译通过；实物待验 / UNO-target build passed; hardware pending"],
+    ["bev_segmentation.py", "320×240彩色帧 / 320×240 colour frame", "红绿HSV、道路密度、CW/CCW、恢复状态 / Red-green HSV, road density, CW/CCW, recovery", "逻辑steer/speed，约20 Hz / Logical steer/speed, ~20 Hz", "原型；实车指标待做 / Prototype; vehicle metrics pending"],
+    ["orange_pi_gpio.py", "逻辑目标 + 物理按钮 / Logical targets + physical button", "GPIO/PWM、限幅、状态、250 ms看门狗 / GPIO/PWM, limits, state, watchdog", "舵机PWM + 电机PWM/DIR / Steering PWM + motor PWM/DIR", "语法通过；真实映射和硬件待验 / Syntax passed; mapping and hardware pending"],
 ]
 story += [table(module_rows, [3.2 * cm, 3.3 * cm, 5.5 * cm, 3.0 * cm, 2.8 * cm])]
 
@@ -481,7 +482,7 @@ obstacle_rows = [
     ["绿色 / Green", "与红色方向相反的合规侧 / Opposite compliant side from red", "绿色背景/白平衡漂移 / Green background or white-balance drift", "召回、误检、完整回合 / Recall, false positives, full laps"],
     ["红绿同时 / Both", "按距离/风险和方向策略选择 / Select using distance/risk and direction strategy", "遮挡、面积排序错误 / Occlusion, incorrect area ordering", "组合场景成功率 / Combined-scene success rate"],
     ["暂时丢失 / Temporary loss", "先停车或低速恢复，不保持旧高速 / Stop or low-speed recovery; do not hold old high speed", "恢复转向符号错误 / Wrong recovery steering sign", "恢复时间、碰撞、超时 / Recovery time, contacts, timeout"],
-    ["摄像头/进程失效 / Camera/process failure", "视觉发送0或停止发送，UNO看门狗停车 / Vision sends zero or stops; UNO watchdog stops", "Linux阻塞导致最后命令 / Linux stall leaves last command", "实际停车时间、重复性 / Actual stop time and repeatability"],
+    ["摄像头/进程失效 / Camera/process failure", "视觉请求0；GPIO更新看门狗停车 / Vision requests zero; GPIO update watchdog stops", "Linux/PWM整体冻结可能保持最后输出 / Complete Linux/PWM freeze may hold output", "停车时间、冻结边界与硬件保护 / Stop time, freeze boundary and hardware fail-safe"],
 ]
 story += [table(obstacle_rows, [3.0 * cm, 5.2 * cm, 4.5 * cm, 4.1 * cm])]
 
@@ -496,9 +497,9 @@ story += [heading("8.", "系统思维、方案取舍与风险", "Systems Thinkin
 trade_rows = [
     ["选择 / Choice", "替代方案/代价 / Alternative or Cost", "工程理由 / Engineering Rationale", "数据闭环 / Data Closure"],
     ["阿克曼转向 / Ackermann", "差速滑移更简单 / Skid steering simpler", "汽车式轨迹、直线稳定、轮胎擦滑小 / Automotive path, straight stability, less scrub", "左右半径、偏差、机构迭代待测 / Radii, deviation and iteration pending"],
-    ["Orange Pi + UNO分层 / Layered Orange Pi + UNO", "单控制器更简单 / One controller simpler", "Linux适合视觉，UNO提供确定性本地安全 / Linux for vision, UNO for deterministic local safety", "延迟、超时和复位注入待测 / Latency, timeout and reset tests pending"],
+    ["Orange Pi单板GPIO直控 / Single-board Orange Pi GPIO", "双控制器有故障隔离 / Two controllers add fault isolation", "减少器件、线束和协议延迟；输出集中审查 / Fewer parts, wires and protocol latency; centralised output review", "映射、波形、冻结边界与硬件保护待测 / Mapping, waveforms, freeze boundary and hardware protection pending"],
     ["单USB彩色摄像头 / One USB colour camera", "多传感器有冗余 / Multiple sensors add redundancy", "同时看赛道与颜色，布置简洁 / Track and colour together, simple layout", "光影、召回、误检、断连待测 / Lighting, recall, FP and loss pending"],
-    ["有线串口 / Wired serial", "无线更灵活 / Wireless more flexible", "稳定、离线、可控且符合比赛环境 / Stable, offline, controlled and competition-appropriate", "命令年龄和线束可靠性待测 / Command age and harness reliability pending"],
+    ["本地GPIO/PWM / Local GPIO/PWM", "板间控制器可独立失效停车 / A second controller can stop independently", "无无线、无板间协议、延迟路径短 / No radio or inter-board protocol; short latency path", "设备树、资源占用和独立保护待冻结 / Device tree, ownership and independent protection pending"],
     ["开环速度 / Open-loop speed", "编码器PI抗负载变化 / Encoder PI resists load variation", "当前明确不读取编码器，先降低集成复杂度 / No encoder reading in current scope; lower integration complexity", "电量分层速度/停车距离映射待测 / Battery-stratified speed and stopping map pending"],
 ]
 story += [table(trade_rows, [3.2 * cm, 4.0 * cm, 5.5 * cm, 4.1 * cm])]
@@ -506,11 +507,12 @@ story += [table(trade_rows, [3.2 * cm, 4.0 * cm, 5.5 * cm, 4.1 * cm])]
 story += [subheading("8.1", "主要FMEA", "Principal FMEA")]
 fmea_rows = [
     ["故障 / Failure", "影响 / Effect", "控制 / Control", "验证 / Verification"],
-    ["上电运动 / Power-on motion", "损坏或违规 / Damage or violation", "WAIT_START + D8物理启动 / WAIT_START + D8 arm", "U-01、反复冷启动 / U-01 and repeated cold starts"],
-    ["视觉/串口卡死 / Vision/serial stall", "旧命令持续 / Stale command persists", "250 ms本地看门狗 / 250 ms local watchdog", "U-06，记录实际时间 / U-06, record actual time"],
-    ["畸形命令 / Malformed command", "错误转向/速度 / Wrong steering/speed", "完整行、字段数、数字与范围校验 / Complete-line, field-count, numeric and range validation", "U-05/U-10"],
-    ["故障自动恢复 / Automatic post-fault motion", "无人确认即运动 / Motion without confirmation", "必须D8重新启动 + 新命令 / D8 re-arm + fresh command", "U-07/U-08"],
-    ["电机启动压降 / Motor-start sag", "Orange Pi/UNO复位 / Orange Pi/UNO reset", "分支供电、保险、短回路、余量 / Branch power, fuse, short return, margin", "E-08五次峰值 / Five E-08 surge trials"],
+    ["上电运动 / Power-on motion", "损坏或违规 / Damage or violation", "enabled=false模板 + WAIT_START物理启动 / Disabled template + WAIT_START arm", "G-01/G-02反复冷启动 / Repeated G-01/G-02 cold starts"],
+    ["GPIO/PWM映射错误 / Wrong GPIO/PWM mapping", "误动作或损坏 / Unintended action or damage", "模板映射-1、非法配置拒绝启用 / Template mappings -1; invalid config rejected", "排针/设备树/枚举核对 + G-04"],
+    ["控制循环停止 / Control-loop stall", "旧输出持续 / Stale output persists", "250 ms控制更新看门狗 / 250 ms control-update watchdog", "G-05五次实际时间 / Five G-05 measurements"],
+    ["故障自动恢复 / Automatic post-fault motion", "无人确认即运动 / Motion without confirmation", "必须物理重新启动 / Physical re-arm required", "G-06/G-07"],
+    ["Linux/PWM整体冻结 / Complete Linux/PWM freeze", "最后PWM可能持续 / Last PWM may persist", "当前仅总开关和人工旁站 / Currently main switch and spotter only", "故障注入并决定独立硬件保护 / Inject faults and decide hardware fail-safe"],
+    ["电机启动压降 / Motor-start sag", "Orange Pi复位 / Orange Pi reset", "分支供电、保险、短回路、余量 / Branch power, fuse, short return, margin", "E-08五次峰值 / Five E-08 surge trials"],
     ["舵机顶死 / Servo stall", "过流、发热、转向损伤 / Overcurrent, heat, damage", "软件限幅 + 机械余量 / Software limit + mechanical margin", "M-09/E-09"],
     ["强光/阴影/反光 / Bright/shadow/reflection", "颜色误判、道路丢失 / Colour error, road loss", "固定相机参数、分层测试、降速/停车 / Frozen parameters, stratified tests, slow/stop", "S-04/S-10"],
     ["无线未关闭 / Radios enabled", "规则风险与不确定通信 / Rule risk and uncontrolled communication", "本地自动启动前执行关闭并保存证据 / Disable before local autostart and preserve evidence", "rfkill/ip link截图 / rfkill/ip link evidence"],
@@ -532,7 +534,7 @@ story += bilingual(
 )
 test_rows = [
     ["ID/类别 / Category", "方法 / Method", "必须报告 / Required Report", "通过目标 / Pass Target"],
-    ["U-01...U-10 UNO安全", "架空串口注入 / Lifted serial injection", "状态、实际PWM、舵角、超时时间、重复5次 / State, PWM, angle, timeout, five repeats", "无上电运动；畸形行不执行；故障不自动恢复 / No power-on motion; invalid lines rejected; no auto-recovery"],
+    ["G-01...G-10 GPIO安全", "DRY_RUN、抬轮GPIO/PWM与故障注入 / DRY_RUN, lifted GPIO/PWM and fault injection", "映射、频率、占空比、脉宽、超时、退出和方向切换波形 / Mapping, frequency, duty, pulse, timeout, exit and direction-change waveforms", "无上电运动；超时/退出停车；故障不自动恢复 / No power-on motion; timeout/exit stop; no auto-recovery"],
     ["机械 / Mechanical", "尺寸、质量、2 m直线、左右圆、固定距离 / Dimensions, mass, 2 m straight, circles, fixed distance", "均值、范围、照片、异常 / Mean, range, photo, anomalies", "尺寸合规、无机构干涉、重复性可解释 / Compliant, no interference, explainable repeatability"],
     ["动力 / Power", "静止、视觉、直行、启动、最大转向 / Idle, vision, straight, start, full steer", "电压/电流均值峰值、5 V最低、温度 / Voltage/current mean/peak, 5 V min, temperature", "无复位/断连；额定值有余量 / No reset/loss; rating margin"],
     ["视觉 / Vision", "按颜色、距离、位置、光照分层 / Stratify by colour, range, position, lighting", "TP/FN/FP、召回、空场误检 / TP/FN/FP, recall, empty false positives", "由实际任务目标冻结阈值 / Freeze thresholds from task targets"],
@@ -547,7 +549,7 @@ metric_rows = [
     ["召回率 / Recall", "TP / (TP + FN)", "避免漏检红绿障碍 / Avoid missed obstacles"],
     ["精确率 / Precision", "TP / (TP + FP)", "避免错误障碍触发 / Avoid false obstacle actions"],
     ["空场误检率 / Empty-track FP rate", "有误触发的空场帧 / 全部空场帧 / False-trigger empty frames / all empty frames", "避免无故急转 / Avoid unjustified steering"],
-    ["端到端延迟 / End-to-end latency", "采集曝光到UNO输出变化 / Capture exposure to UNO output change", "结合速度计算安全距离 / Combine with speed for safe distance"],
+    ["端到端延迟 / End-to-end latency", "采集曝光到GPIO/PWM输出变化 / Capture exposure to GPIO/PWM output change", "结合速度计算安全距离 / Combine with speed for safe distance"],
     ["成功回合率 / Successful-lap rate", "无碰撞、无干预且完成规则任务的回合 / Runs completed without contact or intervention", "总体可靠性 / Overall reliability"],
 ]
 story += [table(metric_rows, [4.1 * cm, 7.1 * cm, 5.6 * cm])]
@@ -576,8 +578,8 @@ story += bilingual(
 repo_rows = [
     ["目录 / Folder", "内容 / Content", "规则用途 / Rule Purpose"],
     ["models模型", "底盘、尺寸、层板DXF / Chassis, dimensions, plate DXF", "CAD与机械复现 / CAD and mechanical reproduction"],
-    ["schemes原理图", "PNG/SVG接线、引脚、配电、协议 / PNG/SVG wiring, pins, power, protocol", "电路接线 / Electrical reproduction"],
-    ["src源代码", "视觉、UNO安全执行、历史实验 / Vision, UNO safe execution, history", "完整源代码与架构 / Source code and architecture"],
+    ["schemes原理图", "PNG/SVG接线、GPIO/PWM映射和配电 / PNG/SVG wiring, GPIO/PWM mapping and power", "电路接线 / Electrical reproduction"],
+    ["src源代码", "视觉、GPIO/PWM安全执行、默认禁用配置和历史实验 / Vision, GPIO/PWM safe execution, disabled config and history", "完整源代码与架构 / Source code and architecture"],
     ["other其他", "BOM、测试、标定、FMEA、日志、评分证据 / BOM, tests, calibration, FMEA, log, rubric evidence", "工程过程与可复现性 / Process and reproducibility"],
     ["t-photos团队照片", "队伍、赛事、制作过程 / Team, competition, development", "团队与研发证据 / Team and process evidence"],
     ["v-photos车辆照片", "比赛现场；六视图待补 / Competition field; six views pending", "每侧、顶部、底部照片 / Every side, top and bottom"],
@@ -587,15 +589,16 @@ story += [table(repo_rows, [3.4 * cm, 7.4 * cm, 6.0 * cm])]
 
 story += [subheading("10.1", "独立复现验收", "Independent Reproduction Acceptance")]
 story += bilingual(
-    "由未参与编程的队员仅依据仓库完成：定位接线和程序、编译UNO、安装Python依赖、复制串口配置、解释状态机、架空启动、发送合法/畸形命令、触发250 ms超时并定位日志。记录用时、卡住步骤和由此产生的文档修改。无口头提示后才可声明完全可复现。",
-    "A member who did not write the software must use only the repository to locate wiring and programs, build the UNO sketch, install Python dependencies, copy serial configuration, explain the state machine, perform a lifted-wheel start, send valid/malformed commands, trigger the 250 ms timeout and locate logs. Record elapsed time, blocked steps and documentation changes. Claim full reproducibility only when no verbal assistance is needed.",
+    "由未参与编程的队员仅依据仓库完成：定位接线和程序、枚举GPIO/PWM、核对排针与line/channel、安装Python依赖、复制默认禁用配置、解释状态机、完成DRY_RUN和架空G-01至G-10、触发250 ms控制更新超时并定位日志。记录用时、卡住步骤和由此产生的文档修改。无口头提示且所有映射有证据后才可声明完全可复现。",
+    "A member who did not write the software must use only the repository to locate wiring and programs, enumerate GPIO/PWM, map header pins to line/channels, install Python dependencies, copy the disabled configuration, explain the state machine, complete DRY_RUN and lifted-wheel G-01 through G-10, trigger the 250 ms control-update timeout and locate logs. Record elapsed time, blocked steps and documentation changes. Claim full reproducibility only when no verbal assistance is needed and all mappings have evidence.",
 )
 
 story += [subheading("10.2", "提交前关键缺口", "Critical Pre-Submission Gaps")]
 gap_rows = [
     ["优先级 / Priority", "缺口 / Gap", "完成证据 / Completion Evidence", "负责人 / Owner"],
     ["P0", "确认电池、驱动器、稳压器、舵机型号和电气接口 / Confirm battery, driver, regulator, servo and interfaces", "标签照片 + 更新BOM/接线/图纸 / Label photos + updated BOM/wiring", "黄鸣博 / Huang Mingbo"],
-    ["P0", "UNO实物上传与U-01...U-10 / Physical UNO upload and U-01...U-10", "测试数据、串口日志、超时视频 / Test data, serial log, timeout video", "陆昭颖 + 黄鸣博"],
+    ["P0", "冻结GPIO/PWM映射并完成G-01...G-10 / Freeze GPIO/PWM mapping and complete G-01...G-10", "排针对照、枚举、配置哈希、波形、超时视频和签字 / Header map, enumeration, config hash, waveforms, timeout video and sign-off", "陆昭颖 + 黄鸣博"],
+    ["P0", "关闭Linux/PWM冻结安全边界 / Close Linux/PWM freeze boundary", "故障注入结果 + 独立硬件保护决策与实现 / Fault results + hardware-fail-safe decision and implementation", "陆昭颖 + 黄鸣博 + 薛源"],
     ["P0", "六视图与趣味团队照 / Six views and informal team photo", "规定文件名的原图 / Originals with required filenames", "全队 / Team"],
     ["P0", "相机内参、位姿、HSV与识别指标 / Camera calibration, pose, HSV and metrics", "配置、样本、混淆统计 / Config, samples, confusion statistics", "陆昭颖 / Lu Zhaoying"],
     ["P0", "停车区、圈数与最终停车 / Parking, lap count and final stop", "状态机、代码、边界测试和视频 / State machine, code, edge tests and video", "陆昭颖 / Lu Zhaoying"],
@@ -611,15 +614,13 @@ story += [subheading("10.3", "建议提交序列", "Recommended Commit Sequence"
 commit_rows = [
     ["顺序 / Order", "说明 / Message", "主题 / Theme"],
     ["1", "docs: map 2026 rubric evidence and add archival engineering log", "评分、PDF与导航 / Rubric, PDF and navigation"],
-    ["2", "control: add vision serial executor and local command watchdog", "协议与安全执行 / Protocol and safe execution"],
-    ["3", "hardware: add vision-only wiring diagram and verified pin map", "电气复现 / Electrical reproduction"],
+    ["2", "control: add direct Orange Pi GPIO executor and process watchdog", "GPIO/PWM与安全执行 / GPIO/PWM and safe execution"],
+    ["3", "hardware: add direct-control wiring and verified GPIO/PWM map", "电气复现 / Electrical reproduction"],
     ["4", "test: record power vision and full-lap validation results", "实测与迭代 / Measurements and iteration"],
     ["5", "release: freeze competition configuration and video mapping", "提交快照 / Submission freeze"],
 ]
 story += [table(commit_rows, [2.1 * cm, 9.7 * cm, 5.0 * cm])]
 story += [p("本次生成不执行Git暂存、提交或推送；由队伍审核后自行提交。 / This build does not stage, commit or push. The team will review and commit independently.", "CalloutCN")]
-
-story.append(PageBreak())
 
 # Sign-off
 story += [heading("11.", "最终签署与声明", "Final Sign-Off and Declaration")]

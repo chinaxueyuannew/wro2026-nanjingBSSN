@@ -1,113 +1,84 @@
-# 测试流程与记录 / Test Procedure and Records
+# 测试流程与结果记录 / Test Procedure and Results
 
-**范围：** 摄像头标定、视觉识别、视觉转向、串口超时和故障停车；不包含超声波或编码器测试。
+> 范围：纯视觉识别、Orange Pi GPIO/PWM执行、故障停车和整车性能；当前车辆不包含Arduino、串口、超声波或编码器。 / Scope: vision-only perception, Orange Pi GPIO/PWM execution, fault stopping and full-vehicle performance; the current vehicle has no Arduino, serial link, ultrasonic sensor or encoder.
 
-**Scope:** Camera calibration, visual perception, vision steering, serial timeout and fault stopping; ultrasonic and encoder tests are excluded.
+所有测试必须填写日期、软件提交号、系统镜像、内核、配置文件哈希、执行人、环境、至少五次重复值和原始证据路径。“通过”不能代替实测数值。
 
-每次记录日期、提交号、电池、场地、参数和结果，失败记录也保留。
+Every test must record date, software commit, system image, kernel, configuration hash, operator, environment, at least five repeated values and raw-evidence paths. “Pass” cannot replace measurements.
 
-Record date, commit, battery, field, parameters and result for every test, including failures.
+## 1. 测试安全前提 / Test Safety Preconditions
 
-## 1. 静态与抬轮 / Static and Lifted-Wheel
+1. 先断开电机动力，核对3.3 V逻辑、共地、极性和电源分支。 / Disconnect motor power first; verify 3.3 V logic, common ground, polarity and power branches.
+2. 首次输出测试抬起驱动轮，并使车辆不会碰到人员或物品。 / Lift the driven wheels for initial output tests and restrain the vehicle.
+3. 旁站人员掌握总电源并能立即断电。 / A spotter controls the main power and can disconnect it immediately.
+4. 初次运行保持 `enabled=false`；冻结映射和波形后才启用。 / Keep `enabled=false` initially; enable only after mapping and waveform sign-off.
+5. 每次变更引脚、设备树、驱动器、舵机或电源后重新执行G-01至G-10。 / Repeat G-01 through G-10 after any pin, device-tree, driver, servo or power change.
 
-- 核对极性、共地、紧固件、轮胎、拉杆和线束 / Check polarity, common ground, fasteners, tyres, links and wiring.
-- 确认舵机中位、转向符号和电机方向 / Confirm servo centre, steering sign and motor direction.
-- 遮挡、冻结或停止视觉，确认目标归零和Arduino超时停车 / Obstruct, freeze or stop vision and confirm zero target and Arduino timeout stop.
-- 测试总开关和启动按钮 / Test main switch and start button.
+## 2. GPIO/PWM安全验收 / GPIO/PWM Safety Acceptance
 
-## 2. 摄像头与视觉输入 / Camera and Vision Input
+| ID | 操作 / Action | 预期结果 / Expected Result | 实际结果 / Actual Result | 证据 / Evidence | 结论 / Result |
+|---|---|---|---|---|---|
+| G-01 | `enabled=false`运行程序 / Run with `enabled=false` | `DRY_RUN`；不打开GPIO/PWM，不运动 / `DRY_RUN`; no GPIO/PWM opened and no motion | 待测 / Pending | 日志 + 枚举前后对比 / Log + enumeration diff | 待测 / Pending |
+| G-02 | `enabled=true`后上电，不按按钮 / Power up without pressing the button | `WAIT_START`；电机0、舵机中位 / `WAIT_START`; zero motor, centred steering | 待测 / Pending | 波形 + 视频 / Waveform + video | 待测 / Pending |
+| G-03 | 按钮授权但不给新控制更新 / Arm without a fresh control update | 不运动，250 ms后失效 / No motion; fail-safe after 250 ms | 待测 / Pending | 日志 + 波形 / Log + waveform | 待测 / Pending |
+| G-04 | 输入 `-100, 0, +100`及越界值 / Apply boundary and out-of-range values | 限幅正确；脉宽/占空比符合配置 / Values bounded; pulse/duty match configuration | 待测 / Pending | 示波器/逻辑分析仪 / Oscilloscope/logic analyser | 待测 / Pending |
+| G-05 | 运动时停止控制更新 / Stop updates while moving | 最后更新后约250 ms电机PWM归零 / Motor PWM zero about 250 ms after last update | 待测 / Pending | 五次延迟值 / Five latency values | 待测 / Pending |
+| G-06 | G-05后恢复目标但不按按钮 / Resume targets after G-05 without button | 不自动恢复，保持停车 / No automatic recovery; remains stopped | 待测 / Pending | 日志 + 视频 / Log + video | 待测 / Pending |
+| G-07 | 运动中按物理按钮 / Press physical button while moving | 立即停车并回到 `WAIT_START` / Immediate stop and `WAIT_START` | 待测 / Pending | 延迟 + 视频 / Latency + video | 待测 / Pending |
+| G-08 | 拔摄像头、冻结帧或停止视觉 / Disconnect camera, freeze frames or stop vision | 请求速度0，输出层停车 / Zero request and stopped output | 待测 / Pending | 日志 + 波形 / Log + waveform | 待测 / Pending |
+| G-09 | 注入异常、Ctrl+C和正常退出 / Inject exception, Ctrl+C and normal exit | PWM归零/禁用，舵机中位，资源释放 / PWM zero/disabled, steering centred, resources released | 待测 / Pending | 三类日志 + 波形 / Three logs + waveforms | 待测 / Pending |
+| G-10 | 五次上电和五次正反向切换 / Five power cycles and five direction changes | 不出现上电运动；方向改变前PWM先归零 / No power-on motion; PWM zero before direction change | 待测 / Pending | 连续视频 + 波形 / Continuous video + waveform | 待测 / Pending |
 
-固定高度、俯仰、焦距后，记录UVC模式、内参、畸变、ROI、HSV、曝光和白平衡。
+### G-05原始延迟 / G-05 Raw Latencies
 
-After fixing height, pitch and focus, record UVC mode, intrinsics, distortion, ROI, HSV, exposure and white balance.
+| 重复 / Trial | 最后更新时刻 / Last Update | PWM归零时刻 / PWM Zero | 延迟ms / Latency ms | 判定 / Result |
+|---|---:|---:|---:|---|
+| 1 | 待测 / Pending | 待测 / Pending | 待测 / Pending | 待测 / Pending |
+| 2 | 待测 / Pending | 待测 / Pending | 待测 / Pending | 待测 / Pending |
+| 3 | 待测 / Pending | 待测 / Pending | 待测 / Pending | 待测 / Pending |
+| 4 | 待测 / Pending | 待测 / Pending | 待测 / Pending | 待测 / Pending |
+| 5 | 待测 / Pending | 待测 / Pending | 待测 / Pending | 待测 / Pending |
 
-| 日期 / Date | 提交 / Commit | 分辨率/FPS / Resolution/FPS | 高度/角度 / Height/Angle | 重投影误差 / Reprojection Error | 延迟 / Latency | 结论 / Result |
-|---|---|---|---|---:|---:|---|
-| 待测 / TBD | 待填 / TBD | 待测 / TBD | 待测 / TBD | 待测 / TBD | 待测 / TBD | |
+## 3. 摄像头与视觉 / Camera and Vision
 
-## 3. UNO视觉命令与安全状态 / UNO Vision Commands and Safety State
-
-测试前抬起驱动轮，使用115200 baud串口逐行发送下表输入。每项至少重复5次；用串口时间戳、逻辑分析仪或高速录像记录从最后合法命令到电机PWM归零的时间。任何结果都必须写入“实际结果”，不得只勾选通过。
-
-Lift the drive wheels before testing and send each line below at 115200 baud. Repeat every item at least five times. Use serial timestamps, a logic analyser or high-speed video to measure the time from the last valid command to zero motor PWM. Enter the actual result; a pass tick alone is insufficient.
-
-| ID | 前置状态 / Precondition | 输入/动作 / Input or Action | 预期 / Expected | 实际结果 / Actual Result |
+| ID | 测试 / Test | 方法 / Method | 指标 / Metric | 实际 / Actual |
 |---|---|---|---|---|
-| U-01 | 刚上电 / Just powered | 连续发送 `0,30`，不按D8 / Send `0,30`, do not press D8 | `WAIT_START`，电机始终0 / Motor remains zero | 待测 / TBD |
-| U-02 | `WAIT_START` | 按D8但不发送新命令 / Press D8, send no fresh line | 250 ms后 `COMMS_FAILSAFE` / Fail-safe after 250 ms | 待测 / TBD |
-| U-03 | D8刚按下 / Just armed | `0,0` | 舵机中位、电机0 / Centre, motor zero | 待测 / TBD |
-| U-04 | 已启动 / Armed | `-100,100` 与 `100,-100` | 输出不超过舵机/PWM限幅 / Output stays within limits | 待测 / TBD |
-| U-05 | 已启动 / Armed | `101,0`, `0,-101`, `abc,20`, `20`, `1,2,3` | 全部忽略，不刷新看门狗 / Ignore all; watchdog not refreshed | 待测 / TBD |
-| U-06 | 正在运动 / Moving | 停止发送 / Stop transmission | 250 ms目标内PWM归零、舵机回中 / Zero PWM and centre at 250 ms target | 待测 / TBD |
-| U-07 | `COMMS_FAILSAFE` | 恢复发送但不按D8 / Resume lines without D8 | 不自动运动 / No automatic motion | 待测 / TBD |
-| U-08 | `COMMS_FAILSAFE` | 按D8后发送新合法命令 / D8 then fresh valid line | 重新进入受限执行 / Resume limited execution | 待测 / TBD |
-| U-09 | 正在运动 / Moving | 按D8 / Press D8 | 立即回到 `WAIT_START` 并停车 / Return to wait and stop | 待测 / TBD |
-| U-10 | 已启动 / Armed | 发送超长行后发送 `0,0` / Overlong line, then `0,0` | 超长行丢弃；下一完整行正常 / Overflow discarded; next line works | 待测 / TBD |
+| V-01 | 内参与畸变 / Intrinsics and distortion | 棋盘格覆盖画面各区域 / Checkerboard across the frame | 重投影误差px / Reprojection error px | 待测 / Pending |
+| V-02 | 透视与ROI / Perspective and ROI | 已知地面点和赛道边界 / Known ground points and track borders | 边界误差px / Border error px | 待测 / Pending |
+| V-03 | 红绿识别 / Red-green detection | 多距离、多角度、多光照标注集 / Labelled set across distance, angle and lighting | Precision, recall, F1 | 待测 / Pending |
+| V-04 | 方向与道路 / Direction and road | 顺/逆时针录像及实车 / CW/CCW recordings and vehicle | 正确率 / Accuracy | 待测 / Pending |
+| V-05 | 帧率与延迟 / FPS and latency | 30分钟连续运行 / 30-minute continuous run | mean/P95 FPS and latency | 待测 / Pending |
+| V-06 | 低置信度策略 / Low-confidence policy | 反光、阴影、遮挡和模糊 / Reflection, shadow, occlusion and blur | 减速/停车正确率 / Correct slow/stop rate | 待测 / Pending |
 
-## 4. 视觉控制 / Vision Control
+红绿测试集必须包含原始图、标注、参数、运行脚本和结果CSV。禁止只展示成功样例。
 
-从低速测试道路权重、信标权重、最大转向、减速阈值和恢复时间。记录回合、横向偏差、碰撞、通过侧正确率、丢帧和蛇形。
+The red-green dataset must include raw images, labels, parameters, run script and result CSV. Showing only successful examples is not acceptable.
 
-Starting at low speed, test road weight, beacon weight, maximum steering, slowdown threshold and recovery time. Record laps, lateral deviation, collisions, passing-side accuracy, frame loss and oscillation.
+## 4. 机械、电气与整车 / Mechanical, Electrical and Full Vehicle
 
-| 日期 / Date | 提交 / Commit | 速度 / Speed | 最大转向 / Max Steering | 权重 / Weights | 回合 / Laps | 碰撞 / Collisions | 失效 / Failures | 结论 / Result |
-|---|---|---:|---:|---|---:|---:|---:|---|
-| 待测 / TBD | 待填 / TBD | 低 / Low | 待测 / TBD | 待测 / TBD | | | | |
+| ID | 项目 / Item | 条件 / Condition | 记录 / Record |
+|---|---|---|---|
+| H-01 | 最终长宽高、质量 / Final size and mass | 完整比赛配置 / Complete competition configuration | 待测 / Pending |
+| H-02 | 舵机中位与机械极限 / Steering centre and limits | 抬轮、低速、保留机械余量 / Lifted wheels, low speed, mechanical margin | 待测 / Pending |
+| H-03 | 最小转弯半径 / Minimum turning radius | 顺/逆时针各5次 / Five CW and five CCW runs | 待测 / Pending |
+| E-01 | 静态与视觉运行电流 / Idle and vision current | 电池、5 V和舵机支路 / Battery, 5 V and servo branches | 待测 / Pending |
+| E-02 | 电机启动压降 / Motor-start voltage sag | 最低与最高测试速度 / Lowest and highest test speed | 待测 / Pending |
+| E-03 | 舵机堵转风险 / Servo stall risk | 安全限位附近短时测试 / Brief test near safe limits | 待测 / Pending |
+| R-01 | 直线、转弯与障碍 / Straight, turn and obstacle | 两种赛道方向各5回合 / Five laps in both directions | 成功率、时间、碰撞 / Success, time, contacts |
+| R-02 | 停车区与圈数 / Parking and lap count | 完整规则流程 / Complete rule flow | 待实现/待测 / Pending implementation/test |
+| R-03 | 30分钟稳定性 / 30-minute stability | 比赛速度、摄像头与日志全开 / Competition speed, camera and logging | 重启、掉帧、温度 / Restarts, drops, temperature |
 
-## 5. 机械与动力 / Mechanical and Power
+## 5. 单板故障边界测试 / Single-board Fault-Boundary Test
 
-| 项目 / Item | 方法 / Method | 当前结果 / Current Result |
-|---|---|---|
-| 整车质量 / Mass | 电子秤 / Scale | 底盘0.7 kg，装车待测 / Chassis 0.7 kg; assembled TBD |
-| 长宽高 / Size | 卡尺或钢尺 / Caliper or ruler | 底盘260×140×85 mm，装车待测 / Chassis value; assembled TBD |
-| 轮径/轴距/轮距 / Wheel/wheelbase/track | 测量 / Measurement | 47/174/123 mm，待复核 / To verify |
-| 最大转角 / Maximum angle | 抬轮逐度 / Lifted-wheel steps | 待测 / TBD |
-| 转弯半径 / Turning radius | 地面轨迹 / Ground path | 标称475 mm，待测 / Rated 475 mm; TBD |
-| 速度 / Speed | 固定距离 / Fixed distance | 待测 / TBD |
-| 电流 / Current | 功率计 / Power meter | 待测 / TBD |
-| 最低电压 / Minimum voltage | 带载记录 / Loaded logging | 待测 / TBD |
+进程看门狗不能证明Linux或PWM整体冻结时一定停车。完成常规测试后，应在抬轮和可立即断电条件下，分别注入：视觉线程停止、主循环停止、看门狗线程停止、用户态进程挂起、GPIO/PWM设备异常以及受控的系统失联。记录哪些故障仍能让输出归零，哪些不能，并据此关闭FMEA中的独立硬件失效保护决策。
 
-### 动力工况记录 / Power-Condition Record
+A process watchdog does not prove stopping during a complete Linux or PWM freeze. After normal tests, with wheels lifted and immediate power removal available, separately inject a stopped vision thread, stopped main loop, stopped watchdog thread, suspended user process, GPIO/PWM device error and controlled system unresponsiveness. Record which faults still zero outputs and which do not, then use the results to close the independent-hardware-fail-safe decision in the FMEA.
 
-| 日期 / Date | 提交 / Commit | 工况 / Condition | 电池电压均值/最低 / Battery Mean/Min | 电池电流均值/峰值 / Battery Mean/Peak | 5 V最低 / 5 V Min | 温度 / Temperature | 结论 / Result |
-|---|---|---|---:|---:|---:|---:|---|
-| 待测 / TBD | 待填 / TBD | 静止 / Idle | | | | | |
-| 待测 / TBD | 待填 / TBD | 视觉运行 / Vision | | | | | |
-| 待测 / TBD | 待填 / TBD | 直行 / Straight | | | | | |
-| 待测 / TBD | 待填 / TBD | 电机启动 / Motor start | | | | | |
-| 待测 / TBD | 待填 / TBD | 最大转向 / Full steering | | | | | |
+## 6. 测试签字 / Test Sign-off
 
-## 6. 故障注入 / Fault Injection
-
-- 低电压：检查复位和舵机抖动 / Low voltage: check resets and servo jitter.
-- 阴影、反光、打滑和广角边缘：检查恢复 / Shadows, reflections, slip and wide-angle edges: check recovery.
-- 松动或拔掉摄像头：确认安全停车 / Loosen or unplug camera: confirm safe stop.
-- 停视觉或断串口：确认旧命令不持续 / Stop vision or serial: confirm stale commands do not persist.
-- Orange Pi 5 V跌落：记录重启且不得自动恢复运动 / Orange Pi 5 V drop: log restart and prevent automatic motion recovery.
-
-## 7. 稳定性与识别 / Stability and Recognition
-
-固定镜像、提交、摄像头模式和温度，连续运行至少30分钟，记录FPS、延迟、温度、5 V最低电压和断连。
-
-Fix image, commit, camera mode and temperature; run at least 30 minutes and record FPS, latency, temperature, minimum 5 V and disconnections.
-
-红绿数据覆盖不同距离、中心/边缘、明暗、反光和同时出现，分别记录召回、颜色误判和空场误检。
-
-Red-green data must cover distances, centre/edge, bright/dark, reflections and simultaneous colours; record recall, colour errors and empty-track false positives.
-
-| 数据集 / Dataset | 样本数 / Samples | TP | FN | FP | 召回率 / Recall | 空场误检率 / Empty-Track FP Rate | 备注 / Notes |
-|---|---:|---:|---:|---:|---:|---:|---|
-| 红色障碍 / Red obstacles | 待采 / TBD | | | | | | |
-| 绿色障碍 / Green obstacles | 待采 / TBD | | | | | | |
-| 红绿同时 / Both colours | 待采 / TBD | | | | | | |
-| 无障碍 / Empty track | 待采 / TBD | | | | | | |
-
-## 8. 最终通过门槛 / Final Pass Criteria
-
-- 连续10个完整回合无人工干预 / Ten consecutive full laps without intervention.
-- 零碰撞、零违规 / Zero collisions and rule violations.
-- 冻帧、断相机或低置信度进入安全状态 / Safe state on frozen frames, camera loss or low confidence.
-- Orange Pi、摄像头或串口失效时按时停车 / Timely stop on Orange Pi, camera or serial failure.
-- 离线冷启动且无线关闭 / Offline cold start with wireless disabled.
-- 参数、提交和视频一致 / Parameters, commit and video match.
-- 照片、接线、CAD和实车一致 / Photographs, wiring, CAD and vehicle match.
+| 角色 / Role | 姓名 / Name | 日期 / Date | 结论 / Decision | 签字 / Signature |
+|---|---|---|---|---|
+| 程序 / Programming | 陆昭颖 / Lu Zhaoying | 待填 / Pending | 待填 / Pending | 待填 / Pending |
+| 结构 / Mechanical | 张隽泽 / Zhang Junze | 待填 / Pending | 待填 / Pending | 待填 / Pending |
+| 电子 / Electronics | 黄鸣博 / Huang Mingbo | 待填 / Pending | 待填 / Pending | 待填 / Pending |
+| 教练 / Coach | 薛源 / Xue Yuan | 待填 / Pending | 待填 / Pending | 待填 / Pending |

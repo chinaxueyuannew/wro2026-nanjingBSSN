@@ -1,6 +1,6 @@
 /*
  * 2026 WRO Future Engineers - Open Challenge baseline
- * Hardware: Arduino UNO + DRV8701/MD02 Pro + RF-A101HE chassis
+ * Hardware: Arduino UNO + DRV8701/MD02 Pro + four-wheel-drive Ackermann chassis (previous experiment)
  * Driver interface: PWM + DIR. Do not use this file with AT8236 wiring.
  */
 #include <Servo.h>

@@ -33,13 +33,13 @@ The page's “maximum 1920×1080” conflicts with 0.3 MP and the 480p SKU and m
 
 The camera connects to an **Orange Pi Zero 3W 4GB**. Its A733 CPU runs capture, undistortion, HSV segmentation and contour filtering under Linux/OpenCV. The current algorithm does not depend on the NPU; use of the 3 TOPS NPU may only be claimed after model conversion, latency and accuracy validation.
 
-摄像头和Arduino同时接入时，需要可靠的多端口OTG集线器。视觉结果通过有线USB串口或UART发给Arduino。Orange Pi不直接驱动执行器；Arduino负责输出限幅和命令超时停车。当前没有独立距离传感器。
+摄像头通过USB接入Orange Pi。视觉结果在同一进程内转换为受限转向和速度目标，再由Orange Pi GPIO/PWM直接驱动舵机和电机驱动器；当前没有Arduino串口链路，也没有独立距离传感器。
 
-A reliable multi-port OTG hub is needed when connecting the camera and Arduino simultaneously. Vision results travel to the Arduino through wired USB serial or UART. The Orange Pi does not drive actuators directly; the Arduino limits outputs and stops on command timeout. No independent range sensor is installed.
+The camera connects to the Orange Pi through USB. Vision results are converted in the same process into limited steering and speed targets, then applied directly to the steering servo and motor driver through Orange Pi GPIO/PWM. The current version has no Arduino serial link and no independent range sensor.
 
-仓库中的 `bev_road.py` 用于道路掩膜、实验性BEV和连通域，`bev_segmentation.py` 包含红绿HSV、CW/CCW策略、道路密度转向、串口和恢复状态机。目前仅完成语法检查和最低安全修正，仍按原型记录。
+仓库中的 `bev_road.py` 用于道路掩膜、实验性BEV和连通域，`bev_segmentation.py` 包含红绿HSV、CW/CCW策略、道路密度转向和恢复状态机，`orange_pi_gpio.py` 提供默认禁用、物理启动、GPIO/PWM限幅和250 ms进程级看门狗。目前已完成语法检查，实物GPIO映射和车辆测试仍待完成。
 
-In the repository, `bev_road.py` provides road masks, experimental BEV and connected components, while `bev_segmentation.py` includes red-green HSV detection, CW/CCW strategy, road-density steering, serial output and recovery states. Only syntax checks and minimum safety corrections are complete, so it remains a prototype.
+In the repository, `bev_road.py` provides road masks, experimental BEV and connected components; `bev_segmentation.py` contains red-green HSV detection, CW/CCW strategy, road-density steering and recovery states; and `orange_pi_gpio.py` provides disabled-by-default output, physical arming, GPIO/PWM limits and a 250 ms process-level watchdog. Syntax checks are complete, while physical GPIO mapping and vehicle tests remain pending.
 
 ## 3. 选择30 FPS彩色的原因 / Why 30 FPS Colour Was Selected
 
@@ -99,7 +99,7 @@ Final records must include height above ground, distance from the front axle, pi
 | 稳定检测距离 / Stable detection range | 逐级增加距离 / Incremental distance | 待测 / TBD | 设置减速点 / Set slowdown point |
 | 边缘误差 / Edge-position error | 多横向角度标定 / Multiple lateral angles | 待测 / TBD | 验证去畸变 / Validate undistortion |
 | 30分钟稳定性 / 30-minute stability | 掉帧、负载、温度 / Drops, load and temperature | 待测 / TBD | 验证USB和散热 / Validate USB and cooling |
-| 串口延迟 / Serial latency | 采集到Arduino收包 / Capture to Arduino receive | 待测 / TBD | 设置命令超时 / Set command timeout |
+| GPIO控制延迟 / GPIO control latency | 采集到PWM/GPIO变化 / Capture to PWM/GPIO change | 待测 / TBD | 计算停车距离 / Calculate stopping distance |
 
 ## 8. 车载核验 / Onboard Verification
 
@@ -109,9 +109,9 @@ On the Orange Pi, use `lsusb`, `v4l2-ctl --list-devices` and `v4l2-ctl --list-fo
 
 ## 9. 规则与安全 / Rules and Safety
 
-摄像头是唯一环境感知设备，所有处理在车上完成。比赛期间不使用Wi-Fi或蓝牙传输图像或控制。摄像头、视觉进程或串口失效时，Arduino通过命令超时停车；没有超声波安全层。
+摄像头是唯一环境感知设备，所有处理和GPIO/PWM控制均在Orange Pi上完成。比赛期间不使用Wi-Fi或蓝牙传输图像或控制。摄像头或视觉进程失效时，程序必须立即把电机PWM置零；进程级看门狗处理控制更新停滞。没有Arduino或超声波安全层。
 
-The camera is the only environmental sensor and all processing occurs onboard. Wi-Fi and Bluetooth are not used for images or control during competition. If the camera, vision process or serial link fails, the Arduino stops through its command-timeout watchdog; no ultrasonic safety layer exists.
+The camera is the only environmental sensor, and all processing plus GPIO/PWM control occurs on the Orange Pi. Wi-Fi and Bluetooth are not used for images or control during competition. Camera or vision-process failure must immediately set motor PWM to zero, while a process-level watchdog handles missing control updates. No Arduino or ultrasonic safety layer exists.
 
 ## 10. 信息来源 / Sources
 

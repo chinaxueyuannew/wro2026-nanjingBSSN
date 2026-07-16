@@ -1,0 +1,14 @@
+# Keep generated and photographic assets binary in Git.
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+
+# Keep reviewable source and documentation consistent across platforms.
+*.md text eol=lf
+*.py text eol=lf
+*.json text eol=lf
+*.txt text eol=lf
+*.svg text eol=lf
+*.ino text eol=lf
+.gitignore text eol=lf

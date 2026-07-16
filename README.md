@@ -2,13 +2,13 @@
 
 > 本页面所有内容均为中文与英文直接对照。 / All content on this page is presented directly in Chinese and English.
 
-本仓库是 **南京博颂学校 / BONA SONORITY SCHOOL NANJING** 参加 2026 WRO Future Engineers 的公开工程材料，沿用官方 Future Engineers 模板，记录底盘、机电集成、Orange Pi视觉算法、Arduino底层控制、测试、安全分析、团队资料与演示视频。
+本仓库是 **南京博颂学校 / BONA SONORITY SCHOOL NANJING** 参加 2026 WRO Future Engineers 的公开工程材料，沿用官方 Future Engineers 模板，记录底盘、机电集成、Orange Pi视觉与GPIO/PWM直接控制、测试、安全分析、团队资料与演示视频。
 
-This public repository documents the 2026 WRO Future Engineers project of **BONA SONORITY SCHOOL NANJING**. It follows the official Future Engineers template and records the chassis, mechatronic integration, Orange Pi vision, Arduino execution control, tests, safety analysis, team materials and demonstration video.
+This public repository documents the 2026 WRO Future Engineers project of **BONA SONORITY SCHOOL NANJING**. It follows the official Future Engineers template and records the chassis, mechatronic integration, Orange Pi vision with direct GPIO/PWM control, tests, safety analysis, team materials and demonstration video.
 
-车辆以 **RF-A101HE-109010203 阿克曼四驱底盘**为机械基础，只使用 **USB彩色摄像头**进行环境感知。**Orange Pi Zero 3W 4GB**运行视觉算法和高层策略，并通过有线串口向 **Arduino UNO**发送转向与速度目标；Arduino负责舵机、电机驱动、启动状态和命令超时停车。当前车辆不使用超声波，也不使用编码器闭环。
+车辆以阿克曼四轮驱动底盘为机械基础，只使用 **USB彩色摄像头**进行环境感知。**Orange Pi Zero 3W 4GB**在同一平台上完成视觉、路径决策、安全状态管理和GPIO/PWM执行，直接控制转向舵机与电机驱动器。当前车辆不安装Arduino，不使用超声波，也不读取编码器。
 
-The vehicle is based on an **RF-A101HE-109010203 four-wheel-drive Ackermann chassis** and uses a **USB colour camera as its only environmental sensor**. An **Orange Pi Zero 3W 4GB** runs perception and high-level strategy and sends wired steering and speed targets to an **Arduino UNO**. The Arduino controls the steering servo, motor driver, start state and command-timeout stop. The current vehicle uses neither ultrasonic sensing nor encoder feedback.
+The vehicle uses a four-wheel-drive Ackermann chassis and a **USB colour camera as its only environmental sensor**. An **Orange Pi Zero 3W 4GB** performs vision, path decisions, safety-state management and GPIO/PWM execution on the same platform, directly controlling the steering servo and motor driver. The current vehicle has no Arduino, ultrasonic sensing or encoder feedback.
 
 ## 演示视频 / Driving Video
 
@@ -32,12 +32,12 @@ We collaborate on programming, mechanical structure and electronics for a vision
 
 | 姓名 / Name | 分工 / Role |
 |---|---|
-| 陆昭颖 / Lu Zhaoying | 程序 / Programming |
+| 陆昭颖 🏳️‍🌈 / Lu Zhaoying | 程序 / Programming |
 | 张隽泽 / Zhang Junze | 结构 / Mechanical Structure |
 | 黄鸣博 / Huang Mingbo | 电子 / Electronics |
 | 薛源 / Xue Yuan | 教练 / Coach |
 
-[查看完整团队介绍 / Read the full team profile](other其他/team-profile.md)
+[查看完整团队介绍 / Read the full team profile](other其他/team-profile.md) · [陆昭颖自我介绍（中/英/日） / Lu Zhaoying profile (CN/EN/JP)](other其他/team-profile.md#lu-zhaoying-profile)
 
 ### 成员照片 / Member Portraits
 
@@ -79,8 +79,8 @@ See the [development-process photo index](t-photos团队照片/README.md) for mo
 | 超声波与编码器代码 / Ultrasonic and encoder code | 团队早期自主实验代码已入库 / Earlier team-developed experimental code included | 当前车辆不使用 / Not used by the current vehicle |
 | 道路预处理 / Road preprocessing | `bev_road.py` 已入库 / Included | 透视参数仍需实车标定 / Perspective parameters require vehicle calibration |
 | 红绿视觉控制 / Red-green vision control | `bev_segmentation.py` 已入库 / Included | 当前主要方向，仍需板端和实车验证 / Current main approach; board and vehicle validation pending |
-| UNO视觉安全执行 / UNO vision safety execution | `VisionSerialExecutor.ino` 已实现并通过UNO目标编译 / Implemented and built for the UNO target | 上电停车、D8启动、解析/限幅和250 ms看门狗已闭环；待实物上传、驱动器和车辆验证 / Power-on stop, D8 start, parsing/limits and 250 ms watchdog are closed in code; physical upload, driver and vehicle validation pending |
-| 接线与配电 / Wiring and distribution | PNG/SVG图、引脚、供电和协议已入库 / PNG/SVG, pins, power and protocol included | 准确器件型号、额定值和支路电流待实物核验 / Exact models, ratings and branch currents require physical verification |
+| Orange Pi GPIO/PWM执行 / Orange Pi GPIO/PWM execution | `orange_pi_gpio.py`、安全状态机和配置模板已入库 / Driver, safety state machine and configuration template included | 默认禁用、上电停车、物理按钮、限幅、退出清零和250 ms进程看门狗已闭环；实际GPIO/PWM映射及硬件测试待完成 / Disabled-by-default, power-on stop, physical button, limits, zero-on-exit and 250 ms process watchdog implemented; actual mapping and hardware tests pending |
+| 接线与配电 / Wiring and distribution | 现行GPIO直控PNG/SVG、供电分支和映射表已入库 / Current direct-GPIO PNG/SVG, power branches and mapping table included | 实际GPIO line、PWM chip/channel、逻辑电平、额定值和支路电流待实物核验 / Actual GPIO lines, PWM chip/channels, logic levels, ratings and branch currents require physical verification |
 | 评分与工程日志 / Rubric and engineering log | 五维证据地图、缺失证据登记、双语PDF已入库 / Five-dimension map, gap register and bilingual PDF included | 实测后需更新PDF和签署 / PDF and sign-off require update after measurements |
 | 驾驶演示 / Driving demonstration | YouTube链接和87.07 MiB视频已入库 / YouTube link and 87.07 MiB video included | 拍摄日期、提交号和硬件对应表待补 / Date, commit and hardware mapping pending |
 | 团队材料 / Team materials | 队旗、介绍、三名成员照、正式照、冠军照和11张过程照已入库 / Flag, profile, three portraits, official photo, award photo and 11 process photos included | 趣味团队照待补 / Informal team photo pending |
@@ -93,8 +93,8 @@ See the [development-process photo index](t-photos团队照片/README.md) for mo
 | 目录或文件 / Folder or File | 内容 / Contents | 复现用途 / Reproduction Use |
 |---|---|---|
 | [`README.md`](README.md) | 总体技术说明、视频、状态和导航 / Overall documentation, video, status and navigation | 裁判首页与总体复现 / Landing page and system reproduction |
-| [`src源代码/`](src源代码/README.md) | Orange Pi视觉、UNO安全执行候选与历史实验 / Orange Pi vision, UNO safety-executor candidate and historical experiments | 编译、运行和算法审查 / Build, execution and algorithm review |
-| [`schemes原理图/`](schemes原理图/wiring.md) | 引脚、串口、供电和接线 / Pins, serial, power and wiring | 电气复现 / Electrical reproduction |
+| [`src源代码/`](src源代码/README.md) | Orange Pi视觉、GPIO/PWM执行与历史实验 / Orange Pi vision, GPIO/PWM execution and historical experiments | 编译、运行和算法审查 / Build, execution and algorithm review |
+| [`schemes原理图/`](schemes原理图/wiring.md) | GPIO/PWM映射、供电和接线 / GPIO/PWM mapping, power and wiring | 电气复现 / Electrical reproduction |
 | [`models模型/`](models模型/README.md) | 底盘、尺寸和层板DXF / Chassis, dimensions and plate DXF | 机械复现 / Mechanical reproduction |
 | [`other其他/`](other其他/engineering-log.md) | 物料、测试、标定、风险和日志 / BOM, tests, calibration, risk and logs | 工程追溯 / Engineering traceability |
 | [`t-photos团队照片/`](t-photos团队照片/README.md) | 团队、赛事和制作过程照片 / Team, competition and development photos | 团队与过程证据 / Team and process evidence |
@@ -107,7 +107,7 @@ See the [development-process photo index](t-photos团队照片/README.md) for mo
 - [2026评分证据地图 / 2026 scoring-evidence map](other其他/scoring-evidence.md)
 - [实测与照片证据登记 / Measurement and photograph evidence register](other其他/evidence-register.md)
 - [源代码、运行方法与验证状态 / Source code, operation and validation](src源代码/README.md)
-- [接线、串口与供电 / Wiring, serial communication and power](schemes原理图/wiring.md)
+- [GPIO/PWM接线与供电 / GPIO/PWM wiring and power](schemes原理图/wiring.md)
 - [正式PNG接线图 / Formal PNG wiring diagram](schemes原理图/system-wiring.png)
 - [机械模型、尺寸与DXF / Mechanical models, dimensions and DXF](models模型/README.md)
 - [Orange Pi车载计算平台 / Orange Pi onboard computer](other其他/processor-orange-pi.md)
@@ -137,22 +137,20 @@ The documented chassis size is **260 × 140 × 85 mm**, or approximately **246 m
 ```mermaid
 flowchart LR
   CAM["USB彩色摄像头 / USB colour camera"] --> OPI["Orange Pi Zero 3W 4GB"]
-  OPI -->|"视觉决策 / Vision decisions"| PLAN["转向与速度目标 / Steering and speed targets"]
-  PLAN -->|"有线串口 / Wired serial"| MCU["Arduino UNO"]
-  MCU -->|"D2"| SERVO["转向舵机 / Steering servo"]
-  MCU -->|"D6 PWM + D7 DIR"| DRIVER["电机驱动器 / Motor driver"]
-  BUTTON["D8物理启动/停止 / Physical start-stop"] --> MCU
+  OPI -->|"视觉与决策 / Vision and decisions"| SAFE["GPIO安全状态机 / GPIO safety state machine"]
+  SAFE -->|"PWM（映射待冻结） / PWM mapping pending"| SERVO["转向舵机 / Steering servo"]
+  SAFE -->|"PWM + DIR（映射待冻结） / mapping pending"| DRIVER["电机驱动器 / Motor driver"]
+  BUTTON["物理启动/停止按钮 / Physical start-stop"] -->|"3.3 V GPIO input"| SAFE
   DRIVER --> MOTOR["四轮驱动 / Four-wheel drive"]
   BAT["车载电源 / Vehicle battery"] --> REG["稳压与配电 / Regulation and distribution"]
   REG --> OPI
-  REG --> MCU
   REG --> SERVO
   REG --> DRIVER
 ```
 
-当前感知输入只有USB摄像头。视觉、串口或Orange Pi失效时，Arduino必须通过命令超时让电机停止。
+当前感知输入只有USB摄像头。视觉帧过期、控制更新过期、程序异常或退出时，Orange Pi输出层必须立即把电机占空比置零并使舵机回中；250 ms进程看门狗触发后必须重新按键授权。该进程级机制不能覆盖Linux内核或硬件PWM整体冻结，因此最终安全评估仍需验证是否增加独立硬件使能门。
 
-The USB camera is the only perception input. If vision, serial communication or the Orange Pi fails, the Arduino must stop the motor through a command-timeout watchdog.
+The USB camera is the only perception input. On stale frames, stale control updates, exceptions or process exit, the Orange Pi output layer must immediately command zero motor duty and centred steering; a 250 ms process-watchdog event requires physical re-arming. This process-level mechanism cannot cover a complete Linux-kernel or hardware-PWM freeze, so the final safety assessment must determine whether an independent hardware enable gate is required.
 
 ## 3. 移动性与机械设计 / Mobility and Mechanical Design
 
@@ -168,9 +166,9 @@ The differentials allow inner and outer wheels to rotate at different speeds dur
 
 ### 3.2 转向保护 / Steering Protection
 
-历史程序曾把逻辑转向量 `-100...100` 映射到约 `35...145°`。当前视觉执行候选为降低首次集成风险，暂用更保守的 `45...135°` 和中位 `90°`。两组都不是最终装车结论；必须架空实测左右机械安全极限并留出余量。更换舵机、舵臂孔位或拉杆长度后必须重新标定。
+历史程序曾把逻辑转向量 `-100...100` 映射到约 `35...145°`。当前GPIO/PWM输出层为降低首次集成风险，默认使用更保守的舵机脉宽范围与中位脉宽；这些都不是最终装车结论。必须架空实测左右机械安全极限并留出余量，更换舵机、舵臂孔位或拉杆长度后必须重新标定。
 
-Historical sketches mapped logical steering `-100...100` to approximately `35...145°`. To reduce first-integration risk, the current vision-executor candidate temporarily uses a more conservative `45...135°` with `90°` centre. Neither range is a final assembled-vehicle result; measure both mechanical limits with the wheels lifted and retain margin. Recalibrate after changing the servo, horn position or link length.
+Historical sketches mapped logical steering `-100...100` to approximately `35...145°`. To reduce first-integration risk, the current GPIO/PWM output layer uses a conservative default pulse-width range and centre pulse. These are not final assembled-vehicle results; measure both mechanical limits with the wheels lifted and retain margin. Recalibrate after changing the servo, horn position or link length.
 
 ### 3.3 速度、扭矩与几何 / Speed, Torque and Geometry
 
@@ -191,13 +189,13 @@ At a 47 mm wheel diameter, 1692 rpm converts to approximately 4.17 m/s, above th
 
 ### 4.1 控制器与执行器 / Controllers and Actuators
 
-Orange Pi负责摄像头、OpenCV图像处理、赛道判断和红绿障碍策略。Arduino只执行有线命令并控制舵机、电机驱动、启动状态和超时停车。舵机信号接D2，电机驱动接D6 PWM和D7 DIR。
+Orange Pi负责摄像头、OpenCV图像处理、赛道判断、红绿障碍策略、安全状态机以及GPIO/PWM输出。它通过内核PWM直接控制舵机和电机速度，通过3.3 V GPIO控制电机方向并读取物理启动/停止按钮。实际GPIO line和PWM chip/channel必须依据冻结的比赛系统镜像、设备树与实物排针核对后填写，文档不虚构引脚号。
 
-The Orange Pi handles the camera, OpenCV image processing, track interpretation and red/green obstacle strategy. The Arduino only executes wired commands and controls the servo, motor driver, start state and timeout stop. The servo signal uses D2; the motor driver uses D6 PWM and D7 DIR.
+The Orange Pi handles the camera, OpenCV processing, track interpretation, red/green obstacle strategy, safety state machine and GPIO/PWM output. Kernel PWM directly controls steering and motor speed; 3.3 V GPIO controls motor direction and reads the physical start/stop button. Actual GPIO lines and PWM chip/channel values must be filled only after checking the frozen competition image, device tree and physical header; this documentation does not invent pin numbers.
 
-舵机、电机和Orange Pi不得直接由UNO的5 V引脚供电。应使用电机动力支路、Orange Pi独立5 V/3 A稳压支路和控制器/舵机支路，并保持共地。
+舵机和电机不得由Orange Pi排针供电。应使用电机动力支路、Orange Pi独立5 V/3 A稳压支路和舵机独立支路，并保持控制共地。连接驱动器前必须确认其逻辑输入兼容3.3 V；不兼容时使用合适的电平转换或接口电路。
 
-The servo, motor and Orange Pi must not be powered directly from the UNO 5 V pin. Use a motor-power branch, an independent regulated 5 V/3 A Orange Pi branch and a controller/servo branch, with a common ground.
+The servo and motor must not be powered from the Orange Pi header. Use a motor-power branch, an independent regulated 5 V/3 A Orange Pi branch and a separate servo branch, with a common control ground. Confirm 3.3 V compatibility before connecting the driver; otherwise use an appropriate level shifter or interface circuit.
 
 ### 4.2 视觉感知 / Vision Perception
 
@@ -205,9 +203,9 @@ The servo, motor and Orange Pi must not be powered directly from the UNO 5 V pin
 
 The vehicle uses one USB colour camera, with no ultrasonic sensors and no encoder readings. The team purchase record identifies a **160° distorted wide angle, 30 FPS colour, non-night-vision and 480p** version and records GC0308, HBVCAM, CMOS, 0.3 megapixels and driver-free USB. Colour frames distinguish red and green obstacles; wide-angle distortion is handled through calibration, ROI cropping and on-site lighting tests.
 
-安全措施包括上电默认停车、视觉帧超时、串口命令超时、程序退出发送停止、物理启动/停止控制和最坏停车距离测试。
+安全措施包括配置默认禁用、上电默认停车、视觉帧超时、250 ms控制更新看门狗、程序退出清零PWM、物理启动/停止控制、方向切换前先归零电机以及最坏停车距离测试。
 
-Safety measures include stopped-by-default power-up, vision-frame timeout, serial-command timeout, stop-on-exit, physical start/stop control and worst-case stopping-distance tests.
+Safety measures include disabled-by-default configuration, stopped-by-default power-up, vision-frame timeout, a 250 ms control-update watchdog, zero PWM on exit, physical start/stop control, zero motor duty before direction changes and worst-case stopping-distance tests.
 
 ### 4.3 动力预算 / Power Budget
 
@@ -231,12 +229,13 @@ Tests must record battery voltage and current while idle, running vision, travel
 | 团队早期实验 / Earlier team experiments | [`UNO_AT8236`](src源代码/UNO_AT8236_OpenChallenge/UNO_AT8236_OpenChallenge.ino), [`UNO_DRV8701`](src源代码/UNO_DRV8701_OpenChallenge/UNO_DRV8701_OpenChallenge.ino) | 编码器PI和双超声波 / Encoder PI and dual ultrasonic | 团队自主开发，当前不使用 / Team-developed; not currently used |
 | ESP32试验 / ESP32 experiment | [`ESP32_AT8236`](src源代码/ESP32_AT8236_OpenChallenge/ESP32_AT8236_OpenChallenge.ino) | AT8236控制和关闭无线 / AT8236 control and wireless shutdown | 仅参考 / Reference only |
 | 道路工具 / Road tool | [`bev_road.py`](src源代码/bev_road.py) | 亮度、BEV、道路掩膜和连通域 / Brightness, BEV, road mask and components | 需实车标定 / Vehicle calibration required |
-| 视觉原型 / Vision prototype | [`bev_segmentation.py`](src源代码/bev_segmentation.py) | 红绿识别、方向策略、串口和恢复 / Red-green detection, direction strategy, serial and recovery | 当前主要方向 / Current main approach |
-| UNO安全执行候选 / UNO safety-executor candidate | [`VisionSerialExecutor.ino`](src源代码/VisionSerialExecutor/VisionSerialExecutor.ino) | D8启动/停止、命令校验、D2/D6/D7输出、250 ms超时 / D8 start-stop, validation, D2/D6/D7 output and 250 ms timeout | 代码闭环；待实机验证 / Code chain complete; hardware validation pending |
+| 视觉与策略 / Vision and strategy | [`bev_segmentation.py`](src源代码/bev_segmentation.py) | 红绿识别、方向策略、恢复和GPIO输出调用 / Red-green detection, direction strategy, recovery and GPIO-output calls | 当前主要方向 / Current main approach |
+| Orange Pi GPIO/PWM执行 / Orange Pi GPIO/PWM execution | [`orange_pi_gpio.py`](src源代码/orange_pi_gpio.py) | 物理按钮、PWM/DIR输出、限幅、250 ms看门狗和安全释放 / Physical button, PWM/DIR output, limits, 250 ms watchdog and safe release | 语法通过；实际映射和实车验证待完成 / Syntax passed; actual mapping and vehicle validation pending |
+| 上一版串口执行 / Previous serial executor | [`VisionSerialExecutor.ino`](src源代码/VisionSerialExecutor/VisionSerialExecutor.ino) | Arduino串口执行架构的历史记录 / Historical record of the Arduino serial-execution architecture | 当前不安装、不运行 / Not installed or run currently |
 
-两份Python文件已通过语法解析。视觉程序默认速度为0，减速阈值低于避障阈值，制动阶段先停车，并在视频源丢失或程序退出时发送停止命令。UNO候选执行程序已与 `steer,speed` 文本协议闭环，并增加物理启动、畸形行过滤、执行限幅和250 ms本地看门狗。该程序已使用Arduino AVR Boards `1.8.8`与Servo `1.3.0`完成UNO目标编译，占用5544 bytes程序空间和277 bytes全局变量；仍需上传实物、核实驱动器电气兼容性并完成整车集成验证。
+当前三份Python核心文件已通过语法解析。视觉程序默认速度为0，减速阈值低于避障阈值，制动阶段先停车，并在视频源丢失或程序退出时调用安全停止。`orange_pi_gpio.py`将直接硬件访问集中在一个输出层：配置默认 `enabled=false`，只有填写并核验真实映射后才打开GPIO/PWM；上电进入 `WAIT_START`，由物理按钮授权，250 ms无新控制更新进入 `CONTROL_FAILSAFE`，异常或退出时电机归零、舵机回中并释放资源。该实现仍需在冻结系统镜像上完成设备树、PWM占用、3.3 V逻辑兼容性、输出波形和整车停车测试。
 
-Both Python files pass syntax parsing. The vision controller defaults to zero speed, keeps the slow-down threshold below the avoidance threshold, stops before braking actions and sends a stop command when the video source is lost or the program exits. The candidate UNO executor closes the `steer,speed` text path and adds physical start, malformed-line rejection, output limits and a 250 ms local watchdog. It builds for the UNO target with Arduino AVR Boards `1.8.8` and Servo `1.3.0`, using 5,544 bytes of program storage and 277 bytes of global-variable memory. Physical upload, driver electrical compatibility and full-vehicle integration tests are still required.
+The three current core Python files pass syntax parsing. The vision controller defaults to zero speed, keeps the slow-down threshold below the avoidance threshold, stops before recovery braking and invokes a safe stop on video loss or process exit. `orange_pi_gpio.py` centralises direct hardware access in one output layer: `enabled=false` is the default, GPIO/PWM is opened only after real mappings are entered and verified, power-up enters `WAIT_START`, a physical button arms motion, no fresh control update for 250 ms enters `CONTROL_FAILSAFE`, and exceptions or exit zero the motor, centre steering and release resources. Device-tree exposure, PWM ownership, 3.3 V logic compatibility, output waveforms and full-vehicle stopping still require verification on the frozen competition image.
 
 历史Arduino程序中的 `getDistance()`、`move()`、`steer()`、`setup()` 和 `loop()` 仅用于解释早期硬件验证，不代表当前传感器配置。
 
@@ -250,32 +249,33 @@ The early program used a 30 cm target right-wall distance, `KP=2.5` and speed 70
 
 ### 5.3 当前边界与升级 / Current Boundaries and Upgrades
 
-视觉串口当前使用简单的 `steer,speed` 文本行，尚无序号、源时间戳、CRC和确认应答。物理启动和250 ms命令失效停车已在UNO候选程序中实现。透视、HSV、道路密度、红绿通过侧、倒车时间和速度仍需标定；停车区、圈数、方向初始化、无桌面自动启动/恢复和多光照长时间测试仍需完成。
+当前版本不使用板间串口。视觉策略在同一进程内调用受限的GPIO/PWM输出接口，并以单调时钟记录最近一次控制更新；物理启动和250 ms进程级失效停车已在代码中实现。透视、HSV、道路密度、红绿通过侧、倒车时间、速度、实际GPIO/PWM映射、停车区、圈数、方向初始化、无桌面自动启动/恢复和多光照长时间测试仍需完成。由于视觉与执行位于同一Orange Pi，Linux或硬件PWM整体冻结是尚未由进程看门狗覆盖的残余风险。
 
-The current visual serial protocol uses a simple `steer,speed` text line without sequence numbers, source timestamps, CRC or acknowledgement. Physical start and a 250 ms command-failure stop are implemented in the candidate UNO sketch. Perspective, HSV, road density, red/green passing side, reversing time and speed still require calibration; parking, lap counting, direction initialisation, headless startup/recovery and long-duration multi-lighting tests remain incomplete.
+The current version has no inter-board serial link. The vision strategy calls a bounded GPIO/PWM output interface in the same process, using a monotonic clock for the latest control update; physical arming and a 250 ms process-level fail-safe are implemented in code. Perspective, HSV, road density, red/green passing side, reversing time, speed, actual GPIO/PWM mapping, parking, lap counting, direction initialisation, headless startup/recovery and long-duration multi-lighting tests remain incomplete. Because vision and execution share one Orange Pi, a complete Linux or hardware-PWM freeze remains outside the process watchdog's coverage.
 
 ## 6. 系统思维与工程决策 / System Thinking and Engineering Decisions
 
 1. **阿克曼转向 / Ackermann steering：** 更接近汽车并提高直线稳定性，但需要更精确的机械标定。 / More automotive and stable in straight travel, but requires more precise mechanical calibration.
 2. **历史超声波基线 / Historical ultrasonic baseline：** 曾用于验证底盘、舵机和电机方向；当前只保留代码，不作为比赛传感器或安全备份。 / Previously validated chassis, servo and motor direction; retained only as code history, not as a competition sensor or safety backup.
-3. **视觉失效停车 / Stop on vision failure：** 无独立距离传感器时，视觉帧、串口或处理器超时必须立即将电机目标置零。 / Without an independent range sensor, a vision-frame, serial or processor timeout must immediately set the motor target to zero.
+3. **视觉失效停车 / Stop on vision failure：** 无独立距离传感器时，视觉帧或控制更新超时必须立即把电机PWM置零并要求重新授权。 / Without an independent range sensor, a vision-frame or control-update timeout must immediately set motor PWM to zero and require re-arming.
+4. **单板直控取舍 / Single-board direct-control trade-off：** 取消Arduino和串口可减少器件、线束与协议延迟，但视觉、决策和执行进入同一故障域，因此必须明确进程看门狗的边界并评估独立硬件使能保护。 / Removing the Arduino and serial link reduces parts, wiring and protocol latency, but places vision, decision and execution in one fault domain; the process-watchdog boundary and an independent hardware enable must therefore be assessed explicitly.
 
 ## 7. 搭建、编译与上传 / Assembly, Build and Upload
 
-1. 按[机械文档](models模型/README.md)固定底盘、Orange Pi、Arduino、电源、摄像头和支架。 / Mount the chassis, Orange Pi, Arduino, power system, camera and brackets according to the [mechanical documentation](models模型/README.md).
-2. 按[接线文档](schemes原理图/wiring.md)连接舵机、驱动器、摄像头和串口；不要连接历史超声波或编码器。 / Follow the [wiring guide](schemes原理图/wiring.md) for the servo, driver, camera and serial link; do not connect historical ultrasonic or encoder interfaces.
-3. 抬轮上电并确认舵机中位、转向方向、电机方向和物理启动。 / Power on with the wheels lifted and verify servo centre, steering direction, motor direction and physical start control.
-4. 编译 [`VisionSerialExecutor.ino`](src源代码/VisionSerialExecutor/VisionSerialExecutor.ino)，核对PWM/DIR接口并确保115200 baud与Orange Pi一致。 / Build [`VisionSerialExecutor.ino`](src源代码/VisionSerialExecutor/VisionSerialExecutor.ino), verify the PWM/DIR interface and match 115200 baud to the Orange Pi.
-5. 在Orange Pi安装并冻结Python/OpenCV/PySerial依赖，填写真实串口配置。 / Install and freeze Python/OpenCV/PySerial dependencies on the Orange Pi and enter the actual serial configuration.
-6. 先用录像测试视觉，再接摄像头，确认默认速度为0、方向和红绿策略正确。 / Test vision with recordings before connecting the camera; confirm zero default speed, correct direction and correct red/green strategy.
-7. 从低速开始测试直行、弯道、障碍、摄像头断开、串口断开、重启和30分钟稳定性。 / Starting at low speed, test straight travel, turns, obstacles, camera loss, serial loss, restart and 30-minute stability.
-8. 在[测试记录](other其他/tests.md)中保存日期、提交号、参数和结果。 / Record date, commit, parameters and results in the [test records](other其他/tests.md).
+1. 按[机械文档](models模型/README.md)固定底盘、Orange Pi、电源、摄像头、舵机和支架；当前车辆不安装Arduino。 / Mount the chassis, Orange Pi, power system, camera, servo and brackets according to the [mechanical documentation](models模型/README.md); the current vehicle has no Arduino.
+2. 在冻结的比赛镜像上列出 `/dev/gpiochip*` 与 `/sys/class/pwm`，对照排针和设备树确认真实GPIO line、PWM chip/channel及复用关系。 / On the frozen competition image, enumerate `/dev/gpiochip*` and `/sys/class/pwm`, then confirm real GPIO lines, PWM chip/channels and pin multiplexing against the header and device tree.
+3. 按[接线文档](schemes原理图/wiring.md)连接摄像头、物理按钮、舵机与电机驱动器；先确认3.3 V逻辑兼容并保持负载独立供电与控制共地。 / Follow the [wiring guide](schemes原理图/wiring.md) for the camera, physical button, servo and motor driver; verify 3.3 V logic compatibility and keep load power separate with a common control ground.
+4. 安装并冻结Python、OpenCV、NumPy和python-periphery依赖，把 [`gpio_config.example.json`](src源代码/gpio_config.example.json) 复制为本地 `gpio_config.json`，核验后再把 `enabled` 设为 `true`。 / Install and freeze Python, OpenCV, NumPy and python-periphery, copy [`gpio_config.example.json`](src源代码/gpio_config.example.json) to local `gpio_config.json`, and set `enabled` to `true` only after verification.
+5. 保持 `enabled=false` 用录像测试视觉与DRY_RUN输出，确认默认速度为0、方向与红绿策略正确。 / Keep `enabled=false` while testing vision and DRY_RUN output from recordings; confirm zero default speed and correct direction and red/green strategy.
+6. 抬轮执行G-01至G-10，测量PWM频率、占空比、舵机脉宽、方向切换死区和250 ms看门狗停车时间。 / With the wheels lifted, perform G-01 through G-10 and measure PWM frequency, duty cycle, steering pulse widths, direction-change dead time and the 250 ms watchdog stop time.
+7. 从低速开始测试直行、弯道、障碍、摄像头断开、进程终止、重启和30分钟稳定性。 / Starting at low speed, test straight travel, turns, obstacles, camera loss, process termination, restart and 30-minute stability.
+8. 在[测试记录](other其他/tests.md)中保存日期、提交号、镜像版本、映射、参数和结果。 / Record date, commit, image version, mapping, parameters and results in the [test records](other其他/tests.md).
 
 ## 8. 测试、风险与版本管理 / Testing, Risk and Version Management
 
-主要风险包括舵机顶死、电机启动压降、视觉误判或掉帧、摄像头/串口断开、转向符号错误、线束松脱、轮胎打滑、上电即行驶和无线通信未关闭。每次上场前应完成静态、抬轮、低速和完整回合测试。
+主要风险包括舵机顶死、电机启动压降、视觉误判或掉帧、摄像头断开、GPIO/PWM映射错误、3.3 V逻辑不兼容、Linux或PWM冻结、转向符号错误、线束松脱、轮胎打滑、上电即行驶和无线通信未关闭。每次上场前应完成静态、抬轮、低速和完整回合测试。
 
-Main risks include servo mechanical stall, motor-start voltage drop, visual misclassification or dropped frames, camera/serial disconnection, reversed steering sign, loose wiring, tyre slip, movement immediately after power-up and wireless communication left enabled. Complete static, lifted-wheel, low-speed and full-lap tests before every run.
+Main risks include servo mechanical stall, motor-start voltage drop, visual misclassification or dropped frames, camera disconnection, incorrect GPIO/PWM mapping, incompatible 3.3 V logic, a Linux or PWM freeze, reversed steering sign, loose wiring, tyre slip, movement immediately after power-up and wireless communication left enabled. Complete static, lifted-wheel, low-speed and full-lap tests before every run.
 
 后续提交说明应可追溯，例如 `docs: add measured power budget`、`vision: tune obstacle HSV from field data` 和 `hardware: add final wiring diagram`。公开仓库应按规则保持可访问。
 
@@ -284,18 +284,18 @@ Future commit messages should be traceable, for example `docs: add measured powe
 ## 9. 提交前缺口清单 / Pre-Submission Gap Checklist
 
 - [x] 公开YouTube驾驶演示 / Public YouTube driving demonstration.
-- [x] Arduino/ESP32参考程序、Orange Pi视觉原型和源码说明 / Arduino/ESP32 references, Orange Pi vision prototype and source documentation.
+- [x] Orange Pi视觉/GPIO直控程序、配置模板以及上一版本Arduino/ESP32实验记录 / Orange Pi vision/direct-GPIO code, configuration template and previous Arduino/ESP32 experiment records.
 - [x] DXF、BOM、接线、风险、标定、测试和复现资料 / DXF, BOM, wiring, risk, calibration, test and reproduction materials.
 - [x] 2026五维评分地图、缺失证据登记和结构化双语工程日志PDF / 2026 five-dimension map, missing-evidence register and structured bilingual engineering-log PDF.
-- [x] 视觉串口UNO安全执行候选与PNG/SVG接线图 / Vision-serial UNO safety-executor candidate and PNG/SVG wiring diagram.
+- [x] Orange Pi GPIO/PWM安全输出层与现行PNG/SVG接线图 / Orange Pi GPIO/PWM safety-output layer and current PNG/SVG wiring diagram.
 - [x] 正式团队照、冠军照和比赛现场车辆照 / Official team, championship and competition-field vehicle photographs.
 - [ ] 补充车辆前、后、左、右、顶、底六视图 / Add front, rear, left, right, top and bottom vehicle views.
-- [ ] 补充全员趣味照和黄鸣博个人照 / Add an informal full-team photograph and Huang Mingbo's portrait.
+- [ ] 补充全员趣味照 / Add an informal full-team photograph.
 - [ ] 在视频文档填写拍摄日期、提交号和硬件参数 / Add recording date, commit and hardware parameters to the video document.
 - [ ] 补充最终CAD/STL、传动参数和摄像头安装尺寸 / Add final CAD/STL, drivetrain data and camera mounting dimensions.
 - [ ] 以实物核验PNG电路图中的准确器件型号、额定值、逻辑电平、保险和引脚 / Physically verify exact models, ratings, logic levels, fuse and pins in the PNG diagram.
 - [ ] 完成尺寸、质量、速度、电流、转弯半径和完整回合实测 / Measure dimensions, mass, speed, current, turning radius and full-lap time.
-- [ ] 验证物理启动、视觉/通信超时停车并关闭无线 / Verify physical start, vision/communication timeout stop and disabled wireless functions.
+- [ ] 验证物理启动、视觉/控制更新超时停车、Linux/PWM冻结边界并关闭无线 / Verify physical start, vision/control-update timeout stopping, Linux/PWM freeze boundary and disabled wireless functions.
 - [ ] 完成透视、红绿识别、圈数、停车区和停车策略 / Complete perspective, red-green detection, lap counting, parking zone and stopping strategy.
 
 ## 10. 完整文件索引 / Complete File Index
@@ -310,10 +310,12 @@ Future commit messages should be traceable, for example `docs: add measured powe
 | [`UNO_DRV8701`](src源代码/UNO_DRV8701_OpenChallenge/UNO_DRV8701_OpenChallenge.ino) | UNO + DRV8701历史参考 / Historical reference |
 | [`ESP32_AT8236`](src源代码/ESP32_AT8236_OpenChallenge/ESP32_AT8236_OpenChallenge.ino) | ESP32试验参考 / ESP32 experimental reference |
 | [`bev_road.py`](src源代码/bev_road.py) | 道路掩膜和BEV调试 / Road mask and BEV debugging |
-| [`bev_segmentation.py`](src源代码/bev_segmentation.py) | 红绿视觉、方向策略、串口和恢复 / Red-green vision, direction strategy, serial and recovery |
-| [`VisionSerialExecutor.ino`](src源代码/VisionSerialExecutor/VisionSerialExecutor.ino) | 视觉串口、物理启动、限幅和250 ms失效停车 / Vision serial, physical start, limits and 250 ms fail-safe |
+| [`bev_segmentation.py`](src源代码/bev_segmentation.py) | 红绿视觉、方向策略、恢复和GPIO输出调用 / Red-green vision, direction strategy, recovery and GPIO output calls |
+| [`orange_pi_gpio.py`](src源代码/orange_pi_gpio.py) | 现行GPIO/PWM输出、安全状态和250 ms进程看门狗 / Current GPIO/PWM output, safety states and 250 ms process watchdog |
+| [`gpio_config.example.json`](src源代码/gpio_config.example.json) | 默认禁用的GPIO/PWM配置模板 / Disabled-by-default GPIO/PWM configuration template |
+| [`VisionSerialExecutor.ino`](src源代码/VisionSerialExecutor/VisionSerialExecutor.ino) | 上一版本Arduino串口执行记录 / Previous Arduino serial-executor record |
 | [`requirements.txt`](src源代码/requirements.txt) | Python依赖 / Python dependencies |
-| [`serial_config.example.json`](src源代码/serial_config.example.json) | 串口配置示例 / Serial configuration example |
+| [`serial_config.example.json`](src源代码/serial_config.example.json) | 上一版本串口配置记录 / Previous-version serial configuration record |
 
 ### 机械、电气与工程文档 / Mechanical, Electrical and Engineering Documents
 
@@ -321,7 +323,7 @@ Future commit messages should be traceable, for example `docs: add measured powe
 |---|---|
 | [`models模型/README.md`](models模型/README.md) | 底盘、尺寸和模型 / Chassis, dimensions and models |
 | [`HSP94182层板.dxf`](models模型/HSP94182层板.dxf) | 二维层板文件 / 2D plate file |
-| [`wiring.md`](schemes原理图/wiring.md) | 引脚、串口、供电和接线 / Pins, serial, power and wiring |
+| [`wiring.md`](schemes原理图/wiring.md) | GPIO/PWM映射、供电和接线 / GPIO/PWM mapping, power and wiring |
 | [`system-wiring.png`](schemes原理图/system-wiring.png) / [`SVG`](schemes原理图/system-wiring.svg) | 双语系统接线图与可编辑矢量源 / Bilingual system wiring and editable vector source |
 | [`BOM.md`](other其他/BOM.md) | 物料与选型 / Materials and selection |
 | [`processor-orange-pi.md`](other其他/processor-orange-pi.md) | Orange Pi规格、职责和验收 / Orange Pi specifications, role and acceptance |

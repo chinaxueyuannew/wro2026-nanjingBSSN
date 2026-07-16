@@ -1,0 +1,20 @@
+{
+  "enabled": false,
+  "gpiochip": "/dev/gpiochip0",
+  "motor_dir_line": -1,
+  "start_line": -1,
+  "start_active_low": true,
+  "motor_direction_inverted": false,
+  "motor_pwm_chip": -1,
+  "motor_pwm_channel": -1,
+  "motor_pwm_frequency_hz": 20000,
+  "motor_max_duty": 0.65,
+  "servo_pwm_chip": -1,
+  "servo_pwm_channel": -1,
+  "servo_pwm_frequency_hz": 50,
+  "servo_left_us": 1100,
+  "servo_center_us": 1500,
+  "servo_right_us": 1900,
+  "watchdog_ms": 250,
+  "debounce_ms": 60
+}

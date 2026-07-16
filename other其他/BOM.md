@@ -10,10 +10,11 @@ This table separates information confirmed from available material from details 
 
 | 子系统 / Subsystem | 部件 / Component | 当前信息 / Current Information | 数量 / Qty. | 作用 / Purpose | 状态 / Status |
 |---|---|---|---:|---|---|
-| 机械 / Mechanical | 阿克曼底盘 / Ackermann chassis | RF-A101HE-109010203, 260×140×85 mm | 1 | 前轮转向、四驱和差速 / Front steering, four-wheel drive and differentials | 团队确认 / Team confirmed |
+| 机械 / Mechanical | 阿克曼底盘 / Ackermann chassis | 260×140×85 mm基础尺寸记录 / 260×140×85 mm base-size record | 1 | 前轮转向、四驱和差速 / Front steering, four-wheel drive and differentials | 最终装车尺寸待测 / Final assembled size pending |
 | 机械 / Mechanical | 二维层板 / 2D plate | `models模型/HSP94182层板.dxf` | 1 set | 主控、摄像头和电源安装 / Controller, camera and power mounting | 文件已入库，实物待核 / File included; hardware pending |
 | 计算 / Computing | 视觉计算机 / Vision computer | Orange Pi Zero 3W, Allwinner A733, 4 GB LPDDR5 | 1 | 图像采集、识别和决策 / Image capture, recognition and decisions | SKU确认，实机待验 / SKU confirmed; hardware pending |
-| 控制 / Control | 执行控制器 / Execution controller | Arduino UNO R3 | 1 | 接收视觉目标、驱动执行器和超时停车 / Receive vision targets, drive actuators and stop on timeout | 固件和实物待确认 / Firmware and hardware pending |
+| 计算与控制 / Compute and control | 主控与执行控制器 / Main and execution controller | Orange Pi Zero 3W 4GB | 1 | 视觉、策略、GPIO/PWM执行和进程级失效停车 / Vision, strategy, GPIO/PWM execution and process-level fail-safe | 当前架构；GPIO映射待实物冻结 / Current architecture; physical mapping pending |
+| 上一版本 / Previous version | Arduino UNO R3 | 不安装于当前车辆 / Not installed on the current vehicle | 0 | 上一版串口执行控制 / Previous serial execution control | 仅保留历史程序 / Historical code only |
 | 驱动 / Drive | 电机驱动器 / Motor driver | AT8236 or DRV8701/MD02 Pro | 1 | 放大控制信号并驱动电机 / Amplify control signals and drive motor | 实物二选一 / Select from actual hardware |
 | 驱动 / Drive | 带编码器接口电机 / Motor with encoder interface | 6–12 V, 12 CPR, 1:8.864, dual channel | 1 set | 当前只提供四轮动力 / Currently supplies four-wheel drive only | 反馈不使用 / Feedback not used |
 | 转向 / Steering | 舵机 / Servo | 4.5–7 V, 10 kg·cm, 400–800 mA | 1 | 前轮转向 / Front-wheel steering | 规格确认，待实测 / Specification confirmed; measurement pending |
@@ -30,11 +31,17 @@ The current BOM contains no front or right ultrasonic sensor. Chassis encoder in
 
 ## 选型逻辑 / Selection Rationale
 
-### Arduino UNO
+### 当前Orange Pi GPIO直控 / Current Orange Pi Direct GPIO Control
 
-UNO启动快、开发链简单且引脚行为稳定，适合接收Orange Pi有线命令并控制舵机和电机。它不处理图像，也不读取超声波或编码器。最终固件必须上电停车、命令超时停车并限制输出。
+当前版本由Orange Pi同时完成视觉决策与GPIO/PWM执行。电机方向、启动按钮使用3.3 V GPIO，电机速度和舵机使用内核PWM。优点是减少一块控制器和串口链路；代价是Linux进程和GPIO输出属于同一故障域，必须使用上电默认停车、物理按钮、进程级250 ms看门狗、退出清零和实测最坏停车距离。实际GPIO line与PWM chip/channel必须从冻结镜像和实物排针确认。
 
-The UNO starts quickly, has a simple toolchain and predictable pins. It receives wired Orange Pi commands and controls the servo and motor. It performs no image processing and reads neither ultrasonic sensors nor encoders. Final firmware must remain stopped at power-up, stop on command timeout and limit outputs.
+The current version performs both vision decisions and GPIO/PWM execution on the Orange Pi. A 3.3 V GPIO controls motor direction and the physical start button, while kernel PWM controls motor speed and steering. This removes one controller and the serial link, but places Linux processing and actuator output in one failure domain. Stopped-by-default startup, a physical button, a 250 ms process-level watchdog, zero-on-exit and measured worst-case stopping distance are therefore required. Actual GPIO lines and PWM chip/channel values must be confirmed from the frozen image and physical header.
+
+### 上一版Arduino UNO / Previous Arduino UNO Version
+
+Arduino UNO串口执行程序属于上一版本，当前车辆不安装、不供电、不接线。程序保留用于说明迭代过程和两级控制方案的取舍，不能在当前接线图或比赛车辆配置中标为执行控制器。
+
+The Arduino UNO serial executor belongs to the previous version and is not installed, powered or wired in the current vehicle. Its code remains as engineering-history evidence and to explain the trade-off of a two-controller architecture; it must not be presented as the current execution controller or wiring.
 
 ### ESP32
 
@@ -44,9 +51,9 @@ The ESP32 code is an earlier team-developed experimental version and is not used
 
 ### Orange Pi Zero 3W 4GB
 
-团队购买的是带字母W的A733八核Zero 3W 4GB版本，不是H618四核Zero 3。它负责Linux、OpenCV、赛道与障碍识别和高层决策；Arduino负责执行和超时停车。比赛时关闭Wi-Fi 6和Bluetooth 5.4。独立供电按5 V/3 A设计。
+团队购买的是带字母W的A733八核Zero 3W 4GB版本，不是H618四核Zero 3。它负责Linux、OpenCV、赛道与障碍识别、高层决策以及GPIO/PWM执行。比赛时关闭Wi-Fi 6和Bluetooth 5.4。独立供电按5 V/3 A设计。
 
-The team purchased the A733 octa-core Zero 3W 4GB version with the letter W, not the H618 quad-core Zero 3. It runs Linux, OpenCV, track/obstacle recognition and high-level decisions; the Arduino handles execution and timeout stopping. Wi-Fi 6 and Bluetooth 5.4 must be disabled during competition. Use an independent 5 V/3 A supply.
+The team purchased the A733 octa-core Zero 3W 4GB version with the letter W, not the H618 quad-core Zero 3. It runs Linux, OpenCV, track/obstacle recognition, high-level decisions and GPIO/PWM execution. Wi-Fi 6 and Bluetooth 5.4 must be disabled during competition. Use an independent 5 V/3 A supply.
 
 ### USB彩色摄像头 / USB Colour Camera
 

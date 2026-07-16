@@ -42,6 +42,8 @@ This register converts “pending” items into executable tasks. Filenames, met
 | E-07 | 视觉功耗 / Vision power | 摄像头+视觉运行U/I / Camera + vision V/I | 稳态60 s / 60 s steady | 待测 / Pending |
 | E-08 | 电机启动 / Motor start | 峰值电流、电池最低电压、5 V最低值 / Peak current, battery and 5 V minima | 最大记录率，5次 / Highest log rate, five trials | 待测 / Pending |
 | E-09 | 最大转向 / Full steering | 舵机峰值、是否抖动/嗡鸣 / Servo peak, jitter/buzz | 架空，左右各5次 / Lifted, five each side | 待测 / Pending |
+| E-10 | GPIO/PWM映射 / GPIO/PWM mapping | 物理排针、gpiochip/line、PWM chip/channel、overlay / Header, gpiochip/line, PWM chip/channel and overlay | 排针图+设备树+枚举三方核对 / Header + device tree + enumeration | 待冻结 / Pending freeze |
+| E-11 | 3.3 V逻辑 / 3.3 V logic | 驱动器阈值、有效电平、空载波形 / Driver threshold, active level and unloaded waveform | 资料核对+示波器 / Documentation + oscilloscope | 待核 / Pending |
 
 ## D. 视觉与软件 / Vision and Software
 
@@ -53,12 +55,14 @@ This register converts “pending” items into executable tasks. Filenames, met
 | S-04 | 颜色识别 / Colour recognition | 红/绿TP、FN、FP、召回、误检 / Red/green TP, FN, FP, recall, false positives | 分层样本集 / Stratified dataset | 待测 / Pending |
 | S-05 | 延迟 / Latency | 均值、P95、最大端到端延迟 / Mean, P95, max end-to-end latency | 时间戳或高速录像 / Timestamps or high-speed video | 待测 / Pending |
 | S-06 | 稳定性 / Stability | 30 min FPS、温度、掉帧、断连、5 V / 30 min FPS, temperature, drops, disconnects, 5 V | 固定版本连续运行 / Fixed-version endurance | 待测 / Pending |
-| S-07 | 命令解析 / Command parsing | 合法、边界、畸形、超长、重复逗号 / Valid, boundary, malformed, overflow, duplicate comma | 架空串口注入 / Lifted serial injection | 程序已实现，待硬件测 / Implemented; hardware test pending |
-| S-08 | 250 ms看门狗 / 250 ms watchdog | 实际停车时间、重复次数 / Actual stop time and repeats | 断开发送，示波/日志或视频 / Stop sender; trace/log/video | 待测 / Pending |
-| S-09 | 故障后恢复 / Post-fault recovery | 不自动动；重新按键+新命令后恢复 / No automatic motion; button + fresh command | 故障注入 / Fault injection | 待测 / Pending |
+| S-07 | GPIO/PWM边界输出 / GPIO/PWM boundary output | `-100/0/+100`及越界值对应占空比、DIR和舵机脉宽 / Duty, DIR and steering pulses for boundary/out-of-range values | G-04抬轮波形 / Lifted G-04 waveforms | 程序已实现，待硬件测 / Implemented; hardware test pending |
+| S-08 | 250 ms控制更新看门狗 / 250 ms control-update watchdog | 五次实际停车时间、均值、最大值 / Five stop times, mean and maximum | 停止控制更新，示波/日志/视频 / Stop control updates; trace/log/video | 待测 / Pending |
+| S-09 | 故障后恢复 / Post-fault recovery | 不自动运动；重新按键后才恢复 / No automatic motion; recover only after button re-arm | G-05/G-06故障注入 / G-05/G-06 fault injection | 待测 / Pending |
 | S-10 | CW/CCW与障碍 / CW/CCW and obstacles | 通过侧、碰撞、失败、时间 / Passing side, contacts, failures, time | 两方向、红绿组合 / Both directions and colour combinations | 待测 / Pending |
 | S-11 | 连续回合 / Consecutive laps | 至少10回合逐回合记录 / At least ten per-run records | 冻结提交与参数 / Frozen commit and parameters | 待测 / Pending |
 | S-12 | 停车与圈数 / Parking and lap count | 状态机、成功率、边界场景 / State machine, success rate, edge cases | 独立功能+完整赛程 / Unit and full-run tests | 尚未完成 / Not implemented |
+| S-13 | 进程退出清理 / Process-exit cleanup | 异常、Ctrl+C和正常退出均PWM归零/禁用 / PWM zero/disabled on exception, Ctrl+C and normal exit | G-09波形与日志 / G-09 waveform and log | 待测 / Pending |
+| S-14 | 单板冻结边界 / Single-board freeze boundary | 主循环、看门狗线程、用户态进程、GPIO/PWM异常的输出状态 / Output state for loop, watchdog, process and GPIO/PWM faults | 抬轮、限流、可立即断电故障注入 / Lifted, current-limited fault injection | 待测 / Pending |
 
 ## E. 可复现性与提交 / Reproducibility and Submission
 
@@ -66,7 +70,7 @@ This register converts “pending” items into executable tasks. Filenames, met
 |---|---|---|---|
 | R-01 | README | ≥5000字符且首页可找到全部核心证据 / ≥5,000 characters and all evidence discoverable | 已达到篇幅，持续核对链接 / Length met; links checked continuously |
 | R-02 | 有效提交 / Meaningful commits | 主分支至少3条不同工程主题的明确提交 / At least three clear main-branch engineering commits | 由队伍完成 / Team action required |
-| R-03 | 冻结版本 / Frozen versions | OS、内核、Python、OpenCV、PySerial、配置和镜像SHA-256 / OS, kernel, Python, OpenCV, PySerial, config and image SHA-256 | 待板端 / Pending |
-| R-04 | 陌生人复现 / Independent reproduction | 未参与编程者仅看仓库完成架空启动与超时停车 / Non-programmer completes lifted start and timeout using repo only | 待做 / Pending |
+| R-03 | 冻结版本 / Frozen versions | OS、内核、设备树、Python、OpenCV、NumPy、python-periphery、GPIO配置和镜像SHA-256 / OS, kernel, device tree, Python, OpenCV, NumPy, python-periphery, GPIO config and image SHA-256 | 待板端 / Pending |
+| R-04 | 陌生人复现 / Independent reproduction | 未参与编程者仅看仓库完成GPIO/PWM枚举、DRY_RUN、架空启动与超时停车 / Non-programmer completes GPIO/PWM enumeration, DRY_RUN, lifted start and timeout using repo only | 待做 / Pending |
 | R-05 | 视频映射 / Video mapping | 日期、硬件、提交、参数、成功回合与YouTube一致 / Date, hardware, commit, parameters and laps match YouTube | 待补元数据 / Metadata pending |
 | R-06 | 截止快照 / Deadline snapshot | 公共链接、提交SHA、截图、PDF和规则版本归档 / Public link, SHA, screenshot, PDF and rule version archived | 提交前 / Before submission |

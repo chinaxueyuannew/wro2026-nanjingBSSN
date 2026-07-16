@@ -17,10 +17,10 @@ This repository is organised as “rule requirement → design claim → evidenc
 
 | 维度 / Dimension | 已有核心证据 / Existing Core Evidence | 当前证据强度 / Current Evidence Strength | 达到6分仍需 / Still Required for a 6-Point Claim |
 |---|---|---|---|
-| 1. 移动性能与机械设计 / Mobility and mechanical design | [首页机械章节](../README.md#3-移动性与机械设计--mobility-and-mechanical-design)、[机械分析](mechanical-analysis.md)、[模型与DXF](../models模型/README.md)、[测试表](tests.md#4-机械与动力--mechanical-and-power) | 已说明阿克曼、四驱、差速、几何和理论速度；有层板DXF / Ackermann, four-wheel drive, differentials, geometry, theoretical speed and a plate DXF are documented | 最终装车尺寸/质量、舵角、左右转弯半径、速度/扭矩实测、支架图纸、测试前后机械迭代照片 / Final dimensions, mass, steering angles, left/right radius, speed/torque measurements, mount drawings and before/after iteration evidence |
+| 1. 移动性能与机械设计 / Mobility and mechanical design | [首页机械章节](../README.md#3-移动性与机械设计--mobility-and-mechanical-design)、[机械分析](mechanical-analysis.md)、[模型与DXF](../models模型/README.md)、[测试表](tests.md#4-机械电气与整车--mechanical-electrical-and-full-vehicle) | 已说明阿克曼、四驱、差速、几何和理论速度；有层板DXF / Ackermann, four-wheel drive, differentials, geometry, theoretical speed and a plate DXF are documented | 最终装车尺寸/质量、舵角、左右转弯半径、速度/扭矩实测、支架图纸、测试前后机械迭代照片 / Final dimensions, mass, steering angles, left/right radius, speed/torque measurements, mount drawings and before/after iteration evidence |
 | 2. 动力与传感器架构 / Power and sensor architecture | [接线图](../schemes原理图/wiring.md)、[正式系统图](../schemes原理图/system-wiring.png)、[视觉与摄像头](camera-vision.md)、[标定指南](calibration-guide.md)、[FMEA](FMEA.md) | 已明确纯视觉架构、分支供电、共地、噪声和标定流程 / Vision-only architecture, power branches, common ground, interference and calibration method are documented | 实物驱动器/电池/稳压/舵机型号，支路典型与峰值电流、最低电压、保险规格、相机安装实测、故障注入结果 / Exact hardware models, branch currents, minimum voltage, fuse rating, camera pose and fault-injection results |
-| 3. 软件架构与障碍策略 / Software and obstacle strategy | [软件架构](software-architecture.md)、[`bev_segmentation.py`](../src源代码/bev_segmentation.py)、[UNO视觉执行端](../src源代码/VisionSerialExecutor/VisionSerialExecutor.ino)、[测试流程](tests.md) | 已有模块说明、视觉恢复逻辑、Arduino安全状态机和250 ms命令看门狗 / Module documentation, vision recovery logic, Arduino safety state machine and 250 ms watchdog are present | 相机标定参数、停车区与圈数逻辑、边界场景结果、识别率/误检率/延迟/FPS、连续回合数据、最终视频对应提交 / Calibration values, parking/lap logic, edge-case results, recognition metrics, latency/FPS, consecutive-lap data and a video-matched commit |
-| 4. 系统思维与工程决策 / Systems thinking and engineering decisions | [工程日志](engineering-log.md)、[可归档PDF](engineering-log.pdf)、[FMEA](FMEA.md)、[BOM与选型](BOM.md)、[变更记录](CHANGELOG.md) | 已有高低层分工、约束、风险、早期方案与当前纯视觉方案的区别 / High/low-level roles, constraints, risks and the transition from early concepts to the vision-only system are documented | 用实测数据完成至少三条“选择X而非Y”的结论，并给出改动前/后数据 / At least three measured “X rather than Y” decisions with before/after data |
+| 3. 软件架构与障碍策略 / Software and obstacle strategy | [软件架构](software-architecture.md)、[`bev_segmentation.py`](../src源代码/bev_segmentation.py)、[`orange_pi_gpio.py`](../src源代码/orange_pi_gpio.py)、[测试流程](tests.md) | 已有模块说明、视觉恢复、GPIO安全状态机、默认禁用和250 ms进程看门狗 / Module documentation, vision recovery, GPIO safety state, disabled default and 250 ms process watchdog are present | 真实GPIO/PWM映射与波形、相机标定、停车区与圈数逻辑、识别率/误检率/延迟/FPS、连续回合数据、Linux/PWM冻结边界和最终视频对应提交 / Real GPIO/PWM mapping and waveforms, calibration, parking/lap logic, recognition/latency/FPS metrics, consecutive laps, Linux/PWM freeze boundary and a video-matched commit |
+| 4. 系统思维与工程决策 / Systems thinking and engineering decisions | [工程日志](engineering-log.md)、[可归档PDF](engineering-log.pdf)、[FMEA](FMEA.md)、[BOM与选型](BOM.md)、[变更记录](CHANGELOG.md) | 已记录从超声波、Arduino串口执行到当前单板GPIO直控的迭代，以及减少器件与扩大故障域的取舍 / Evolution from ultrasonic and Arduino serial execution to current single-board GPIO control, including the fewer-parts/larger-fault-domain trade-off, is documented | 用实测数据完成至少三条“选择X而非Y”的结论，并给出改动前/后数据 / At least three measured “X rather than Y” decisions with before/after data |
 | 5. 可复现性与GitHub质量 / Reproducibility and GitHub quality | [README](../README.md)、[复现指南](reproduction-guide.md)、[源代码索引](../src源代码/README.md)、[测试](tests.md)、[版本记录](CHANGELOG.md) | 目录沿用官方模板；README超过5000字符；含代码、DXF、接线、测试与版本说明 / Official-template structure; README exceeds 5,000 characters; code, DXF, wiring, tests and version notes are present | 主分支至少3条内容明确的提交、车辆六视图、趣味团队照、最终CAD、冻结软件版本/镜像校验值、陌生队员复现记录 / At least three meaningful main-branch commits, six vehicle views, informal team photo, final CAD, frozen software/image checksums and an independent reproduction record |
 
 ## 3. 维度1：移动性能与机械设计 / Dimension 1: Mobility and Mechanical Design
@@ -49,14 +49,14 @@ The vehicle uses automotive Ackermann steering, front and rear differentials and
 
 ### 4.1 架构主张 / Architecture Claim
 
-当前车辆只以USB彩色摄像头感知赛道和红绿障碍。Orange Pi负责视觉，Arduino负责确定性执行和本地失效停车。选择单摄像头的优势是信息密度高、可同时判断边线、方向和颜色，且机械布置简洁；代价是缺少独立距离冗余，对光照、反光、遮挡、广角畸变、掉帧和计算延迟更加敏感，因此必须通过标定、固定安装、低置信度降速和命令看门狗补偿。
+当前车辆只以USB彩色摄像头感知赛道和红绿障碍。Orange Pi同时完成视觉、决策和GPIO/PWM执行。选择单摄像头的优势是信息密度高、可同时判断边线、方向和颜色，且机械布置简洁；选择单板直控则减少控制器、线束和板间协议延迟。代价是缺少独立距离冗余，且视觉与执行共享故障域，因此必须通过标定、固定安装、低置信度降速、控制更新看门狗、故障注入和独立硬件失效保护评估进行补偿。
 
-The current vehicle uses a USB colour camera as its only track and red-green obstacle sensor. The Orange Pi handles vision; the Arduino provides deterministic execution and local fail-safe stopping. A single camera offers high information density and can interpret borders, direction and colour with simple mechanical layout. The trade-off is no independent ranging redundancy and greater sensitivity to lighting, reflections, occlusion, wide-angle distortion, dropped frames and computation delay, so calibration, rigid mounting, low-confidence slowdown and a command watchdog are mandatory.
+The current vehicle uses a USB colour camera as its only track and red-green obstacle sensor. The Orange Pi performs vision, decisions and GPIO/PWM execution. One camera offers high information density and interprets borders, direction and colour with simple mechanical layout, while single-board direct control reduces controllers, wiring and inter-board protocol latency. The costs are no independent range redundancy and a shared vision/execution fault domain, requiring calibration, rigid mounting, low-confidence slowdown, a control-update watchdog, fault injection and an independent-hardware-fail-safe assessment.
 
 ### 4.2 电源边界 / Power Boundaries
 
-- 电机功率、Orange Pi 5 V/3 A和控制/舵机使用规划支路；UNO 5 V不得承担舵机、电机或Orange Pi大电流。 / Motor power, Orange Pi 5 V/3 A and control/servo use planned branches; the UNO 5 V pin must not carry servo, motor or Orange Pi load current.
-- 大电流回流与USB/串口分开走线但控制地相连；最终保险、线径和稳压额定值必须由实物数据确定。 / High-current return paths are routed separately from USB/serial while control grounds remain common; final fuse, wire gauge and regulator ratings must follow actual hardware data.
+- 电机动力、Orange Pi独立5 V/3 A和舵机4.5–7 V使用独立规划支路；执行器负载不得由Orange Pi排针供电。 / Motor power, independent Orange Pi 5 V/3 A and servo 4.5–7 V use planned branches; actuator loads must not be powered from the Orange Pi header.
+- 大电流回流与USB/GPIO信号分开走线但控制地相连；最终保险、线径和稳压额定值必须由实物数据确定。 / High-current returns are routed separately from USB/GPIO signals while control grounds remain common; final fuse, wire gauge and regulator ratings must follow actual hardware data.
 - 正式图纸：[PNG接线图](../schemes原理图/system-wiring.png)与[接线说明](../schemes原理图/wiring.md)。 / Formal drawing: [PNG wiring diagram](../schemes原理图/system-wiring.png) and [wiring guide](../schemes原理图/wiring.md).
 
 ### 4.3 满分证据包 / Full-Score Evidence Package
@@ -65,7 +65,7 @@ The current vehicle uses a USB colour camera as its only track and red-green obs
 2. 分别记录静止、视觉运行、直行、最大转向、电机启动时的电池电压/电流，以及Orange Pi 5 V最低值。 / Record battery voltage/current and minimum Orange Pi 5 V while idle, running vision, driving straight, steering fully and starting the motor.
 3. 用 `P=U×I` 计算每支路典型/峰值功率和至少25%的设计余量；根据峰值选择保险和稳压。 / Calculate typical/peak branch power with `P=U×I` and at least 25% design margin; select fuse and regulator from peak values.
 4. 标定相机内参、畸变、安装高度/俯仰、ROI、曝光、白平衡和HSV阈值。 / Calibrate intrinsics, distortion, height/pitch, ROI, exposure, white balance and HSV thresholds.
-5. 注入强光、阴影、反光、拔相机、断串口和5 V压降故障，记录停车时间和恢复条件。 / Inject bright light, shadows, reflections, camera loss, serial loss and 5 V sag; record stop time and recovery conditions.
+5. 注入强光、阴影、反光、拔相机、停止控制更新、进程挂起、GPIO/PWM设备异常和5 V压降，记录停车时间、输出状态和恢复条件。 / Inject bright light, shadows, reflections, camera loss, stopped updates, process suspension, GPIO/PWM device errors and 5 V sag; record stopping time, output state and recovery conditions.
 
 ## 5. 维度3：软件架构与障碍应对策略 / Dimension 3: Software and Obstacle Strategy
 
@@ -74,16 +74,17 @@ The current vehicle uses a USB colour camera as its only track and red-green obs
 | 层 / Layer | 文件 / File | 责任 / Responsibility | 安全边界 / Safety Boundary |
 |---|---|---|---|
 | 图像预处理 / Image preprocessing | [`bev_road.py`](../src源代码/bev_road.py) | 亮度、道路候选、实验BEV、连通域 / Brightness, road candidates, experimental BEV and components | 当前不是最终标定BEV / Not yet a final calibrated BEV |
-| 视觉与策略 / Vision and strategy | [`bev_segmentation.py`](../src源代码/bev_segmentation.py) | 红绿HSV、道路密度、CW/CCW、恢复、约20 Hz命令 / Red-green HSV, road density, CW/CCW, recovery and ~20 Hz commands | 初始/退出速度为0；参数需实车冻结 / Zero initial/exit speed; parameters require vehicle freeze |
-| 安全执行 / Safe execution | [`VisionSerialExecutor.ino`](../src源代码/VisionSerialExecutor/VisionSerialExecutor.ino) | 按钮、解析、限幅、舵机、电机、250 ms超时 / Button, parsing, limits, servo, motor and 250 ms timeout | 上电不动；故障后重新按键且需新命令 / No power-on motion; re-arm and fresh command after fault |
+| 视觉与策略 / Vision and strategy | [`bev_segmentation.py`](../src源代码/bev_segmentation.py) | 红绿HSV、道路密度、CW/CCW、恢复和约20 Hz控制更新 / Red-green HSV, road density, CW/CCW, recovery and ~20 Hz control updates | 初始/退出速度为0；参数需实车冻结 / Zero initial/exit speed; parameters require vehicle freeze |
+| GPIO/PWM安全执行 / GPIO/PWM safe execution | [`orange_pi_gpio.py`](../src源代码/orange_pi_gpio.py) | 按钮、GPIO/PWM、限幅、方向切换保护和250 ms超时 / Button, GPIO/PWM, limits, direction-change protection and 250 ms timeout | 默认禁用；上电不动；故障后需重新按键 / Disabled by default; no power-on motion; re-arm after fault |
 
-### 5.2 当前串口契约 / Current Serial Contract
+### 5.2 当前GPIO/PWM执行契约 / Current GPIO/PWM Execution Contract
 
-- 发送格式：`steer,speed\n`，两项均为十进制整数，范围 `-100...100`。 / Format: `steer,speed\n`; both fields are decimal integers in `-100...100`.
-- 发送周期：视觉端约50 ms一次；Arduino只接受完整且范围合法的一行。 / Period: approximately 50 ms from vision; Arduino accepts only a complete in-range line.
-- 安全超时：250 ms无合法命令，电机PWM归零、舵机回中并进入 `COMMS_FAILSAFE`。 / Timeout: after 250 ms without a valid line, motor PWM goes to zero, steering centres and the state becomes `COMMS_FAILSAFE`.
-- 恢复：必须物理按键重新启动，并在按键后收到新合法命令。 / Recovery: physical re-arm is required, followed by a fresh valid command.
-- 协议局限：目前没有序号、源时间戳、CRC和确认；因此不能把该文本协议描述为抗损坏最终协议。 / Limitation: there is no sequence, source timestamp, CRC or acknowledgement, so this text protocol is not claimed to be a corruption-resistant final protocol.
+- 输入：同一进程内调用 `set_control(steer, speed)`，两项逻辑范围为 `-100...100`。 / Input: in-process `set_control(steer, speed)` calls with both logical values in `-100...100`.
+- 更新：视觉循环约每50 ms提交一次新目标，输出层用单调时钟记录最近更新。 / Update: the vision loop submits a target about every 50 ms; the output layer records the latest update on a monotonic clock.
+- 授权：上电处于 `WAIT_START`，去抖后的物理按钮才允许执行。 / Arming: power-up enters `WAIT_START`; only a debounced physical press enables execution.
+- 安全超时：250 ms无新控制更新，电机PWM归零、舵机回中并进入 `CONTROL_FAILSAFE`。 / Timeout: after 250 ms without a fresh update, motor PWM goes to zero, steering centres and state becomes `CONTROL_FAILSAFE`.
+- 恢复：必须重新按物理按钮；方向变化前电机PWM先归零。 / Recovery: physical re-arm is required; motor PWM is zeroed before direction changes.
+- 边界：同进程看门狗不能保证覆盖Linux或PWM整体冻结。 / Boundary: the same-process watchdog cannot guarantee coverage of a complete Linux or PWM freeze.
 
 ### 5.3 满分证据包 / Full-Score Evidence Package
 
@@ -109,9 +110,9 @@ The current vehicle uses a USB colour camera as its only track and red-green obs
 | 选择 / Choice | 放弃或代价 / Alternative or Cost | 选择理由 / Rationale | 验证状态 / Validation |
 |---|---|---|---|
 | 阿克曼而非差速转向 / Ackermann rather than skid steering | 机构和标定更复杂 / More mechanics and calibration | 更接近汽车、直线稳定、轮胎侧滑小 / Automotive motion, straight stability, reduced scrub | 理论说明完成；实测待补 / Rationale complete; measurements pending |
-| Orange Pi高层 + UNO底层 / Orange Pi high level + UNO low level | 两控制器和串口增加复杂度 / Two controllers and serial add complexity | Linux适合视觉，UNO提供确定性输出和本地看门狗 / Linux suits vision; UNO adds deterministic output and local watchdog | 代码闭环已建立；实车待测 / Code chain present; vehicle test pending |
+| Orange Pi单板GPIO/PWM直控 / Orange Pi single-board direct GPIO/PWM | 视觉与执行共享故障域 / Vision and execution share a fault domain | 减少控制器、线束和协议延迟，所有输出集中审查 / Fewer controllers, wires and protocol latency; centralised output review | 代码闭环；映射、波形、整车与冻结边界待测 / Code chain present; mapping, waveforms, vehicle and freeze boundary pending |
 | 单USB彩色摄像头 / One USB colour camera | 无独立距离冗余，受光照影响 / No range redundancy; lighting sensitivity | 同时获取赛道几何和红绿颜色，布置简单 / Track geometry and colour from one sensor, simple layout | 参数与识别指标待实测 / Parameters and metrics pending |
-| 有线串口而非无线控制 / Wired serial rather than wireless control | 需要固定线束 / Requires secured cabling | 延迟稳定、离线可复现、符合比赛通信约束 / Stable latency, offline reproduction and rule alignment | 程序已实现；线束待最终确认 / Implemented; final harness pending |
+| 本地GPIO/PWM而非板间通信 / Local GPIO/PWM rather than inter-board communication | 依赖Linux GPIO/PWM正确配置 / Depends on correct Linux GPIO/PWM configuration | 无无线、无板间协议，延迟路径短 / No radio or inter-board protocol; short latency path | 模板默认禁用；实际资源待冻结 / Template disabled by default; actual resources pending |
 | 开环速度而非编码器PI / Open-loop speed rather than encoder PI | 电量和负载导致速度变化 / Speed varies with battery and load | 当前车辆明确不读取编码器，降低集成复杂度 / Current vehicle does not read encoders; simpler integration | 必须用速度映射与停车距离补偿 / Requires speed/stopping-distance mapping |
 
 ### 6.3 数据驱动结论模板 / Data-Driven Decision Template
@@ -128,7 +129,7 @@ Each final decision must follow: **constraint/problem → candidates X and Y →
 |---|---|---|
 | README不少于5000字符 / README at least 5,000 characters | [`README.md`](../README.md) | 已满足篇幅；继续以内容质量为准 / Length satisfied; quality still governs |
 | 至少3条有效提交 / At least three meaningful commits | Git历史 / Git history | 主分支提交说明仍需由队伍整理；不要把全部修改压成一次提交 / Main-branch messages still need team action; do not squash all work into one commit |
-| 代码 / Code | [`src源代码/`](../src源代码/README.md) | 已有视觉和底层候选程序 / Vision and candidate lower-level code present |
+| 代码 / Code | [`src源代码/`](../src源代码/README.md) | 已有视觉、GPIO/PWM执行与默认禁用配置模板 / Vision, GPIO/PWM execution and disabled-by-default configuration template present |
 | CAD / CAD | [`models模型/`](../models模型/README.md) | 有层板DXF；最终支架CAD待补 / Plate DXF present; final mount CAD pending |
 | 接线 / Wiring | [`schemes原理图/`](../schemes原理图/wiring.md) | 有PNG/SVG图和文字接线；实物型号待核 / PNG/SVG and written wiring present; hardware models pending |
 | 测试流程 / Test procedure | [`tests.md`](tests.md) | 流程与表格齐全；真实数据待录入 / Procedure and tables present; actual data pending |
@@ -139,9 +140,9 @@ Each final decision must follow: **constraint/problem → candidates X and Y →
 
 ### 7.2 独立复现验收 / Independent Reproduction Acceptance
 
-由一名未编写程序的队员仅阅读仓库完成：找到接线、核对引脚、编译UNO、安装依赖、复制串口配置、解释状态机、架空启动、触发通信超时并定位日志。记录所用时间、卡住步骤和文档修改。只有当不需要口头补充时，才可声明“完全可复现”。
+由一名未编写程序的队员仅阅读仓库完成：找到接线、枚举GPIO/PWM、核对物理排针与line/channel、安装依赖、复制默认禁用配置、解释状态机、完成DRY_RUN与架空G-01至G-10、触发控制更新超时并定位日志。记录用时、卡住步骤和文档修改。只有不需要口头补充且所有真实映射有证据时，才可声明“完全可复现”。
 
-A member who did not write the software must use only the repository to locate wiring, verify pins, build the UNO sketch, install dependencies, copy serial configuration, explain the state machine, perform a lifted-wheel start, trigger a communication timeout and locate the logs. Record time, blocked steps and resulting documentation edits. “Fully reproducible” may be claimed only when no verbal additions are required.
+A member who did not write the software must use only the repository to locate wiring, enumerate GPIO/PWM, map the physical header to line/channel values, install dependencies, copy the disabled configuration, explain the state machine, complete DRY_RUN and lifted-wheel G-01 through G-10, trigger a control-update timeout and locate logs. Record time, blocked steps and resulting documentation edits. “Fully reproducible” may be claimed only when no verbal additions are required and all real mappings have evidence.
 
 ## 8. 提交前红线 / Pre-Submission Red Lines
 
@@ -160,4 +161,3 @@ A member who did not write the software must use only the repository to locate w
 | 张隽泽 / Zhang Junze | 尺寸、机械图、转向、六视图 / Dimensions, mechanical drawings, steering, six views | | | |
 | 黄鸣博 / Huang Mingbo | 型号、接线、电流、电压、保险、安全 / Models, wiring, current, voltage, fuse, safety | | | |
 | 薛源 / Xue Yuan | 规则、视频、提交截止与总体验收 / Rules, video, deadline and final acceptance | | | |
-

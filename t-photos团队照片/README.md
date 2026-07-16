@@ -29,13 +29,15 @@ This folder contains the official team photograph, the 2026 WRO China Qualificat
 
 ## 成员照片 / Member Portraits
 
-| 陆昭颖 / Lu Zhaoying | 张隽泽 / Zhang Junze | 黄鸣博 / Huang Mingbo |
+| 陆昭颖 🏳️‍🌈 / Lu Zhaoying | 张隽泽 / Zhang Junze | 黄鸣博 / Huang Mingbo |
 |---|---|---|
 | [![陆昭颖正式成员照 / Formal portrait of Lu Zhaoying](陆昭颖.jpg)](陆昭颖.jpg) | [![张隽泽正式成员照 / Formal portrait of Zhang Junze](张隽泽.jpg)](张隽泽.jpg) | [![黄鸣博正式成员照 / Formal portrait of Huang Mingbo](黄鸣博.jpg)](黄鸣博.jpg) |
 
 ### 陆昭颖形象照 / Additional Portrait of Lu Zhaoying
 
 [![陆昭颖形象照 / Additional portrait of Lu Zhaoying](陆昭颖形象照.jpg)](陆昭颖形象照.jpg)
+
+[陆昭颖自我介绍（中/英/日） / Lu Zhaoying profile (CN/EN/JP)](../other其他/team-profile.md#lu-zhaoying-profile)
 
 ## 制作过程照片索引 / Development Process Index
 
@@ -70,9 +72,9 @@ The future informal team photograph should show every member clearly while avoid
 
 | 角色 Role | 主要职责 Main Responsibilities | 姓名 Name |
 |---|---|---|
-| 程序 / Programming | Orange Pi视觉、算法、串口、调试与测试日志 / vision, algorithms, serial communication, tuning and test logs | 陆昭颖 / Lu Zhaoying |
+| 程序 / Programming | Orange Pi视觉、算法、GPIO控制、调试与测试日志 / vision, algorithms, GPIO control, tuning and test logs | 陆昭颖 / Lu Zhaoying |
 | 结构 / Mechanical Structure | 底盘、摄像头支架、CAD、装配与尺寸复核 / chassis, camera mount, CAD, assembly and dimensional checks | 张隽泽 / Zhang Junze |
-| 电子 / Electronics | 供电、Arduino、电机驱动、舵机和线束 / power, Arduino, motor driver, steering servo and wiring | 黄鸣博 / Huang Mingbo |
+| 电子 / Electronics | 供电、Orange Pi GPIO接口、电机驱动、舵机和线束 / power, Orange Pi GPIO interfaces, motor driver, steering servo and wiring | 黄鸣博 / Huang Mingbo |
 | 教练 / Coach | 项目指导、安全审查、测试计划与比赛准备 / guidance, safety review, test planning and competition preparation | 薛源 / Xue Yuan |
 
 角色可以协作和重叠，但每名队员都应能解释整车的基本工作原理和本人负责部分。

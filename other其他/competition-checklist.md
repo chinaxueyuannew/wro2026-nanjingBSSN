@@ -27,23 +27,23 @@
 ## 电气 / Electrical
 
 - [ ] 电池电压、极性、共地、保险和总开关正常 / Battery voltage, polarity, ground, fuse and main switch are correct.
-- [ ] 舵机、电机和Orange Pi不从UNO 5 V取大电流 / Servo, motor and Orange Pi do not draw high current from UNO 5 V.
-- [ ] Orange Pi 5 V、USB-C、摄像头和串口牢固 / Orange Pi 5 V, USB-C, camera and serial are secure.
+- [ ] 舵机和电机不从Orange Pi排针取大电流 / Servo and motor do not draw load current from the Orange Pi header.
+- [ ] Orange Pi 5 V、USB-C、摄像头、GPIO/PWM和共地连接牢固 / Orange Pi 5 V, USB-C, camera, GPIO/PWM and common-ground connections are secure.
 - [ ] 启动按钮有效，上电保持停止 / Start button works and vehicle stays stopped at power-up.
 - [ ] Wi-Fi、蓝牙和热点关闭，`rfkill`/`ip link`通过 / Wi-Fi, Bluetooth and hotspot disabled; checks pass.
 - [ ] 无异常热、味或舵机嗡鸣 / No abnormal heat, smell or servo buzz.
 
 ## 软件与场地 / Software and Field
 
-- [ ] Arduino程序匹配实车驱动器和视觉协议 / Arduino matches driver and vision protocol.
-- [x] `VisionSerialExecutor.ino` 使用Arduino AVR Boards `1.8.8`和Servo `1.3.0`通过UNO目标编译 / The executor builds for the UNO target with Arduino AVR Boards `1.8.8` and Servo `1.3.0`.
-- [ ] 程序上传至实物UNO，U-01至U-10均有结果和证据 / Upload the sketch to the physical UNO and record results and evidence for U-01 through U-10.
+- [x] `orange_pi_gpio.py` 与视觉程序通过Python语法检查 / `orange_pi_gpio.py` and the vision program pass Python syntax checks.
+- [ ] 冻结并记录实际GPIO line、PWM chip/channel、设备树和权限 / Freeze and record actual GPIO lines, PWM chip/channels, device tree and permissions.
+- [ ] G-01至G-10 GPIO安全测试均有结果和证据 / Record results and evidence for GPIO safety tests G-01 through G-10.
 - [ ] 冻结镜像离线自动启动 / Frozen image autostarts offline.
-- [ ] 识别4 GB、摄像头和串口 / 4 GB, camera and serial are recognised.
+- [ ] 识别4 GB、摄像头、gpiochip和PWM设备 / 4 GB, camera, gpiochip and PWM devices are recognised.
 - [ ] 保存提交、编译和参数 / Commit, build and parameters saved.
 - [ ] 舵机、电机和视觉命令方向正确 / Servo, motor and vision-command directions correct.
 - [ ] 文档与无超声波/编码器实车一致 / Documentation matches no-sensor wiring.
-- [ ] 摄像头、视觉和串口断开均超时停车 / Camera, vision and serial loss all stop on timeout.
+- [ ] 摄像头失效、视觉异常、控制更新停滞和程序退出均停车 / Camera failure, vision exception, stale control update and program exit all stop the vehicle.
 - [ ] 30分钟温度、FPS和5 V正常 / Temperature, FPS and 5 V remain normal for 30 minutes.
 - [ ] ROI、曝光、白平衡和红绿阈值适应现场 / ROI, exposure, white balance and thresholds suit field.
 - [ ] 至少完成一个完整回合 / At least one full lap completed.
