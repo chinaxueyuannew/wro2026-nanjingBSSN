@@ -35,8 +35,8 @@
 3. 根据驱动器打开对应 `.ino`，不要把不同文件夹的程序混合。
 4. 选择开发板和串口，编译并上传；以 115200 baud 打开串口监视器。
 5. 将团队冻结并记录校验值的 Orange Pi Zero 3W 系统镜像写入 microSD；首次配置使用有线显示/键盘或离线配置，不依赖比赛现场网络。
-6. 安装并记录 OpenCV、V4L2 和视觉程序版本，保存 `uname -a`、`free -h`、`lsusb` 与摄像头格式枚举结果。
-7. 配置视觉程序为本地自动启动服务；程序未通过摄像头、串口和参数自检时不得向 Arduino 发送运动命令。
+6. 按 `src源代码/requirements.txt` 安装并记录 OpenCV、NumPy、PySerial 和视觉程序版本，保存 `uname -a`、`free -h`、`lsusb` 与摄像头格式枚举结果。
+7. 先用录像运行 `bev_road.py` 与 `bev_segmentation.py`，复制 `serial_config.example.json` 为 `serial_config.json` 并修改真实串口；再配置视觉程序为本地自动启动服务。程序未通过摄像头、串口和参数自检时不得发送运动命令。
 8. 关闭并验证 Wi-Fi 与蓝牙；保存 `ip link` 和 `rfkill list` 作为合规证据。
 9. 制作系统盘镜像备份，并准备一张已验证的备用 microSD。
 
@@ -44,7 +44,7 @@
 
 1. 抬起驱动轮，只给控制系统上电。
 2. 确认车辆停在 `WAIT_START`，舵机处于中位。
-3. 给 Orange Pi 上电，确认系统、摄像头、视觉进程和有线串口自检通过；拔掉摄像头验证 Arduino 会保持停车或进入故障安全状态。
+3. 给 Orange Pi 上电，确认系统、摄像头、`bev_segmentation.py` 和有线串口自检通过，且初始目标速度为0；拔掉摄像头验证 Arduino 会保持停车或进入故障安全状态。
 4. 按启动按钮，低速确认电机方向、舵机方向、编码器速度和视觉命令方向。
 5. 若任何方向错误，立即停止并修改方向配置；不要在地面高速试错。
 6. 按 `calibration-guide.md` 完成标定，并连续运行30分钟记录 Orange Pi 温度、掉帧、USB重连和5 V电压。

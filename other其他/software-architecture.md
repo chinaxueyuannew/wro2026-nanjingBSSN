@@ -17,6 +17,17 @@ flowchart TB
 
 安全原则：Orange Pi 只能提出目标，不直接写 PWM；Arduino 始终保留输出限幅、命令超时、前方紧急停车和 `WAIT_START`。视觉进程退出、Linux 卡顿、USB 摄像头断开或串口校验失败时，Arduino 在规定时间内减速停车。通信字段与实机验收见 `processor-orange-pi.md`。
 
+### 当前代码与目标架构的对应关系
+
+| 架构模块 | 当前文件 | 已实现 | 尚未实现/验证 |
+|---|---|---|---|
+| 道路预处理 | `src源代码/bev_road.py` | 亮度归一化、实验性映射、道路掩膜和连通域 | 实车地面四点透视标定 |
+| 视觉与规划 | `src源代码/bev_segmentation.py` | 红绿HSV、道路密度、CW/CCW、恢复状态机 | 停车区、圈数、多光照精度和板端稳定性 |
+| 有线通信 | `bev_segmentation.py` 的 `VehicleIO` | 约50 ms发送 `steer,speed`，接收CW/CCW | 序号、时间戳、CRC、应答和底层超时 |
+| 底层控制 | 3个OpenChallenge Arduino/ESP32版本 | 启动、滤波、转弯、速度PI等基础结构 | 与Python协议的最终集成和实车验证 |
+
+上方架构图中的“序号+时间戳+校验”和 `COMMS_FAILSAFE` 是正式比赛目标设计，当前简单文本串口尚未达到这一要求，不能把设计图误当作已完成代码。
+
 ## 2. Arduino 内部分层结构
 
 ```mermaid

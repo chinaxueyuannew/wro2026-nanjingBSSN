@@ -10,7 +10,7 @@ from enum import Enum, auto
 
 NORMALIZED_SIZE = (320, 240)
 PROCESS_SIZE = (512, 512)
-CONFIG_FILE = Path("serial_config.json")
+CONFIG_FILE = Path(__file__).with_name("serial_config.json")
 
 class DriveState(Enum):
     NORMAL = auto()
@@ -44,8 +44,8 @@ class ControlProfile:
     # 减速区与油门控制
     decel_zone_y_start: float = 0.6
     decel_zone_y_end: float = 0.75
-    decel_avoid_thresh: float = 0.6
-    decel_warn_thresh: float = 0.7
+    decel_avoid_thresh: float = 0.8
+    decel_warn_thresh: float = 0.5
     # 信标避障增强（共享减速区域）
     beacon_avoid_h_dist_thresh: float = 0.1
 
@@ -73,8 +73,8 @@ PROFILE_CW = ControlProfile(
     lane_gain=1.0,
     decel_zone_y_start=0.6,
     decel_zone_y_end=0.75,
-    decel_avoid_thresh=0.5,
-    decel_warn_thresh=0.8,
+    decel_avoid_thresh=0.8,
+    decel_warn_thresh=0.5,
     beacon_avoid_h_dist_thresh=0.3
 )
 
@@ -90,8 +90,8 @@ PROFILE_CCW = ControlProfile(
     lane_gain=1.0,
     decel_zone_y_start=0.6,
     decel_zone_y_end=0.75,
-    decel_avoid_thresh=0.5,
-    decel_warn_thresh=0.8,
+    decel_avoid_thresh=0.8,
+    decel_warn_thresh=0.5,
     beacon_avoid_h_dist_thresh=0.3
 )
 
@@ -102,17 +102,22 @@ class VehicleIO:
         self.ser: Optional[serial.Serial] = None
         self.current_steer = 0
         self.current_speed = 0
-        self.target_speed = 100
+        # 安全默认值：程序启动后保持停车，必须由明确操作设置速度。
+        self.target_speed = 0
         self.running = True
         self.switch_command: Optional[str] = None
         self._init_serial()
         threading.Thread(target=self._io_loop, daemon=True).start()
 
     def _load_config(self) -> dict:
-        if not CONFIG_FILE.exists(): 
-            with open(CONFIG_FILE, 'w') as f: json.dump({"port": "COM3", "baudrate": 115200}, f)
-        try: return json.loads(CONFIG_FILE.read_text())
-        except: return {}
+        if not CONFIG_FILE.exists():
+            print(f"ℹ️ Serial config not found: {CONFIG_FILE}; using safe defaults")
+            return {"port": "COM3", "baudrate": 115200}
+        try:
+            return json.loads(CONFIG_FILE.read_text(encoding="utf-8"))
+        except Exception as exc:
+            print(f"⚠️ Invalid serial config: {exc}; using safe defaults")
+            return {"port": "COM3", "baudrate": 115200}
 
     def _init_serial(self):
         try: 
@@ -135,9 +140,18 @@ class VehicleIO:
                 except Exception: pass
             time.sleep(0.05)
     
-    def stop(self): 
+    def stop(self):
+        self.current_steer = 0
+        self.current_speed = 0
+        if self.ser and self.ser.is_open:
+            try:
+                self.ser.write(b"0,0\n")
+                self.ser.flush()
+            except Exception as exc:
+                print(f"⚠️ Failed to send final stop command: {exc}")
         self.running = False
-        if self.ser: self.ser.close()
+        if self.ser:
+            self.ser.close()
 
     def set_control(self, steer: float, speed: int):
         self.current_steer = int(np.clip(steer * 100, -100, 100))
@@ -157,6 +171,8 @@ class Autopilot:
     def __init__(self, video_source: Optional[str], profile: ControlProfile):
         src = int(video_source) if (video_source and video_source.isdigit()) else (video_source or 0)
         self.cap = cv2.VideoCapture(src)
+        if not self.cap.isOpened():
+            raise RuntimeError(f"Unable to open video source: {src}")
         self.profile = profile
         self.io = VehicleIO()
         
@@ -377,7 +393,10 @@ class Autopilot:
                         print(f"🔄 MODE SWITCHED: {new_cmd}")
 
                 ret, frame = self.cap.read()
-                if not ret: break
+                if not ret:
+                    self.io.set_control(0, 0)
+                    print("⚠️ Video source lost; stopping vehicle output")
+                    break
                 
                 # 视觉处理
                 processed_img, dist_map = self._process_vision_layer(cv2.resize(frame, NORMALIZED_SIZE))
@@ -399,7 +418,7 @@ class Autopilot:
                         self.state_start_time = current_time
                         self.last_steer_value = calc_steer
                         self.saved_cruise_speed = self.io.target_speed
-                        self.io.set_control(0, self.emergency_cfg['reverse_speed'])
+                        self.io.set_control(0, 0)
                         print(f"⚠️ EMERGENCY: Obstacle Detected -> BRAKING")
                     else:
                         self.io.set_control(calc_steer, self.io.target_speed * throttle)
